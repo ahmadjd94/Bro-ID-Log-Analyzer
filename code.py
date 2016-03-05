@@ -13,8 +13,8 @@ from PyQt5.QtGui import QIcon
 import sqlite3
 
 class Ui_MainWindow(object):
-    public :
-        global con
+    
+    global con
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(646, 434)
@@ -76,18 +76,21 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusBar)
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.message=QtWidgets.QMessageBox(MainWindow)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
-
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
+
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.message.setDetailedText("this is a freaking test")
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
         self.pushButton.setText(_translate("MainWindow", "Load"))
@@ -101,8 +104,17 @@ class Ui_MainWindow(object):
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.actionAbout.setText(_translate("MainWindow", "about"))
         self.pushButton_2.clicked.connect(self.a)
+        self.actionAbout.triggered.connect(self.a)
 
-    def openFileDialog(self):
+        
+
+    def a (self):
+        self.message.resize(500,300)
+        self.message.setText("this is a graduation project as a requirment for PSUT ")
+        
+        self.message.show()
+
+"""  def openFileDialog(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
 
         if fname[0]:
@@ -133,7 +145,7 @@ class Ui_MainWindow(object):
             openFile(each)
 
 
-
+"""
 if __name__ == "__main__":
     import sys ,glob
 
@@ -142,6 +154,7 @@ if __name__ == "__main__":
     except :
         # showmessgae box to tell the user to use the program with admin permissions 
         sys.exit()
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
