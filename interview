@@ -2,12 +2,27 @@
 	A) should the project be able to deal with the 50 types of log files that BRO provide ?
 	B) should the project deal with single log files or a directory that contains different types of LOG files ?
 2) should the project be able to deal with the scripting capabilites of bro ?
-	ex : writting scripts and executing them inside BRO ?
+	a: writting scripts and executing them inside BRO ?
+	b: should the project be able to deal with the output of BRO Written scripts ?
 3) we are making the software an open source software such that it's source code will be available on 
 	github under GIT license 
 4) BRO is and openBSD/FreeBSD-program , should the project provide support of windows based machines ?
 5 )we will be using SQLITE 3 for log files analysis , should the file based database be secured and encrypted ?
+ and can be the databsae accessed by other hosts on the internet ?
 6) we are using python3 with the GUI creating module PyQt5 and it's internal modules 
 	we will use QT creator to create the  GUI , then the GUI will be converted to python3/PyQt5 using the 
 	PYUIC command 
 7) we may use openGL to create graphs 
+
+
+
+
+
+
+
+
+
+
+
+
+
