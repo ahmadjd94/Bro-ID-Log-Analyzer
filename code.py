@@ -18,6 +18,8 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
     #openCaller=''
     global con
     count=0
+    valid=[]
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(646, 434)
@@ -107,6 +109,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.analysis.setTabEnabled(1,False)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)    # connect event click to function switch2)
         self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
@@ -114,20 +117,30 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.lineEdit.textChanged.connect(self.openFile)    # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)   # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)   # # connect event click to function load
+        self.radioButton.click()
 
     def load(self):     # this function loads the content of the log files into the DB
+        self.progressBar.setValue(0)
         if self.radioButton.isChecked():
             f=open(self.lineEdit.text(),'r')
             i=1
             print(self.count)
             while (i<=self.count):
                 #self.progressBar.setValue(self.progressBar.value()+(i/self.count))
-                self.progressBar.setValue(self.progressBar.value()+self.count/i)
+                self.progressBar.setValue((i/self.count)*100)
                 print(f.readline())
                 i+=1
             f.close()
         elif self.radioButton_2.isChecked():
-            pass
+            v=100/len(self.valid)
+            for each in self.valid:
+                f=open(each,'r')
+                for i in f:
+                    f.readline()
+                f.close()
+                self.progressBar.setValue(self.progressBar.value()+v)
+        self.analysis.setTabEnabled(1,True)
+
 
     def switch1(self):       #functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
         self.lineEdit_2.setDisabled(True)
@@ -159,7 +172,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
 
-            fname = QFileDialog.getOpenFileName(None, 'Open file', '/home','') # error in params
+            fname = QFileDialog.getOpenFileName(None, 'Open file', '/home','*.log') # error in params
             print(fname)
             self.lineEdit.setText(fname[0])
             try:
@@ -179,13 +192,12 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
             print(di)
             os.chdir(di) # change current working directory
             files=(os.listdir()) # make a list of files inside current working dir
-            valid=[]
             for each in files :
                 if fnmatch.fnmatch(each,"*.log"):
                     print(each)
-                    valid.append(each)
-            self.label.setText("the directory you have selected have "+str(len(valid))+" files")
-
+                    self.valid.append(each)
+            self.label.setText("the directory you have selected have "+str(len(self.valid))+" files")
+            self.lineEdit_2.setText(di)
         except NotADirectoryError:   # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
         except :
