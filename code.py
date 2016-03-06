@@ -11,9 +11,11 @@ from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
     QAction, QFileDialog, QApplication)
 from PyQt5.QtGui import QIcon
 import sqlite3
+import os
+import fnmatch
 
 class Ui_MainWindow(object):
-    
+    openCaller=''
     global con
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -28,7 +30,7 @@ class Ui_MainWindow(object):
         self.tab.setObjectName("tab")
         self.radioButton = QtWidgets.QRadioButton(self.tab)
         self.radioButton.setGeometry(QtCore.QRect(70, 100, 198, 19))
-        self.radioButton.setChecked(True)
+
         self.radioButton.setObjectName("radioButton")
         self.radioButton_2 = QtWidgets.QRadioButton(self.tab)
         self.radioButton_2.setGeometry(QtCore.QRect(70, 180, 198, 18))
@@ -90,64 +92,104 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
 
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.message.setDetailedText("this is a freaking test")
+
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
         self.pushButton.setText(_translate("MainWindow", "Load"))
+        self.label.setVisible(False)
         self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
         self.pushButton_2.setText(_translate("MainWindow", "..."))
         self.pushButton_3.setText(_translate("MainWindow", "..."))
         self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.actionAbout.setText(_translate("MainWindow", "about"))
-        self.pushButton_2.clicked.connect(self.a)
+        self.radioButton.clicked.connect(self.switch1)
+        self.radioButton_2.clicked.connect(self.switch2)
+        self.pushButton_2.clicked.connect(self.openFileDialog)
         self.actionAbout.triggered.connect(self.a)
+        self.lineEdit.textChanged.connect(self.openFile)
+        self.pushButton_3.clicked.connect(self.openDirDialog)
+        self.pushButton.clicked.connect(self.load)
+        self.analysis.setTabEnabled(1,False)
 
-        
+    def load(self):
+        if self.radioButton.clicked():
 
-    def a (self):
+
+        elif self.radioButton_2.clicked():
+
+
+    def switch1(self):
+        self.lineEdit_2.setDisabled(True)
+        self.pushButton_3.setDisabled(True)
+        self.lineEdit.setDisabled(False)
+        self.pushButton_2.setDisabled(False)
+    def switch2(self):
+        self.lineEdit.setDisabled(True)
+        self.pushButton_2.setDisabled(True)
+        self.lineEdit_2.setDisabled(False)
+        self.pushButton_3.setDisabled(False)
+    def a(self):
         self.message.resize(500,300)
-        self.message.setText("this is a graduation project as a requirment for PSUT ")
-        
+        self.message.setText("this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
+        self.message.setDetailedText("https://github.com/ahmadjd94/BRO-IDS-Log-files-visualizer-and-analyzer")
         self.message.show()
+    def openFile(self):
+        self.label.setVisible(False)
+        try:
+                file=open(self.lineEdit.text())
+                print (file)
+                count=0
+                for i in file:
+                    count+=1
+                self.label.setText("the selected file has "+str(count)+" lines")
+                self.label.setVisible(True)
+        except FileNotFoundError:
+                self.label.show()
 
-"""  def openFileDialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+    def openFileDialog(self):
 
-        if fname[0]:
-            f = open(fname[0], 'r')
-
-            with f:
-                data = f.read()
-                self.textEdit.setText(data)  
-    def openDirDialog(self):
-
-        pass
-
-    def openFile(self,file):
-        if radioButton.isChecked
+            fname = QFileDialog.getOpenFileName(None, 'Open file', '/home')
+            print(fname)
+            self.lineEdit.setText(fname[0])
             try:
-                f= open(lineEdit.value)
-                for i in f :
-                #should include REGEX to find the rquired patterns
-            except :
-                # launch a message box 
-        else :
+                file=open(fname[0])
+                count=0
+                for i in file:
+                    count+=1
+                self.label.setText("the selected file has "+str(count)+" lines")
+                self.label.setVisible(True)
+                self.lineEdit.setText(fname[0])
+            except FileNotFoundError:
+                self.label.show()
+
+    def openDirDialog(self):
+        try:
+            di=QFileDialog.getExistingDirectory(None,'open dir of log files', '/home', QFileDialog.ShowDirsOnly)
+            print(di)
+            os.chdir(di)
+            files=(os.listdir())
+            valid=[]
+            for each in files :
+                if fnmatch.fnmatch(each,"*.log"):
+                    print(each)
+                    valid.append(each)
+            self.label.setText("the directory you have selected have "+str(len(valid))+" files")
+            print("exception")
+
+        except NotADirectoryError:
+            self.label.setText("make sure you are entering a dir")
+        except :
+            self.label.setText("make sure you have selected a directory")
+        finally:
+            self.label.show()
 
 
-    def openDir():
-        os.chdir(lineEdit_2)
-        files=glob.glob()
-        for each in files :
-            openFile(each)
-
-
-"""
 if __name__ == "__main__":
-    import sys ,glob
+    import sys
 
     try :
         con=sqlite3.connect('analyze.db')
