@@ -14,9 +14,10 @@ import sqlite3
 import os
 import fnmatch
 
-class Ui_MainWindow(object):
-    openCaller=''
+class Ui_MainWindow(object): # Qt creator generated functions and classes
+    #openCaller=''
     global con
+    count=0
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(646, 434)
@@ -106,23 +107,29 @@ class Ui_MainWindow(object):
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.actionAbout.setText(_translate("MainWindow", "about"))
-        self.radioButton.clicked.connect(self.switch1)
-        self.radioButton_2.clicked.connect(self.switch2)
-        self.pushButton_2.clicked.connect(self.openFileDialog)
-        self.actionAbout.triggered.connect(self.a)
-        self.lineEdit.textChanged.connect(self.openFile)
-        self.pushButton_3.clicked.connect(self.openDirDialog)
-        self.pushButton.clicked.connect(self.load)
-        self.analysis.setTabEnabled(1,False)
+        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
+        self.radioButton_2.clicked.connect(self.switch2)    # connect event click to function switch2)
+        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
+        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.lineEdit.textChanged.connect(self.openFile)    # connect event text-changed to function openFile
+        self.pushButton_3.clicked.connect(self.openDirDialog)   # connect event click to function openDirDialog
+        self.pushButton.clicked.connect(self.load)   # # connect event click to function load
 
-    def load(self):
-        if self.radioButton.clicked():
+    def load(self):     # this function loads the content of the log files into the DB
+        if self.radioButton.isChecked():
+            f=open(self.lineEdit.text(),'r')
+            i=1
+            print(self.count)
+            while (i<=self.count):
+                #self.progressBar.setValue(self.progressBar.value()+(i/self.count))
+                self.progressBar.setValue(self.progressBar.value()+self.count/i)
+                print(f.readline())
+                i+=1
+            f.close()
+        elif self.radioButton_2.isChecked():
+            pass
 
-
-        elif self.radioButton_2.clicked():
-
-
-    def switch1(self):
+    def switch1(self):       #functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
         self.lineEdit_2.setDisabled(True)
         self.pushButton_3.setDisabled(True)
         self.lineEdit.setDisabled(False)
@@ -132,27 +139,27 @@ class Ui_MainWindow(object):
         self.pushButton_2.setDisabled(True)
         self.lineEdit_2.setDisabled(False)
         self.pushButton_3.setDisabled(False)
-    def a(self):
-        self.message.resize(500,300)
+    def about(self): #displays the about message if the user selected it from main menu
         self.message.setText("this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
         self.message.setDetailedText("https://github.com/ahmadjd94/BRO-IDS-Log-files-visualizer-and-analyzer")
         self.message.show()
-    def openFile(self):
+    def openFile(self): # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         try:
                 file=open(self.lineEdit.text())
                 print (file)
-                count=0
+                self.count=0
                 for i in file:
-                    count+=1
-                self.label.setText("the selected file has "+str(count)+" lines")
+                    self.count+=1
+                self.label.setText("the selected file has "+str(self.count)+" lines")
                 self.label.setVisible(True)
-        except FileNotFoundError:
+                file.close()
+        except FileNotFoundError: # handling incrorrect file directories / paths
                 self.label.show()
 
-    def openFileDialog(self):
+    def openFileDialog(self):  # displays open file dialog for user to select the required log file
 
-            fname = QFileDialog.getOpenFileName(None, 'Open file', '/home')
+            fname = QFileDialog.getOpenFileName(None, 'Open file', '/home','') # error in params
             print(fname)
             self.lineEdit.setText(fname[0])
             try:
@@ -168,19 +175,18 @@ class Ui_MainWindow(object):
 
     def openDirDialog(self):
         try:
-            di=QFileDialog.getExistingDirectory(None,'open dir of log files', '/home', QFileDialog.ShowDirsOnly)
+            di=QFileDialog.getExistingDirectory(None,'open dir of log files', '/home', QFileDialog.ShowDirsOnly) #error in params
             print(di)
-            os.chdir(di)
-            files=(os.listdir())
+            os.chdir(di) # change current working directory
+            files=(os.listdir()) # make a list of files inside current working dir
             valid=[]
             for each in files :
                 if fnmatch.fnmatch(each,"*.log"):
                     print(each)
                     valid.append(each)
             self.label.setText("the directory you have selected have "+str(len(valid))+" files")
-            print("exception")
 
-        except NotADirectoryError:
+        except NotADirectoryError:   # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
         except :
             self.label.setText("make sure you have selected a directory")
@@ -188,11 +194,11 @@ class Ui_MainWindow(object):
             self.label.show()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # main module
     import sys
 
     try :
-        con=sqlite3.connect('analyze.db')
+        con=sqlite3.connect('analyze.db') # initializing connection to DB // should be in UI init ??
     except :
         # showmessgae box to tell the user to use the program with admin permissions 
         sys.exit()
