@@ -60,9 +60,14 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.pushButton_3 = QtWidgets.QPushButton(self.tab)
         self.pushButton_3.setGeometry(QtCore.QRect(581, 171, 29, 27))
         self.pushButton_3.setObjectName("pushButton_3")
+
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
+        self.graphicsView.setGeometry(QtCore.QRect(65, 11, 521, 281))
+        self.graphicsView.setObjectName("graphicsView")
+        self.analysis.addTab(self.tab_2, "")
         self.analysis.addTab(self.tab_2, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
@@ -118,6 +123,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.pushButton_3.clicked.connect(self.openDirDialog)   # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)   # # connect event click to function load
         self.radioButton.click()
+        self.graphicsView.y
 
     def load(self):     # this function loads the content of the log files into the DB
         self.progressBar.setValue(0)

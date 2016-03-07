@@ -27,7 +27,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -152,6 +152,16 @@
      <attribute name="title">
       <string>Tab 2</string>
      </attribute>
+     <widget class="QGraphicsView" name="graphicsView">
+      <property name="geometry">
+       <rect>
+        <x>65</x>
+        <y>11</y>
+        <width>521</width>
+        <height>281</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
