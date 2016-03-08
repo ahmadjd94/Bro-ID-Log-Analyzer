@@ -20,3 +20,4 @@
 	we will use QT creator to create the  GUI , then the GUI will be converted to python3/PyQt5 using the 
 	PYUIC command
 7) we may use openGL to create graphs
+we may also use pyqtgraph module to draw graphs 
