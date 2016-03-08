@@ -13,9 +13,10 @@ from PyQt5.QtGui import QIcon
 import sqlite3
 import os
 import fnmatch
+import re
 
 class Ui_MainWindow(object): # Qt creator generated functions and classes
-    #openCaller=''
+
     global con
     count=0
     valid=[]
@@ -123,19 +124,26 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.pushButton_3.clicked.connect(self.openDirDialog)   # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)   # # connect event click to function load
         self.radioButton.click()
-        self.graphicsView.y
+
 
     def load(self):     # this function loads the content of the log files into the DB
+                        #this function should use regex to find and match patterns from log files
         self.progressBar.setValue(0)
         if self.radioButton.isChecked():
             f=open(self.lineEdit.text(),'r')
-            i=1
+            i=0
             print(self.count)
-            while (i<=self.count):
-                #self.progressBar.setValue(self.progressBar.value()+(i/self.count))
+            for i in range (self.count):
+
+                inpu=f.readline().split()
+                for each in inpu:
+                    print('k')
+                    #insert into data base for further analysis
+                    #do some operations to the input line
+                    #do pattern matching
                 self.progressBar.setValue((i/self.count)*100)
-                print(f.readline())
-                i+=1
+
+
             f.close()
         elif self.radioButton_2.isChecked():
             v=100/len(self.valid)
@@ -143,6 +151,9 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
                 f=open(each,'r')
                 for i in f:
                     f.readline()
+                    #do some operations to the input line
+                    #do pattern matching
+                    #insert into data base for further analysis
                 f.close()
                 self.progressBar.setValue(self.progressBar.value()+v)
         self.analysis.setTabEnabled(1,True)
