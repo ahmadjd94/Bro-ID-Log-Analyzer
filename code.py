@@ -8,26 +8,29 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit, 
-    QAction, QFileDialog, QApplication)
+    QAction, QFileDialog, QApplication,QMessageBox)
 from PyQt5.QtGui import QIcon
 import sqlite3
 import os
 import fnmatch
+import pyqtgraph as pg
 import re
+
 
 class Ui_MainWindow(object): # Qt creator generated functions and classes
 
     global con
     count=0
+    loaded=False
     valid=[]
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(646, 434)
+        MainWindow.resize(709, 489)
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
         self.analysis = QtWidgets.QTabWidget(self.centralWidget)
-        self.analysis.setGeometry(QtCore.QRect(0, 30, 641, 351))
+        self.analysis.setGeometry(QtCore.QRect(0, 30, 701, 391))
         self.analysis.setMouseTracking(False)
         self.analysis.setObjectName("analysis")
         self.tab = QtWidgets.QWidget()
@@ -67,8 +70,11 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.tab_2.setObjectName("tab_2")
         self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
         self.graphicsView.setGeometry(QtCore.QRect(65, 11, 521, 281))
+        self.graphicsView.setStyleSheet("background-color: rgb(188, 188, 188);")
         self.graphicsView.setObjectName("graphicsView")
-        self.analysis.addTab(self.tab_2, "")
+        self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton_4.setGeometry(QtCore.QRect(560, 320, 97, 27))
+        self.pushButton_4.setObjectName("pushButton_4")
         self.analysis.addTab(self.tab_2, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
@@ -95,6 +101,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
         
 
     def retranslateUi(self, MainWindow):
@@ -115,6 +122,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
         self.analysis.setTabEnabled(1,False)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)    # connect event click to function switch2)
@@ -128,7 +136,14 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
 
     def load(self):     # this function loads the content of the log files into the DB
                         #this function should use regex to find and match patterns from log files
-        self.progressBar.setValue(0)
+        if self.loaded:
+            reply = QMessageBox.question(self.message, 'Message',"are you sure you want to load files", QMessageBox.Yes,QMessageBox.No)
+            if reply==QMessageBox.Yes:
+                self.reset()
+
+            else :
+                return
+
         if self.radioButton.isChecked():
             f=open(self.lineEdit.text(),'r')
             i=0
@@ -136,8 +151,8 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
             for i in range (self.count):
 
                 inpu=f.readline().split()
-                for each in inpu:
-                    print('k')
+                #for each in inpu:
+
                     #insert into data base for further analysis
                     #do some operations to the input line
                     #do pattern matching
@@ -157,6 +172,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
                 f.close()
                 self.progressBar.setValue(self.progressBar.value()+v)
         self.analysis.setTabEnabled(1,True)
+        self.loaded=True
 
 
     def switch1(self):       #functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
@@ -221,6 +237,10 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
             self.label.setText("make sure you have selected a directory")
         finally:
             self.label.show()
+    def reset (self): # this function resets gui components if user tried to reload files
+        self.progressBar.setValue(0)
+        self.analysis.setTabEnabled(1,False)
+        #reset timeline
 
 
 if __name__ == "__main__": # main module

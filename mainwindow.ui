@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>646</width>
-    <height>434</height>
+    <width>709</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>0</x>
       <y>30</y>
-      <width>641</width>
-      <height>351</height>
+      <width>701</width>
+      <height>391</height>
      </rect>
     </property>
     <property name="mouseTracking">
@@ -150,7 +150,7 @@
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Tab 2</string>
+      <string>timeline</string>
      </attribute>
      <widget class="QGraphicsView" name="graphicsView">
       <property name="geometry">
@@ -161,6 +161,22 @@
         <height>281</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(188, 188, 188);</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>320</y>
+        <width>97</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>draw timeline</string>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -170,7 +186,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>646</width>
+     <width>709</width>
      <height>27</height>
     </rect>
    </property>
