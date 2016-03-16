@@ -17,12 +17,12 @@ import pyqtgraph as pg
 import re
 
 
-class Ui_MainWindow(object): # Qt creator generated functions and classes
-
-    global con
-    count=0
-    loaded=False
-    valid=[]
+class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and classes
+    ################################  defining global variable ###################################
+    global con  # connection to DB
+    count=0     # count of lines
+    loaded=False #this variable stores if there is a file loaded into program or not
+    valid = []   #this list stores the valid log files in a directory
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -91,7 +91,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
         self.statusBar = QtWidgets.QStatusBar(MainWindow)
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
-        self.actionAbout = QtWidgets.QAction(MainWindow)
+        self.actionAbout = QtWidgets.QAction(MainWindow)    
         self.actionAbout.setObjectName("actionAbout")
         self.message=QtWidgets.QMessageBox(MainWindow)
         self.menuHelp.addSeparator()
@@ -137,10 +137,9 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
     def load(self):     # this function loads the content of the log files into the DB
                         #this function should use regex to find and match patterns from log files
         if self.loaded:
-            reply = QMessageBox.question(self.message, 'Message',"are you sure you want to load files", QMessageBox.Yes,QMessageBox.No)
-            if reply==QMessageBox.Yes:
+            reply = QMessageBox.question(self.message, 'Message',"are you sure you want to load files", QMessageBox.Yes,QMessageBox.No)# shows a message box to user to  make sure of reloading files
+            if reply==QMessageBox.Yes:     
                 self.reset()
-
             else :
                 return
 
@@ -228,7 +227,7 @@ class Ui_MainWindow(object): # Qt creator generated functions and classes
             for each in files :
                 if fnmatch.fnmatch(each,"*.log"):
                     print(each)
-                    self.valid.append(each)
+                    self.valid.append(each) 
             self.label.setText("the directory you have selected have "+str(len(self.valid))+" files")
             self.lineEdit_2.setText(di)
         except NotADirectoryError:   # exception raised if the selection was not a dir
