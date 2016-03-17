@@ -24,7 +24,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
     loaded=False #this variable stores if there is a file loaded into program or not
     valid = ['conn.log', 'dhcp.log', 'dnp3.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log', 'kerberos.log', 'modbus.log'
         , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log', 'socks.log', 'ssh.log', 'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log', 'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log', 'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log', 'barnyard2.log', 'dpd.log', 'unified2.log', 'weird.log', 'capture_loss.log', 'cluster.log', 'communication.log', 'loaded_scripts.log', 'packet_filter.log', 'prof.log', 'reporter.log', 'stats.log', 'stderr.log', 'stdout.log']
-    
+
 #this list stores the valid log files in a directory
 
     def setupUi(self, MainWindow):
@@ -146,7 +146,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
             else :
                 return
 
-        if self.radioButton.isChecked():
+        if self.radioButton.isChecked() and self.lineEdit.text()!="":
             f=open(self.lineEdit.text(),'r')
             i=0
             print(self.count)
@@ -162,7 +162,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
 
 
             f.close()
-        elif self.radioButton_2.isChecked():
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text()!="":
             v=100/len(self.valid)
             for each in self.valid:
                 f=open(each,'r')
@@ -175,7 +175,10 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                 self.progressBar.setValue(self.progressBar.value()+v)
         self.analysis.setTabEnabled(1,True)
         self.loaded=True
-
+        """else:
+                        self.message.setText("please specifiy a file to load or a directory")
+                        self.message.show()
+"""
 
     def switch1(self):       #functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
         self.lineEdit_2.setDisabled(True)
@@ -194,6 +197,8 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
     def openFile(self): # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         try:
+            path=self.lineEdit.text().split('/')
+            if path[len(path)-1] in self.valid:
                 file=open(self.lineEdit.text())
                 print (file)
                 self.count=0
@@ -202,6 +207,10 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                 self.label.setText("the selected file has "+str(self.count)+" lines")
                 self.label.setVisible(True)
                 file.close()
+            else:
+                self.message.setText("make sure you selected a valid file")
+                self.message.show()
+                self.lineEdit.clear()
         except FileNotFoundError: # handling incrorrect file directories / paths
                 self.label.show()
 
