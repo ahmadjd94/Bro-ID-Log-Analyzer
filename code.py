@@ -150,14 +150,38 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
             f=open(self.lineEdit.text(),'r')
             i=0
             print(self.count)
-            for i in range (self.count):
+            for each in f:
+                if each[0]!="#":
 
-                inpu=f.readline().split()
-                #for each in inpu:
+                    inpu=each.split()
+                    for spl in inpu:
+                      pass#  if
+
 
                     #insert into data base for further analysis
                     #do some operations to the input line
                     #do pattern matching
+
+                elif each[:6]=="#fileds":
+                    indecies=each.split()
+                    timeIndex=indecies.index('ts') #time index
+                    uidIdex=indecies.index("uid") # user Id
+                    sipIndex=indecies.index("id.orig_h") #source IP
+                    spIndex=indecies.index('id.orig_p')     #source Port
+                    dipIndex=indecies.index("id.resp_h")    #Distination IP
+                    dpIndex=indecies.index("id.resp_p")     #Destination Port
+                    protoIndex=indecies.index("proto")      #Protocol type index
+                    serviceIndex=indecies.index("service") #stores the type of service
+                    durationIndex=indecies.index("duration") #stores the duration of service
+                    countOriginBytesIndex=indecies.index("origin_bytes") #count of bytes sent by client
+                    countResponseBytesIndex=indecies.index("resp_bytes") # count of bytes sent by server
+                else:
+                    pass
+
+
+
+
+
                 self.progressBar.setValue((i/self.count)*100)
 
 
@@ -173,12 +197,14 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                     #insert into data base for further analysis
                 f.close()
                 self.progressBar.setValue(self.progressBar.value()+v)
-        self.analysis.setTabEnabled(1,True)
-        self.loaded=True
-        """else:
-                        self.message.setText("please specifiy a file to load or a directory")
-                        self.message.show()
-"""
+            self.analysis.setTabEnabled(1,True)
+            self.loaded=True
+        else:
+            self.message.setText("please specifiy a file to load or a directory")
+            self.message.show()
+
+
+
 
     def switch1(self):       #functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
         self.lineEdit_2.setDisabled(True)
@@ -259,6 +285,9 @@ if __name__ == "__main__": # main module
 
     try :
         con=sqlite3.connect('analyze.db') # initializing connection to DB // should be in UI init ??
+        con.execute("create table analysis  (string time,string SIP,string SP,string DIP,string DP,string protype,int count)")
+        """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
+        ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
     except :
         # showmessgae box to tell the user to use the program with admin permissions 
         sys.exit()
