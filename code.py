@@ -97,19 +97,21 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         self.actionAbout = QtWidgets.QAction(MainWindow)    
         self.actionAbout.setObjectName("actionAbout")
         self.message=QtWidgets.QMessageBox(MainWindow)
+        self.__message2__=QtWidgets.QMessageBox(MainWindow)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
+
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-
+        self.__message2__.setText("error connecting to database")
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
 
         self.radioButton.setText(_translate("MainWindow", "load single file"))
@@ -154,18 +156,28 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                 if each[0]!="#":
 
                     inpu=each.split()
-                    for spl in inpu:
-                      pass#  if
+                    """schema
+                    string time
+                    ,string UID
+                    ,string SIP,
+                    string SP,
+                    string DIP,
+                    string DP,
+                    string protype,
+                    int count)"""
 
-
+                    try:
+                        #brace yourself for the longest sql line ever
+                        con.execute("insert into analysis values("+str(inpu[timeIndex])+","+str(inpu[uidIndex])+","+str(inpu[sipIndex])+","+str(inpu[spIndex])+","+str(inpu[dipIndex])+","+str(inpu[dpIndex])+","+str(inpu[protoIndex])+","+str(inpu[serviceIndex])+","+str(inpu[durationIndex])+","+str(inpu[countOriginBytesIndex])+","+str(inpu[countResponseBytesIndex])+")")
+                    except:
+                        self.message.setText("make sure you have previliges to execute command over data base \n")
                     #insert into data base for further analysis
                     #do some operations to the input line
                     #do pattern matching
-
                 elif each[:6]=="#fileds":
                     indecies=each.split()
                     timeIndex=indecies.index('ts') #time index
-                    uidIdex=indecies.index("uid") # user Id
+                    uidIndex=indecies.index("uid") # user Id
                     sipIndex=indecies.index("id.orig_h") #source IP
                     spIndex=indecies.index('id.orig_p')     #source Port
                     dipIndex=indecies.index("id.resp_h")    #Distination IP
@@ -223,6 +235,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
     def openFile(self): # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         try:
+
             path=self.lineEdit.text().split('/')
             if path[len(path)-1] in self.valid:
                 file=open(self.lineEdit.text())
@@ -260,6 +273,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         try:
             di=QFileDialog.getExistingDirectory(None,'open dir of log files', '/home', QFileDialog.ShowDirsOnly) #error in params
             print(di)
+
             os.chdir(di) # change current working directory
             files=(os.listdir()) # make a list of files inside current working dir
             for each in files :
@@ -282,20 +296,27 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
 
 if __name__ == "__main__": # main module
     import sys
-
-    try :
-        con=sqlite3.connect('analyze.db') # initializing connection to DB // should be in UI init ??
-        con.execute("create table analysis  (string time,string SIP,string SP,string DIP,string DP,string protype,int count)")
-        """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
-        ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
-    except :
-        # showmessgae box to tell the user to use the program with admin permissions 
-        sys.exit()
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+    try :
+        con=sqlite3.connect('analyze.db') # initializing connection to DB // should be in UI init ??
+        try:
+            con.execute("drop table analysis")
+        except:
+            raise Exception
+            print("table doest exist")
+
+        finally:
+            con.execute("create table analysis ( time text, UID text,SIP text, SP text,DIP text,DP text,protype text, count integer)")
+
+        """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
+        ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
+    except :
+        ui.__message2__.show()
+
+
     sys.exit(app.exec_())
 
