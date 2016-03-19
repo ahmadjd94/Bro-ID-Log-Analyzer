@@ -1,0 +1,34 @@
+######THIS FILE IS WRITTEN TO EASE THE MAKING OF GANTT CHART #########################
+Phase 1  equirments specification (2016/3/7-in progress) :
+		MORE REQUIRMENTS MUST BE COLLECTED ABOUT THE GUI 	
+	
+_______________________________________________________________________
+	
+Phase 2 DٍٍُESIGN THE GUI (started 2016/3/7-onging ):
+
+	design file loading tab (2016/3/8 - 2016/3/11 COMPLETED)	
+	using pyqtgraph to graph timeline of packets : pending
+	correlation building  (pending ) 
+______________________________________________________________________
+PHASE 3  IMPLEMENT LOAD FILES (8/3/2016-12/3/2016 Completed): 
+
+	 load single files (2016/3/8-2016/3/11 completed)
+	 load DIR of files (2016/3/8-2016/3/11 completed)
+______________________________________________________________________
+phase 4 (2016/3/15-26/3/2016) DATABASE CONNECTING AND SETTING UP:
+
+	connect database : ( 2016/3/15 done  )
+	database broad exceptions handling at main function : incomplete 
+	load files into database : done (testing is pending ) + no primary key is specified 
+	normalize database : 2016/3/20 check interview file 
+	
+______________________________________________________________________
+
+
+
+
+
+
+
+
+
