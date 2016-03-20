@@ -23,10 +23,10 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
     count=0     # count of lines
     loaded=False #this variable stores if there is a file loaded into program or not
     valid = ['conn.log', 'dhcp.log', 'dnp3.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log', 'kerberos.log', 'modbus.log'
-        , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log', 'socks.log', 'ssh.log', 'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log', 'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log', 'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log', 'barnyard2.log', 'dpd.log', 'unified2.log', 'weird.log', 'capture_loss.log', 'cluster.log', 'communication.log', 'loaded_scripts.log', 'packet_filter.log', 'prof.log', 'reporter.log', 'stats.log', 'stderr.log', 'stdout.log']
+        , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log', 'socks.log',  'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log', 'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log', 'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log', 'barnyard2.log', 'dpd.log', 'unified2.log', 'weird.log', 'capture_loss.log', 'cluster.log', 'communication.log', 'loaded_scripts.log', 'packet_filter.log', 'prof.log', 'reporter.log', 'stats.log', 'stderr.log', 'stdout.log']
 
 #this list stores the valid log files in a directory
-
+										
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(709, 489)
