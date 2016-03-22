@@ -22,8 +22,8 @@
 7) we may use openGL to create graphs
 we may also use pyqtgraph module to draw graphs 
 
-
+####################################################################################> cursor 
 8) should the data base be normalized ? although the data base schema is 
 table analysis ( time text, UID text,SIP text, SP text,DIP text,DP text,protype text, count integer)?
 
-
+9) is the program structured or OOP ??
