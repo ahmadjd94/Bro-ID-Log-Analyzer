@@ -79,6 +79,23 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         self.pushButton_4.setGeometry(QtCore.QRect(560, 320, 97, 27))
         self.pushButton_4.setObjectName("pushButton_4")
         self.analysis.addTab(self.tab_2, "")
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.textEdit = QtWidgets.QTextEdit(self.tab_3)
+        self.textEdit.setGeometry(QtCore.QRect(30, 30, 371, 91))
+        self.textEdit.setObjectName("textEdit")
+        self.pushButton_5 = QtWidgets.QPushButton(self.tab_3)
+        self.pushButton_5.setGeometry(QtCore.QRect(450, 70, 141, 27))
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.tableView = QtWidgets.QTableView(self.tab_3)
+        self.tableView.setGeometry(QtCore.QRect(30, 150, 591, 192))
+        self.tableView.setAutoFillBackground(False)
+        self.tableView.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.tableView.setObjectName("tableView")
+        self.analysis.addTab(self.tab_3, "")
+        self.label_2 = QtWidgets.QLabel(self.tab_3)
+        self.label_2.setGeometry(QtCore.QRect(30, 120, 411, 17))
+        self.label_2.setObjectName("label_2")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 646, 27))
@@ -96,6 +113,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         MainWindow.setStatusBar(self.statusBar)
         self.actionAbout = QtWidgets.QAction(MainWindow)    
         self.actionAbout.setObjectName("actionAbout")
+
         self.message=QtWidgets.QMessageBox(MainWindow)
         self.__message2__=QtWidgets.QMessageBox(MainWindow)
         self.menuHelp.addSeparator()
@@ -126,9 +144,14 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
+        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
         self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.label_2.setStyleSheet("color : green")
         self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
+        self.label_2.setVisible(False)
         self.analysis.setTabEnabled(1,False)
+        #self.analysis.setTabEnabled(2,False)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)    # connect event click to function switch2)
         self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
@@ -136,7 +159,32 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         self.lineEdit.textChanged.connect(self.openFile)    # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)   # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)   # # connect event click to function load
+        self.textEdit.textChanged.connect(self.uMan)
+        self.pushButton_5.clicked.connect(self.executeSQL)
         self.radioButton.click()
+
+    def uMan(self):
+        self.label_2.setVisible(False)
+
+
+    def executeSQL(self):
+        command=self.textEdit.toPlainText()
+        try :
+            con.execute(command)
+        #select statments and insertion queried results into the table view
+        #handle tables that doesnt exist -> show text boxes that show the suitbale hint
+        #handle SQLITE syntax errors
+            self.label_2.setText("command executed successfully")
+            self.label_2.setStyleSheet("color:green")
+            self.label_2.setVisible(True)
+        except sqlite3.OperationalError as err:
+            print(str(err))
+            self.message.setText("make sure you have entered a valid SQLite3 command  ")
+            self.message.setDetailedText(str(err))
+            self.label_2.setText("error executing SQL command")
+            self.label_2.setStyleSheet("color : red")
+            self.label_2.setVisible(True)
+            self.message.show()
 
 
     def load(self):     # this function loads the content of the log files into the DB
@@ -210,6 +258,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                 f.close()
                 self.progressBar.setValue(self.progressBar.value()+v)
             self.analysis.setTabEnabled(1,True)
+            self.analysis.setTabEnabled(2,True)
             self.loaded=True
         else:
             self.message.setText("please specifiy a file to load or a directory")
