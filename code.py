@@ -13,15 +13,16 @@ from PyQt5.QtGui import QIcon
 import sqlite3
 import os       #module used for changing Current working directory of the program
 import fnmatch   # module used for matching files names
-import pyqtgraph as pg
+#import pyqtgraph as pg
 import re
 
 
 class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and classes
     ################################  defining global variable ###################################
     global con  # connection to DB
-    count=0     # count of lines
+    linesCount=0     # count of lines
     loaded=False #this variable stores if there is a file loaded into program or not
+    validFiles =[]
     valid = ['conn.log', 'dhcp.log', 'dnp3.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log', 'kerberos.log', 'modbus.log'
         , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log', 'socks.log',  'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log', 'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log', 'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log', 'barnyard2.log', 'dpd.log', 'unified2.log', 'weird.log', 'capture_loss.log', 'cluster.log', 'communication.log', 'loaded_scripts.log', 'packet_filter.log', 'prof.log', 'reporter.log', 'stats.log', 'stderr.log', 'stdout.log']
 
@@ -59,7 +60,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         self.lineEdit_2.setGeometry(QtCore.QRect(280, 170, 281, 25))
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.label = QtWidgets.QLabel(self.tab)
-        self.label.setGeometry(QtCore.QRect(70, 260, 351, 17))
+        self.label.setGeometry(QtCore.QRect(70, 260, 410, 17))
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
         self.pushButton_2.setGeometry(QtCore.QRect(581, 90, 29, 27))
@@ -199,30 +200,12 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         if self.radioButton.isChecked() and self.lineEdit.text()!="":
             f=open(self.lineEdit.text(),'r')
             i=0
-            print(self.count)
+            #print(self.linesCount)
             for each in f:
-                if each[0]!="#":
-
-                    inpu=each.split()
-                    """schema
-                    string time
-                    ,string UID
-                    ,string SIP,
-                    string SP,
-                    string DIP,
-                    string DP,
-                    string protype,
-                    int count)"""
-
-                    try:
-                        #brace yourself for the longest sql line ever
-                        con.execute("insert into analysis values("+str(inpu[timeIndex])+","+str(inpu[uidIndex])+","+str(inpu[sipIndex])+","+str(inpu[spIndex])+","+str(inpu[dipIndex])+","+str(inpu[dpIndex])+","+str(inpu[protoIndex])+","+str(inpu[serviceIndex])+","+str(inpu[durationIndex])+","+str(inpu[countOriginBytesIndex])+","+str(inpu[countResponseBytesIndex])+")")
-                    except:
-                        self.message.setText("make sure you have previliges to execute command over data base \n")
-                    #insert into data base for further analysis
-                    #do some operations to the input line
-                    #do pattern matching
-                elif each[:6]=="#fileds":
+                print (each)
+                inpu=each.split()
+                if each[:7]=="#fileds":
+                    print(each)
                     indecies=each.split()
                     timeIndex=indecies.index('ts') #time index
                     uidIndex=indecies.index("uid") # user Id
@@ -235,20 +218,32 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                     durationIndex=indecies.index("duration") #stores the duration of service
                     countOriginBytesIndex=indecies.index("origin_bytes") #count of bytes sent by client
                     countResponseBytesIndex=indecies.index("resp_bytes") # count of bytes sent by server
+                    print("wtf is this shit ?")
+                elif each[0]!="#": # lines that begin with # denote comment lines
+
+                    try:
+
+                        #brace yourself for the longest sql line ever
+                        print("dfgh")
+                        #con.execute("insert into analysis values("+str(inpu[timeIndex])+","+str(inpu[uidIndex])+","+str(inpu[sipIndex])+","+str(inpu[spIndex])+","+str(inpu[dipIndex])+","+str(inpu[dpIndex])+","+str(inpu[protoIndex])+","+str(inpu[serviceIndex])+","+str(inpu[durationIndex])+","+str(inpu[countOriginBytesIndex])+","+str(inpu[countResponseBytesIndex])+")")
+                    except:
+                        self.message.setText("make sure you have previliges to execute command over data base \n")
+                    #insert into data base for further analysis
+                    #do some operations to the input line
+                    #do pattern matching
+
                 else:
-                    pass
+                    print("dfgh")
+                    con.execute("insert into analysis values ('"+inpu[timeIndex]+"','"+each[uidIndex]+"','"+each[sipIndex]+"','"+each[spIndex]+"','"+each[dipIndex]+"','"+each[dpIndex]+"','"+each[protoIndex]+"','"+each[serviceIndex]+"','"+each[durationIndex]+"','"+each[countOriginBytesIndex]+"','"+each[countResponseBytesIndex]+"'")
 
 
-
-
-
-                self.progressBar.setValue((i/self.count)*100)
+                self.progressBar.setValue((i/self.linesCount)*100)
 
 
             f.close()
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text()!="":
-            v=100/len(self.valid)
-            for each in self.valid:
+            v=100/len(self.validFiles)
+            for each in self.validFiles:
                 f=open(each,'r')
                 for i in f:
                     f.readline()
@@ -286,12 +281,13 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         try:
 
             path=self.lineEdit.text().split('/')
-            if path[len(path)-1] in self.valid:
+            name =path[len(path)-1]
+            if name in self.valid or ".log" in name:
                 file=open(self.lineEdit.text())
                 print (file)
                 self.count=0
                 for i in file:
-                    self.count+=1
+                    self.linesCount+=1
                 self.label.setText("the selected file has "+str(self.count)+" lines")
                 self.label.setVisible(True)
                 file.close()
@@ -299,7 +295,7 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
                 self.message.setText("make sure you selected a valid file")
                 self.message.show()
                 self.lineEdit.clear()
-        except FileNotFoundError: # handling incrorrect file directories / paths
+        except FileNotFoundError: # handling incorrect file directories / paths
                 self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
@@ -322,14 +318,13 @@ class Ui_MainWindow(object): # Qt and PYUIC creator generated functions and clas
         try:
             di=QFileDialog.getExistingDirectory(None,'open dir of log files', '/home', QFileDialog.ShowDirsOnly) #error in params
             print(di)
-
             os.chdir(di) # change current working directory
             files=(os.listdir()) # make a list of files inside current working dir
             for each in files :
-                if fnmatch.fnmatch(each,"*.log"):
+                if fnmatch.fnmatch(each,"*.log")or each in self.valid:
                     print(each)
-                    self.valid.append(each) 
-            self.label.setText("the directory you have selected have "+str(len(self.valid))+" files")
+                    self.validFiles.append(each)
+            self.label.setText("the directory you have selected have "+str(len(self.validFiles))+" files seem to be valid ")
             self.lineEdit_2.setText(di)
         except NotADirectoryError:   # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
@@ -359,9 +354,11 @@ if __name__ == "__main__": # main module
             print("table doest exist")
 
         finally:
-            con.execute("create table analysis ( time text, UID text,SIP text, SP text,DIP text,DP text,protype text, count integer)")
+            con.execute("""create table analysis ( time text, UID text,SIP text, SP text,DIP text,
+            DP text,protype text,service text,duration text, origin text, response text)""")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
+
         ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
     except :
         ui.__message2__.show()
