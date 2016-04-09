@@ -173,8 +173,28 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_2.setVisible(False)
 
     def executeSQL(self):
-        command = self.textEdit.toPlainText()
+        command = self.textEdit.toPlainText().lower()
         try:
+            if "select" in command :
+                try:
+                 result=con.execute(command).fetchall()
+                 for i in result:
+                     for each in i:
+                         pass
+                        # this lines should inseert the result of select statments into the tableview
+
+                except:
+                    pass
+
+            if "insert" in command:
+                try:
+                    con.execute(command)
+                except :
+                    self.message.setText("error inserting rows to table")
+
+
+
+
             con.execute(command)
             # select statments and insertion queried results into the table view
             # handle tables that doesnt exist -> show text boxes that show the suitbale hint
