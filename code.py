@@ -174,25 +174,39 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
+        s=False
         try:
             if "select" in command :
-                try:
-                 result=con.execute(command).fetchall()
-                 for i in result:
-                     for each in i:
-                         pass
+                s=True
+                result=con.execute(command).fetchall()
+                for i in result:
+                        for each in i:
+                            pass
                         # this lines should inseert the result of select statments into the tableview
 
-                except:
-                    pass
+
 
             if "insert" in command:
-                try:
+
                     con.execute(command)
-                except :
-                    self.message.setText("error inserting rows to table")
+        except sqlite3.OperationalError as err:
+            print(str(err))
 
+            if s :
+                self.message.setText("error selecting rows from data base")
 
+            else:
+                 self.message.setText("error inserting rows into database")
+
+            self.message.setDetailedText(str(err))
+            self.label_2.setText("error executing SQL command")
+            self.label_2.setStyleSheet("color : red")
+            self.label_2.setVisible(True)
+            self.message.show()
+
+        except :
+
+            self.message.show()
 
 
             con.execute(command)
@@ -202,14 +216,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label_2.setText("command executed successfully")
             self.label_2.setStyleSheet("color:green")
             self.label_2.setVisible(True)
-        except sqlite3.OperationalError as err:
-            print(str(err))
-            self.message.setText("make sure you have entered a valid SQLite3 command  ")
-            self.message.setDetailedText(str(err))
-            self.label_2.setText("error executing SQL command")
-            self.label_2.setStyleSheet("color : red")
-            self.label_2.setVisible(True)
-            self.message.show()
 
     def load(self):  # this function loads the content of the log files into the DB
         # this function should use regex to find and match patterns from log files
