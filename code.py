@@ -182,13 +182,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 for i in result:
                         for each in i:
                             pass
-                        # this lines should inseert the result of select statments into the tableview
+                        # this lines should insert the result of select statments into the tableview
 
 
 
             if "insert" in command:
 
                     con.execute(command)
+            else:
+                con.execute(command)
+                self.label_2.setStyleSheet("color: green")
+                self.label_2.setText("operation succeded")
+                self.label_2.show()
+
         except sqlite3.OperationalError as err:
             print(str(err))
 
@@ -208,19 +214,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             self.message.show()
 
-
-            con.execute(command)
-            # select statments and insertion queried results into the table view
-            # handle tables that doesnt exist -> show text boxes that show the suitbale hint
-            # handle SQLITE syntax errors
-            self.label_2.setText("command executed successfully")
-            self.label_2.setStyleSheet("color:green")
-            self.label_2.setVisible(True)
-
     def load(self):  # this function loads the content of the log files into the DB
+
         # this function should use regex to find and match patterns from log files
         timeIndex = uidIndex = sipIndex = spIndex = dipIndex = dpIndex = protoIndex = serviceIndex = durationIndex = countOriginBytesIndex = countResponseBytesIndex = 0
         connStateIndex = localOrig = localResp = missedBytes = history = origPkts = origIPBytes = respPkts = respIPBytes = tunnelParents = 0
+
         if self.loaded:
             reply = QMessageBox.question(self.message, 'Message', "there is files already loaded into databse ,are you sure you want to load files",
                                          QMessageBox.Yes,
@@ -277,6 +276,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             inpu[countOriginBytesIndex], inpu[countResponseBytesIndex], inpu[connStateIndex],
                             inpu[localOrig], inpu[localResp], inpu[missedBytes],
                             inpu[history], inpu[origPkts], inpu[origIPBytes], inpu[respPkts], inpu[respIPBytes],str(inpu[tunnelParents])))
+
                 else:  # lines that begin with # denote comment lines
 
                     try:
@@ -293,6 +293,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.progressBar.setValue((i / self.linesCount) * 100)
 
             f.close()
+
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":
             v = 100 / len(self.validFiles)
             for each in self.validFiles:
@@ -411,10 +412,15 @@ if __name__ == "__main__":  # main module
             print("table doest exist")
 
         finally:
-            con.execute("""create table analysis ( time text, UID text,SIP text, SP text,DIP text,
-                                    DP text,protype text,service text,duration text, origin text, response text,connState text ,localOrig text ,localResp text,
-                                    missedBytes text,history text ,origPkts text ,origIPBytes text ,respPkts text ,
-                                    respIPBytes text,tunnelParents)""")
+            con.execute("""create table analysis ( time text DEFAULT NULL, UID text NOT NULL,SIP textNOT NULL,
+                                    SP text NOT NULL,DIP text NOT NULL,
+                                    DP text NOT NULL,protype text DEFAULT NULL,service text DEFAULT NULL,
+                                    duration text DEFAULT NULL, origin text DEFAULT NULL,
+                                    response text DEFAULT NULL ,connState text DEFAULT NULL ,localOrig text DEFAULT NULL,
+                                    localResp text DEFAULT NULL,
+                                    missedBytes text DEFAULT NULL,history text DEFAULT NULL,origPkts text DEFAULT NULL,
+                                    origIPBytes text DEFAULT NULL,respPkts text DEFAULT NULL,
+                                    respIPBytes text DEFAULT NULL,tunnelParents DEFAULT NULL)""")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
