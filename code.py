@@ -222,7 +222,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         timeIndex = uidIndex = sipIndex = spIndex = dipIndex = dpIndex = protoIndex = serviceIndex = durationIndex = countOriginBytesIndex = countResponseBytesIndex = 0
         connStateIndex = localOrig = localResp = missedBytes = history = origPkts = origIPBytes = respPkts = respIPBytes = tunnelParents = 0
         if self.loaded:
-            reply = QMessageBox.question(self.message, 'Message', "are you sure you want to load files",
+            reply = QMessageBox.question(self.message, 'Message', "there is files already loaded into databse ,are you sure you want to load files",
                                          QMessageBox.Yes,
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
