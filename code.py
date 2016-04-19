@@ -230,7 +230,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return
 
         if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            f = open(self.lineEdit.text(), 'r')
+            f       = open(self.lineEdit.text(), 'r')
             i = 0
             # print(self.linesCount)
             for each in f:
@@ -327,7 +327,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def about(self):  # displays the about message if the user selected it from main menu
         self.message.setText(
             "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
-        self.message.setDetailedText("https://github.com/ahmadjd94/BRO-IDS-Log-files-visualizer-and-analyzer")
+        self.message.setDetailedText("https://github.com/ahmadjd94/BRO-IDS-Log-files-visualizer-and-analyzer") ####################3333
         self.message.show()
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
