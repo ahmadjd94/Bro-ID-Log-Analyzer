@@ -268,9 +268,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     print("dfgh")
                     print(inpu,'\n', each)
                     con.execute(
-                        """insert into analysis values (\'{0}\',\'{1}\',\'{2}\',\'{3}\',\'{4}\',\'{5}\',\'{6}\',\'{7}\',
-                        \'{8}\',\'{9}\',\'{10}\',\'{11}\',\'{12}\',\'{13}\',\'{14}\',\'{15}\',
-                        \'{16}\',\'{17}\',\'{18}\',\'{19}\',\'{20}\'""".format(
+                        (
+                        "insert into analysis values (\'{0}\',\'{1}\',\'{2}\',\'{3}\',\'{4}\',\'{5}\',\'{6}\',\'{7}\',\n"
+                        "                        \'{8}\',\'{9}\',\'{10}\',\'{11}\',\'{12}\',\'{13}\',\'{14}\',\'{15}\',\n"
+                        "                        \'{16}\',\'{17}\',\'{18}\',\'{19}\',\'{20}\'").format(
                             inpu[timeIndex], inpu[uidIndex], inpu[sipIndex], inpu[spIndex], inpu[dipIndex],
                             inpu[dpIndex], inpu[protoIndex], inpu[serviceIndex], inpu[durationIndex],
                             inpu[countOriginBytesIndex], inpu[countResponseBytesIndex], inpu[connStateIndex],
@@ -412,15 +413,20 @@ if __name__ == "__main__":  # main module
             print("table doest exist")
 
         finally:
-            con.execute("""create table analysis ( time text DEFAULT NULL, UID text NOT NULL,SIP textNOT NULL,
-                                    SP text NOT NULL,DIP text NOT NULL,
-                                    DP text NOT NULL,protype text DEFAULT NULL,service text DEFAULT NULL,
-                                    duration text DEFAULT NULL, origin text DEFAULT NULL,
-                                    response text DEFAULT NULL ,connState text DEFAULT NULL ,localOrig text DEFAULT NULL,
-                                    localResp text DEFAULT NULL,
-                                    missedBytes text DEFAULT NULL,history text DEFAULT NULL,origPkts text DEFAULT NULL,
-                                    origIPBytes text DEFAULT NULL,respPkts text DEFAULT NULL,
-                                    respIPBytes text DEFAULT NULL,tunnelParents DEFAULT NULL)""")
+            con.execute("""CREATE TABLE MAIN(STRING UID,TIME TIMESTAMP)""")
+            con.execute("CREATE TABLE DHCP(FOREIGN KEY (UID) REFERENCES MAIN(UID),INT ID ,TEXT MAC,TEXT ASSIGNED_IP,TEXT LEASE_TIME,INT TRANS_ID)")
+            con.execute("""CREATE TABLE TCP (FOREIGN KEY (UID)REFERENCES MAIN(UID),INT ID,TEXT USER,TEXT PASSWORD,TEXT COMMAND,
+TEXT ARG,TEXT MIME_TYPE,INT FILE_SIZE,INT REPLY_CODE,TEXT REPLY_MSG,BLOB DATA_CHANNEL,TEXT FUID )""") #NOT PROPERLY NORMALIZED
+            con.execute("""FOREIGN KEY (UID) REFERENCES MAIN(UID),INT ID,TEXT NICK,TEXT USER,TEXT COMMAND,TEXT VALUE,TEXT ADDI,
+TEXT DCC_FILE_NAME,INT DCC_FILE_SIZE,STRING DCC_MIME_TYPE,TEXT FUID""")
+            con.execute("""CREATE TABLE WEIRD(FOREIGN KEY(UID) REFERENCES MAIN(UID),INT ID,TEXT NAME,TEXT ADDI,BOOL NOTICE,TEXT PEER)""")
+            con.execute("CREATE TABLE SSH( FOREIGN KEY (UID)REFERENCES MAIN(UID),TEXT STATUS,TEXT DIRECTION,STRING CLIENT,STRING SERVER,INT RESP_SIZE)")
+            con.execute("""CREATE TABLE CONN(FOREIGN KEY (UID) REFERENCES MAIN(UID),TEXT ID_ORIG_H,INT ID_ORIG_P,TEXT ID_RESP_H,INT ID_RESP_P,STRING PROTO,STRING SERVICE,TIME DURATION,INT ORIG_BYTES,
+INT RESP_BYTES,TEXT CONN_STATE,BOOL LOCAL_ORIG,COUNT MISSED_BYTES,STRING HISTORY,COUNT ORIG_PKTS,COUNT ORIG_IP_BYTES,INT RESP_PKTS,INT RESP_IP_BYTES,BLOB TUNNEL_PARENTS,TEXT ORIG_CC,TEXT RESP_CC)""")
+            con.execute("""CREATE TABLE  HTTP (FOREIGN KEY  (UID) REFERNCES MAIN (UID),
+INT ID,INT TRANS_DEPTH,STRING METHOD,TEXT HOST,TEXT URI,TEXT REFERRER,TEXT USER_AGENT,INT REQUEST_BODY_LEN,
+INT STATUS_CODE,TEXT STATUS_MSG,INT INFO_CODE,TEXT INFO_MSG,BLOB TAGS,STRING USERNAME,STRING PASSWORD,BLOB PROXIED,
+BLOB ORIG_FUIDS,BLOB ORIG_MEME_ TYPES,BLOB ORIG_FUID,BLOB RESP_MEME_TY)""")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
