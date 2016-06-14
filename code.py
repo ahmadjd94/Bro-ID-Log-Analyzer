@@ -405,61 +405,78 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
     try:
-        con = sqlite3.connect('analyze.db')  # initializing connection to DB // should be in UI init ??
+        con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
         try:
-            con.execute("drop table analysis")
+            con.execute("drop table main")
+            con.execute("drop table DHCP")
+            con.execute("drop table tcp")
+            con.execute("drop table irc")
+            con.execute("drop table weird")
+            con.execute("drop table ssh")
+            con.execute("drop table conn")
+            con.execute("drop table http")
+            con.execute("drop table dns")
+            con.execute("drop table signature")
+            con.execute("drop table ssl")
         except:
-            raise Exception
             print("table doest exist")
 
         finally:
-            con.execute("""CREATE TABLE MAIN( UID STRING PRIMARY KEY, TIMESTAMP TIME )""")
+            print("final")
+            con.execute("""CREATE TABLE MAIN( UID text PRIMARY KEY, TIMESTAMP TIME )""")
+            print("step1")
 
-            con.execute("CREATE TABLE DHCP(TEXT UID,FOREIGN KEY(UID) REFERENCES MAIN(UID), ID INT,\n"
-                        " MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT , TRANS_ID INT)")
+            con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
+, TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
+            print ("step2")
 
             con.execute(
-                "CREATE TABLE TCP (FOREIGN KEY (UID)REFERENCES MAIN(UID),ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,\n"
-                "ARG TEXT,MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,DATA_CHANNEL BLOB,FUID TEXT)") #NOT PROPERLY NORMALIZED
+                "CREATE TABLE TCP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,\n"
+                "ARG TEXT,MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))") #NOT PROPERLY NORMALIZED
+            print ("step3")
 
-            con.execute("""CREATE TABLE IRC (FOREIGN KEY (UID) REFERENCES MAIN(UID),ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
-DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT)""")
-
-            con.execute("""CREATE TABLE WEIRD(FOREIGN KEY(UID) REFERENCES MAIN(UID),ID INT ,NAME TEXT,
-ADDI TEXT,NOTICE BOOL,PEER TEXT)""")
-
-            con.execute("""CREATE TABLE SSH( FOREIGN KEY (UID)REFERENCES MAIN(UID),STATUS TEXT,
-DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT)""")
-
-            con.execute("""CREATE TABLE CONN(FOREIGN KEY (UID) REFERENCES MAIN(UID),ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+            con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
+DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+            print ("step4")
+            con.execute("""CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,
+ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+            print ("step5")
+            con.execute("""CREATE TABLE SSH( UID TEXT,STATUS TEXT,
+DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+            print ("step6")
+            con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
-RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT)""")
+RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+            print("step7")
+            con.execute("""CREATE TABLE  HTTP (UID TEXT,\n
+                        ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
+                        USER_AGENT TEXT,REQUEST_BODY_LEN INT,
+                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,
+                        PASSWORD TEXT,PROXIED BLOB,
+                        ORIG_FUIDS BLOB,ORIG_MEME_TYPES BLOB,ORIG_FUID BLOB,
+                        RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+            print("step8")
 
-            con.execute("CREATE TABLE  HTTP (FOREIGN KEY  (UID) REFERENCES MAIN (UID),\n"
-                        "ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,\n"
-                        "USER_AGENT TEXT,REQUEST_BODY_LEN INT,\n"
-                        "STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,PASSWORD TEXT,PROXIED BLOB,\n"
-                        "ORIG_FUIDS BLOB,ORIG_MEME_TYPES BLOB,ORIG_FUID BLOB,RESP_MEME_TY BLOB)")
-
-
-            con.execute("CREATE TABLE DNS (FOREIGN KEY (UID)REFERENCES MAIN(UID),ID INT,PROTO TEXT,TRAN_ID INT,\n"
-                        "QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,\n"
-                        "RD BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL)")
-
+            con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
+                        QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
+                        RD BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+            print("step9")
             con.execute("CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDRTEXT ,\n"
                         "SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT \n"
                         "EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )")
-
-            con.execute("""CREATE TABLE SSL(FOREIGN KEY (UID)REFERENCES MAIN(UID),VERSION TEXT ,CIPHER TEXT ,
+            print("step10")
+            con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
-LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB )""")
-
+LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
+FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+        print("step11")
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
         ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
-    except:
+    except sqlite3.Error as e:
+        print(e)
         print("error")
 
         ui.__message2__.show()
