@@ -14,7 +14,7 @@ import sqlite3
 import os  # module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
-import re
+import json
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     validFiles = []
     valid = ['conn.log', 'dhcp.log', 'dnp3.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log', 'kerberos.log',
              'modbus.log'
-        , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log',
+            , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log',
              'socks.log', 'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log',
              'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log',
              'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log',
@@ -230,18 +230,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return
 
         if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            f       = open(self.lineEdit.text(), 'r')
+            f= open(self.lineEdit.text(), 'r')
             i = 0
             # print(self.linesCount)
             for each in f:
                 print(each)
                 inpu = each.split()
                 if inpu[0] == "#fields":
-
                     print("true")
                     indecies = each.split()
                     timeIndex = indecies.index('ts')-1  # time index
-                    uidIndex = indecies.index("uid")-1 # user Id
+                    uidIndex = indecies.index("uid")-1 # unique Id
                     sipIndex = indecies.index("id.orig_h")-1  # source IP
                     spIndex = indecies.index('id.orig_p') -1 # source Port
                     dipIndex = indecies.index("id.resp_h") -1 # Destination IP
@@ -267,16 +266,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif inpu[0][0] != "#":
                     print("dfgh")
                     print(inpu,'\n', each)
-                    con.execute(
-                        (
-                        "insert into analysis values (\'{0}\',\'{1}\',\'{2}\',\'{3}\',\'{4}\',\'{5}\',\'{6}\',\'{7}\',\n"
-                        "                        \'{8}\',\'{9}\',\'{10}\',\'{11}\',\'{12}\',\'{13}\',\'{14}\',\'{15}\',\n"
-                        "                        \'{16}\',\'{17}\',\'{18}\',\'{19}\',\'{20}\'").format(
-                            inpu[timeIndex], inpu[uidIndex], inpu[sipIndex], inpu[spIndex], inpu[dipIndex],
-                            inpu[dpIndex], inpu[protoIndex], inpu[serviceIndex], inpu[durationIndex],
-                            inpu[countOriginBytesIndex], inpu[countResponseBytesIndex], inpu[connStateIndex],
-                            inpu[localOrig], inpu[localResp], inpu[missedBytes],
-                            inpu[history], inpu[origPkts], inpu[origIPBytes], inpu[respPkts], inpu[respIPBytes],str(inpu[tunnelParents])))
+                    con.execute("")
 
                 else:  # lines that begin with # denote comment lines
 
@@ -295,9 +285,80 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             f.close()
 
-        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "": # creating db tables will be moved here
             v = 100 / len(self.validFiles)
             for each in self.validFiles:
+                if  each=="tcp.log" or each =="TCP.log":
+                    con.execute("""CREATE TABLE TCP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
+                    MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
+                    DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+                    print("step3")
+
+                if each == "dhcp.log" or each == "DCHP.log":
+                    con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
+                    , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
+                    print("step2")
+
+                if each == "irc.log" or each == "IRC.log":
+                    con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
+                    DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                    print("step4")
+
+                if each == "weird.log" or each == "WEIRD.log":
+                    con.execute("""CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,
+                    ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                    print("step5")
+
+                if each == "ssh.log" or each == "SSH.log":
+                    con.execute("""CREATE TABLE SSH( UID TEXT,STATUS TEXT,
+                    DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                    print("step6")
+
+                if each == "conn.log" or each == "CONN.log":
+                    con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                    RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
+                    RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                    print("step7")
+
+                if each == "http.log" or each == "HTTP.log":
+                    con.execute("""CREATE TABLE  HTTP (UID TEXT,\n
+                                            ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
+                                            USER_AGENT TEXT,REQUEST_BODY_LEN INT,
+                                            STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,
+                                            PASSWORD TEXT,PROXIED BLOB,
+                                            ORIG_FUIDS BLOB,ORIG_MEME_TYPES BLOB,ORIG_FUID BLOB,
+                                            RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+                    print("step8")
+
+                if each == "DNS.log" or each == "dns.log":
+                    con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
+                                            QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
+                                            RD BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                    print("step9")
+
+                if each == "signatrue.log" or each == "SIGNATURE.log":
+                    con.execute("CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDRTEXT ,\n"
+                                "SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT \n"
+                                "EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )")
+                    print("step10")
+
+                if each == "SSL.log" or each == "ssl.log":
+                    con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
+                    SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
+                    ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
+                    LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
+                    FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+                print("step11")
+
+                if each == "FILES.log" or each == "files.log":
+                    con.execute(
+                        """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
+                            ANALYZERS TEXT,MIME_TYPE TEXT,
+                            FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
+                            MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
+                            MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
+
+
                 f = open(each, 'r')
                 for i in f:
                     f.readline()
@@ -328,7 +389,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def about(self):  # displays the about message if the user selected it from main menu
         self.message.setText(
             "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
-        self.message.setDetailedText("https://github.com/ahmadjd94/BRO-IDS-Log-files-visualizer-and-analyzer") ####################3333
+        self.message.setDetailedText("https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer") ####################3333
         self.message.show()
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
@@ -371,18 +432,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def openDirDialog(self):
         try:
-            di = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
+            dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                   QFileDialog.ShowDirsOnly)  # error in params
-            print(di)
-            os.chdir(di)  # change current working directory
+            print(dire)
+            os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
-                if fnmatch.fnmatch(each, "*.log") or each in self.valid:
+                if each in self.valid:
                     print(each)
-                    self.validFiles.append(each)
+                    self.validFiles.append(each) # appends BRO valid log files names to the discovered logs
+
             self.label.setText(
-                "the directory you have selected have " + str(len(self.validFiles)) + " files seem to be valid ")
-            self.lineEdit_2.setText(di)
+                "the directory you have selected have " + str(len(self.validFiles)) + " valid files")
+            self.lineEdit_2.setText(dire)
         except NotADirectoryError:  # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
         except:
@@ -407,71 +469,31 @@ if __name__ == "__main__":  # main module
     try:
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
+
         try:
-            con.execute("drop table main")
-            con.execute("drop table DHCP")
-            con.execute("drop table tcp")
-            con.execute("drop table irc")
-            con.execute("drop table weird")
-            con.execute("drop table ssh")
-            con.execute("drop table conn")
-            con.execute("drop table http")
-            con.execute("drop table dns")
-            con.execute("drop table signature")
-            con.execute("drop table ssl")
+            con.execute("drop table main") #1
+            con.execute("drop table DHCP") #2
+            con.execute("drop table tcp") #3
+            con.execute("drop table irc") #4
+            con.execute("drop table weird") #5
+            con.execute("drop table ssh") #6
+            con.execute("drop table conn") #7
+            con.execute("drop table http") #8
+            con.execute("drop table dns") #9
+            con.execute("drop table signature")#10
+            con.execute("drop table ssl") #11
+            con.execute("drop table IDS")#12
+            con.execute("drop table files")#13
+
         except:
             print("table doest exist")
 
         finally:
             print("final")
             con.execute("""CREATE TABLE MAIN( UID text PRIMARY KEY, TIMESTAMP TIME )""")
+            con.execute("CREATE TABLE IDS ()")
             print("step1")
 
-            con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
-, TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
-            print ("step2")
-
-            con.execute(
-                "CREATE TABLE TCP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,\n"
-                "ARG TEXT,MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))") #NOT PROPERLY NORMALIZED
-            print ("step3")
-
-            con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
-DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
-            print ("step4")
-            con.execute("""CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,
-ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
-            print ("step5")
-            con.execute("""CREATE TABLE SSH( UID TEXT,STATUS TEXT,
-DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
-            print ("step6")
-            con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
-RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
-RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
-            print("step7")
-            con.execute("""CREATE TABLE  HTTP (UID TEXT,\n
-                        ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
-                        USER_AGENT TEXT,REQUEST_BODY_LEN INT,
-                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,
-                        PASSWORD TEXT,PROXIED BLOB,
-                        ORIG_FUIDS BLOB,ORIG_MEME_TYPES BLOB,ORIG_FUID BLOB,
-                        RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
-            print("step8")
-
-            con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
-                        QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
-                        RD BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
-            print("step9")
-            con.execute("CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDRTEXT ,\n"
-                        "SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT \n"
-                        "EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )")
-            print("step10")
-            con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
-SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
-ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
-LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
-FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
-        print("step11")
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
         ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
