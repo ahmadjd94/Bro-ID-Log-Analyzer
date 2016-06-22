@@ -23,15 +23,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []
-    valid = ['conn.log', 'dhcp.log', 'dnp3.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log', 'kerberos.log',
-             'modbus.log'
-            , 'modbus_register_change.log', 'mysql.log', 'radius.log', 'rdp.log', 'sip.log', 'smtp.log', 'snmp.log',
-             'socks.log', 'ssl.log', 'syslog.log', 'tunnel.log', 'files.log', 'pe.log', 'x509.log', 'intel.log',
-             'notice.log', 'notice_alarm.log', 'signatures.log', 'traceroute.log', 'app_stats.log', 'known_certs.log',
-             'known_devices.log', 'known_hosts.log', 'known_modbus.log', 'known_services.log', 'software.log',
-             'barnyard2.log', 'dpd.log', 'unified2.log', 'weird.log', 'capture_loss.log', 'cluster.log',
-             'communication.log', 'loaded_scripts.log', 'packet_filter.log', 'prof.log', 'reporter.log', 'stats.log',
-             'stderr.log', 'stdout.log']
+    valid = ['conn.log', 'dhcp.log',  'dns.log', 'ftp.log', 'http.log', 'irc.log',
+
+            ,'smtp.log', 'snmp.log',
+              'ssl.log', 'files.log',
+             'signatures.log',
+             'weird.log',
 
     # this list stores the valid log files in a directory
 
@@ -236,6 +233,37 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             for each in f:
                 print(each)
                 inpu = each.split()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 if inpu[0] == "#fields":
                     print("true")
                     indecies = each.split()
@@ -261,7 +289,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     respIPBytes = indecies.index("resp_ip_bytes")-1
                     tunnelParents = indecies.index("tunnel_parents")-1
 
-                    print("wtf is this shit ?")
+
 
                 elif inpu[0][0] != "#":
                     print("dfgh")
@@ -273,7 +301,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     try:
 
                         # brace yourself for the longest sql line ever
-                        print("dfgh")
+                        #sql code that insert records in
                         # con.execute("insert into analysis values("+str(inpu[timeIndex])+","+str(inpu[uidIndex])+","+str(inpu[sipIndex])+","+str(inpu[spIndex])+","+str(inpu[dipIndex])+","+str(inpu[dpIndex])+","+str(inpu[protoIndex])+","+str(inpu[serviceIndex])+","+str(inpu[durationIndex])+","+str(inpu[countOriginBytesIndex])+","+str(inpu[countResponseBytesIndex])+")")
                     except:
                         self.message.setText("make sure you have previliges to execute command over data base \n")
@@ -461,12 +489,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 if __name__ == "__main__":  # main module
     import sys
 
+    http={"trans_depth":0,"method":0,}; # this dictionary will store the indecies of lof fileds for each file
+    ftp={}
+    files={}
+    irc={    }
+    ftp={}
+    smtp ={}
+    ssh={}
+    ssl={}
+    weird ={}
+    signatures={}
+    conn={}
+    dhcp={}
+    dns={}
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     try:
+
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
 
