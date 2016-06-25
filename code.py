@@ -23,12 +23,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []
-    valid = ['conn.log', 'dhcp.log',  'dns.log', 'ftp.log', 'http.log', 'irc.log',
-
-            ,'smtp.log', 'snmp.log',
-              'ssl.log', 'files.log',
-             'signatures.log',
-             'weird.log',
+    valid = ['conn', 'dhcp', 'dns', 'ftp', 'http', 'irc',
+             'smtp','ssl', 'files','signatures','weird']
 
     # this list stores the valid log files in a directory
 
@@ -168,24 +164,34 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def uMan(self):
         self.label_2.setVisible(False)
+    def travers(self,fname):
+
+        f=open(fname+'.log','r')
+        for i in f:
+            if i[0]=="#":
+                if i[:7]=="#fields" or "Fields" :
+                    fields=(i[7:].split())
+                    for field in fields:
+                        validF[fname][field]=fields.index(field)
+                else:
+                    continue
+
 
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
-        s=False
+        s = False
         try:
-            if "select" in command :
-                s=True
-                result=con.execute(command).fetchall()
+            if "select" in command:
+                s = True
+                result = con.execute(command).fetchall()
                 for i in result:
-                        for each in i:
-                            pass
+                    for each in i:
+                        pass
                         # this lines should insert the result of select statments into the tableview
-
-
 
             if "insert" in command:
 
-                    con.execute(command)
+                con.execute(command)
             else:
                 con.execute(command)
                 self.label_2.setStyleSheet("color: green")
@@ -195,11 +201,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except sqlite3.OperationalError as err:
             print(str(err))
 
-            if s :
+            if s:
                 self.message.setText("error selecting rows from data base")
 
             else:
-                 self.message.setText("error inserting rows into database")
+                self.message.setText("error inserting rows into database")
 
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
@@ -207,7 +213,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label_2.setVisible(True)
             self.message.show()
 
-        except :
+        except:
 
             self.message.show()
 
@@ -218,80 +224,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         connStateIndex = localOrig = localResp = missedBytes = history = origPkts = origIPBytes = respPkts = respIPBytes = tunnelParents = 0
 
         if self.loaded:
-            reply = QMessageBox.question(self.message, 'Message', "there is files already loaded into databse ,are you sure you want to load files",
+            reply = QMessageBox.question(self.message, 'Message',
+                                         "there is files already loaded into databse ,are you sure you want to load files",
                                          QMessageBox.Yes,
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
                 self.reset()
             else:
                 return
-
         if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            f= open(self.lineEdit.text(), 'r')
+            f = open(self.lineEdit.text(), 'r')
             i = 0
             # print(self.linesCount)
             for each in f:
                 print(each)
                 inpu = each.split()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 if inpu[0] == "#fields":
                     print("true")
-                    indecies = each.split()
-                    timeIndex = indecies.index('ts')-1  # time index
-                    uidIndex = indecies.index("uid")-1 # unique Id
-                    sipIndex = indecies.index("id.orig_h")-1  # source IP
-                    spIndex = indecies.index('id.orig_p') -1 # source Port
-                    dipIndex = indecies.index("id.resp_h") -1 # Destination IP
-                    dpIndex = indecies.index("id.resp_p")-1  # Destination Port
-                    protoIndex = indecies.index("proto")-1  # Protocol type index
-                    serviceIndex = indecies.index("service")-1  # stores the type of service
-                    durationIndex = indecies.index("duration") -1 # stores the duration of service
-                    countOriginBytesIndex = indecies.index("orig_bytes")-1  # count of bytes sent by client
-                    countResponseBytesIndex = indecies.index("resp_bytes")-1  # count of bytes sent by server
-                    connStateIndex = indecies.index("conn_state")-1
-                    localOrig = indecies.index("conn_state")-1
-                    localResp = indecies.index("local_resp")-1
-                    missedBytes = indecies.index("missed_bytes")-1
-                    history = indecies.index("history")-1
-                    origPkts = indecies.index("orig_pkts")-1
-                    origIPBytes = indecies.index("orig_ip_bytes")-1
-                    respPkts = indecies.index("resp_pkts")-1
-                    respIPBytes = indecies.index("resp_ip_bytes")-1
-                    tunnelParents = indecies.index("tunnel_parents")-1
+                    #enable files discovery and fields detections
 
-
-
-                elif inpu[0][0] != "#":
+            """ elif inpu[0][0] != "#":
                     print("dfgh")
                     print(inpu,'\n', each)
                     con.execute("")
@@ -310,24 +262,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         # do pattern matching
 
                 self.progressBar.setValue((i / self.linesCount) * 100)
-
+"""
             f.close()
 
-        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "": # creating db tables will be moved here
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":  # creating db tables will be moved here
             v = 100 / len(self.validFiles)
             for each in self.validFiles:
-                if  each=="tcp.log" or each =="TCP.log":
-                    con.execute("""CREATE TABLE TCP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
+                eachIgnorecase= each
+                if each == "ftp" or each == "FTP":
+                    con.execute("""CREATE TABLE FTP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                     MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                     DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                     print("step3")
 
-                if each == "dhcp.log" or each == "DCHP.log":
+                if each == "dhcp" or each == "DCHP":
                     con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                     , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
                     print("step2")
 
-                if each == "irc.log" or each == "IRC.log":
+                if each == "irc" or each == "IRC":
                     con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                     DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step4")
@@ -349,7 +302,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     print("step7")
 
                 if each == "http.log" or each == "HTTP.log":
-                    con.execute("""CREATE TABLE  HTTP (UID TEXT,\n
+                    con.execute("""CREATE TABLE  HTTP (UID TEXT,
                                             ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                             USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                             STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,
@@ -361,7 +314,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if each == "DNS.log" or each == "dns.log":
                     con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
                                             QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
-                                            RD BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                                            RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step9")
 
                 if each == "signatrue.log" or each == "SIGNATURE.log":
@@ -386,14 +339,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                             MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
 
+                if each == "smtp.log" or each == "SMTP.log":
+                    con.execute("""CREATE TABLE SMTP (uid TEXT ,id INT,trans_depth INT ,helo TEXT,mailfrom STRING,rcptto BLOB
+              ,date TEXT ,from TEXT ,to BLOB,reply_to TEXT,msg_id TEXT ,in_reply_to TEXT ,subject TEXT
+              ,x_originating_ip TEXT,first_received TEXT ,
+            second_received TEXT ,last_reply TEXT ,path BLOB,user_agent TEXT ,
+            tls BOOL,fuids BLOB,is_webmail BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
 
-                f = open(each, 'r')
-                for i in f:
-                    f.readline()
-                    # do some operations to the input line
-                    # do pattern matching
-                    # insert into data base for further analysis
-                f.close()
+               #function moved to top#
                 self.progressBar.setValue(self.progressBar.value() + v)
             self.analysis.setTabEnabled(1, True)
             self.analysis.setTabEnabled(2, True)
@@ -417,7 +370,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def about(self):  # displays the about message if the user selected it from main menu
         self.message.setText(
             "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
-        self.message.setDetailedText("https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer") ####################3333
+        self.message.setDetailedText(
+            "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer")  ####################3333
         self.message.show()
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
@@ -426,7 +380,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
-            if name in self.valid or ".log" in name:
+            if name in self.valid:
                 file = open(self.lineEdit.text())
                 print(file)
                 self.count = 0
@@ -439,7 +393,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.message.setText("make sure you selected a valid file")
                 self.message.show()
                 self.lineEdit.clear()
-        except FileNotFoundError:  # handling incorrect file directories / paths
+        except:  # handling incorrect file directories / paths
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
@@ -461,19 +415,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def openDirDialog(self):
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
-                                                  QFileDialog.ShowDirsOnly)  # error in params
+                                                    QFileDialog.ShowDirsOnly)  # error in params
             print(dire)
             os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
                 if each in self.valid:
                     print(each)
-                    self.validFiles.append(each) # appends BRO valid log files names to the discovered logs
+                    self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
 
             self.label.setText(
                 "the directory you have selected have " + str(len(self.validFiles)) + " valid files")
             self.lineEdit_2.setText(dire)
-        except NotADirectoryError:  # exception raised if the selection was not a dir
+        except  NotADirectoryError as e:  # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
         except:
             self.label.setText("make sure you have selected a directory")
@@ -489,19 +443,55 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 if __name__ == "__main__":  # main module
     import sys
 
-    http={"trans_depth":0,"method":0,}; # this dictionary will store the indecies of lof fileds for each file
-    ftp={}
-    files={}
-    irc={    }
-    ftp={}
-    smtp ={}
-    ssh={}
-    ssl={}
-    weird ={}
-    signatures={}
-    conn={}
-    dhcp={}
-    dns={}
+    validF = {
+    "http" :{'UID': 0, "ID INT": 0, "TRANS_DEPTH": 0, "METHOD": 0, "HOST": 0, "URI": 0, "REFERRER": 0,
+            "USER_AGENT": 0, "REQUEST_BODY_LEN": 0,
+            "STATUS_CODE": 0, "STATUS_MSG": 0, "INFO_CODE": 0, "INFO_MSG": 0, "TAGS": 0, "USERNAME": 0,
+            "PASSWORD": 0, "PROXIED": 0,
+            "ORIG_FUIDS": 0, "ORIG_MEME_TYPES": 0, "ORIG_FUID": 0,
+            "RESP_MEME_TY": 0},  # this dictionary will store the indecies of lof fileds for each file
+
+    'ftp' :{"UID": 0, "ts": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
+           "MIME_TYPE": 0, "FILE_SIZE": 0, "REPLY_CODE": 0, "REPLY_MSG": 0,
+           "DATA_CHANNEL": 0, "FUID": 0},
+
+    "files": {"TS": 0, "FUID": 0, "tx_hosts": 0, "rx_hosts": 0, "CONN_UIDS": 0, "SOURCE": 0, "DEPTH": 0,
+             "ANALYZERS": 0, "MIME_TYPE": 0,
+             "FILENAME": 0, "DURATION": 0, "LOCAL_ORIG": 0, "IS_ORIG": 0, "SEEN_BYTES": 0, "TOTAL_BYTES": 0,
+             "MISSING_BYTES": 0, "OVERFLOW_BYTES": 0, "TIMEDOUT": 0, "PARENT_FUID": 0,
+             "MD5A/SHA1/SHA256": 0, "EXTRACTED": 0} , # CHECK THIS AGAIN
+
+    'irc' : {"UID": 0, "ID": 0, "NICK": 0, "USER": 0, "COMMAND": 0, "VALUE": 0, "ADDI": 0,
+           "DCC_FILE_NAME": 0, "DCC_FILE_SIZE": 0, "DCC_MIME_TYPE": 0, "FUID": 0},
+
+    'smtp' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": 0, "rcptto": 0
+        , "date": 0, "from": 0, "to": 0, "reply_to": 0, "msg_id": 0, "in_reply_to": 0, "subject": 0
+        , "x_originating_ip": 0, "first_received": 0,
+            "second_received": 0, "last_reply": 0, "path": 0, "user_agent": 0,
+            "tls": 0, "fuids": 0, "is_webmail": 0},
+
+    'ssh' : {"UID": 0, "STATUS": 0, "DIRECTION": 0, "CLIENT": 0, "SERVER": 0, "RESP_SIZE": 0},
+
+    'ssl' : {"UID": 0, "VERSION": 0, "CIPHER": 0,
+           "SERVER_NAME": 0, "SESSION_ID": 0, "SUBJECT": 0,
+           "ISSUER_SUBJECT": 0, "NOT_VALID_BEFORE": 0,
+           "LAST_ALERT": 0, "CLIENT_SUBJECT": 0, "CLNT_ISSUER_SUBJECT": 0, "CERT_HASH": 0, "VALIDATION_STATUS": 0},
+
+    'weird' :{"UID": 0, "ID": 0, "NAME": 0, "ADDI": 0, "NOTICE": 0, "PEER": 0},
+
+    'signatures':{"sss":0},
+
+    'conn':{"UID": 0, "ID_ORIG_H": 0, "ID_ORIG_P": 0, "ID_RESP_H": 0, "ID_RESP_P": 0, "PROTO": 0, "SERVICE": 0,
+            "DURATION": 0, "ORIG_BYTES": 0,
+            "RESP_BYTES": 0, "CONN_STATE": 0, "LOCAL_ORIG": 0, "MISSED_BYTES": 0, "HISTORY": 0, "ORIG_PKTS": 0,
+            "ORIG_IP_BYTES": 0,"RESP_PKTS": 0, "RESP_IP_BYTES": 0, "TUNNEL_PARENTS": 0, "ORIG_CC": 0, "RESP_CC": 0}
+
+    'dhcp':{"UID": 0, "ID": 0, "MAC": 0, "ASSIGNED_IP": 0, "LEASE_TIME ": 0, "TRANS_ID": 0},
+
+    'dns':{"UID": 0, 'ts': 0, "ID": 0, "PROTO": 0, "TRAN_ID": 0,
+           "QUERY": 0, "QCLASS": 0, "QCLASS_NAME": 0, "QTYPE": 0, "QTYPE_NAME": 0, "RCODE": 0, "RCODE_NAME": 0, "QR": 0,
+           "AA": 0,"TC": 0, "RD": 0, "RA": 0, "Z": 0, "ANSWERS": 0, "TTLS": 0, "REJECTED BOOL": 0}
+    }
 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
@@ -514,27 +504,27 @@ if __name__ == "__main__":  # main module
         print("connected")
 
         try:
-            con.execute("drop table main") #1
-            con.execute("drop table DHCP") #2
-            con.execute("drop table tcp") #3
-            con.execute("drop table irc") #4
-            con.execute("drop table weird") #5
-            con.execute("drop table ssh") #6
-            con.execute("drop table conn") #7
-            con.execute("drop table http") #8
-            con.execute("drop table dns") #9
-            con.execute("drop table signature")#10
-            con.execute("drop table ssl") #11
-            con.execute("drop table IDS")#12
-            con.execute("drop table files")#13
+            con.execute("DROP TABLE main")  # 1
+            con.execute("DROP TABLE DHCP")  # 2
+            con.execute("DROP TABLE SMTP")  # 3
+            con.execute("DROP TABLE irc")  # 4
+            con.execute("DROP TABLE weird")  # 5
+            con.execute("DROP TABLE ssh")  # 6
+            con.execute("DROP TABLE conn")  # 7
+            con.execute("DROP TABLE http")  # 8
+            con.execute("DROP TABLE dns")  # 9
+            con.execute("DROP TABLE signature")  # 10
+            con.execute("DROP TABLE ssl")  # 11
+            con.execute("DROP TABLE IDS")  # 12
+            con.execute("DROP TABLE files")  # 13
 
         except:
             print("table doest exist")
 
         finally:
             print("final")
-            con.execute("""CREATE TABLE MAIN( UID text PRIMARY KEY, TIMESTAMP TIME )""")
-            con.execute("CREATE TABLE IDS ()")
+            con.execute("""CREATE TABLE MAIN( UID TEXT PRIMARY KEY, TIMESTAMP TIME )""")
+            # con.execute("CREATE TABLE IDS ()")
             print("step1")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
