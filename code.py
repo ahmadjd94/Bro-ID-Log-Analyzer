@@ -172,11 +172,74 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if i[:7]=="#fields" or "Fields" :
                     fields=(i[7:].split())
                     for field in fields:
-                        validF[fname][field]=fields.index(field)
+                        validFields[fname][field]=fields.index(field)
                 else:
                     continue
+            else:
+                line = i.split()
 
+                if fname == 'http': #no hardcoded indecies of fields
+                    con.execute("insert into main (%s)"%line[validFields['http']['uid']])
+                    con.execute("insert into main (%s)" % line[validFields['http']['ts']])
 
+                    con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
+                                            %s,%s,%s,%s,%s,
+                                            %s)"""
+                                %(line [validFields['http']['UID']]
+                                , int(line[validFields["http"]['ID']])
+                                , int(line[validFields["http"]["TRANS_DEPTH"]])
+                                , line[validFields['http']['METHOD']]
+                                , line[validFields["http"]['HOST']]
+                                , line[validFields['http']['URI']]
+                                , line[validFields["http"]["REFERRER"]]
+                                , line[validFields['http']['USER_AGENT']]
+                                , int(line[validFields["http"]["REQUEST_BODY_LEN"]])
+                                , int (validFields["HTTP"]["STATUS_CODE"])
+                                , line[validFields["http"]["STATUS_MSG"]]
+                                , int(line[validFields["http"]["INFO_CODE"]])
+                                , line[validFields['http']['INFO_MSG']]
+                                , line[validFields["http"]["TAGS"]]
+                                , line[validFields['http']['USERNAME']]
+                                , line[validFields["http"]["PASSWORD"]]
+                                , line[validFields["http"]['PROXIED']]
+                                , line[validFields['http']["ORIG_FUIDS"]]
+                                , line[validFields["http"]['ORIG_MEME_TYPES']]
+                                , line[validFields["http"]['ORIG_FUID']]
+                                , line[validFields["http"]['RESP_MEME_TY']]
+                                ))
+
+                if fname == 'ftp':  # no hardcoded indecies of fields
+                    con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
+                    con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
+                    con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
+                                % ( line[validFields['ftp']['user']]
+                                   , line[validFields["ftp"]['PASSWORD']]
+                                   , line[validFields["ftp"]["COMMAND"]]
+                                   , line[validFields['ftp']['ARG']]
+                                   , line[validFields["ftp"]['MIME_TYPE']]
+                                   , int(line[validFields['ftp']['FILE_SIZE']])
+                                   , int(line[validFields["ftp"]["REPLY_CODE"]])
+                                   , line[validFields['ftp']['REPLY_MSG']]
+                                   , line[validFields["ftp"]["DATA_CHANNEL"]]
+                                   , line[validFields["ftp"]["FUID"]]
+                                   ))
+
+                    if fname == 'irc':  # no hardcoded indecies of fields
+                        con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
+                        con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
+                                    % (int(line[validFields['irc']['ID']])
+                                       , line[validFields["irc"]['NICK']]
+                                       , line[validFields["irc"]["USER"]]
+                                       , line[validFields['irc']['COMMAND']]
+                                       , line[validFields["irc"]['VALUE']]
+                                       , (line[validFields['irc']['ADDI']])
+                                       , line[validFields["irc"]["DCC_FILE_NAME"]]
+                                       , int(line[validFields['irc']['DCC_FILE_SIZE']])
+                                       ,line[validFields['irs']['DCC_FILE_TYPE']]
+                                       , line[validFields["irc"]["FUID"]]
+                                       )
+                                    )
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
         s = False
@@ -305,9 +368,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     con.execute("""CREATE TABLE  HTTP (UID TEXT,
                                             ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                             USER_AGENT TEXT,REQUEST_BODY_LEN INT,
-                                            STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS BLOB,USERNAME TEXT,
-                                            PASSWORD TEXT,PROXIED BLOB,
-                                            ORIG_FUIDS BLOB,ORIG_MEME_TYPES BLOB,ORIG_FUID BLOB,
+                                            STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS TEXT,USERNAME TEXT,
+                                            PASSWORD TEXT,PROXIED TEXT,
+                                            ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
                                             RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
                     print("step8")
 
@@ -443,15 +506,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 if __name__ == "__main__":  # main module
     import sys
 
-    validF = {
-    "http" :{'UID': 0, "ID INT": 0, "TRANS_DEPTH": 0, "METHOD": 0, "HOST": 0, "URI": 0, "REFERRER": 0,
-            "USER_AGENT": 0, "REQUEST_BODY_LEN": 0,
-            "STATUS_CODE": 0, "STATUS_MSG": 0, "INFO_CODE": 0, "INFO_MSG": 0, "TAGS": 0, "USERNAME": 0,
-            "PASSWORD": 0, "PROXIED": 0,
-            "ORIG_FUIDS": 0, "ORIG_MEME_TYPES": 0, "ORIG_FUID": 0,
-            "RESP_MEME_TY": 0},  # this dictionary will store the indecies of lof fileds for each file
+    UnsupportedFiles=['x509.log','packet_filter.log','app_stats.log','capture_loss.log','dnp3.log','intel.log',
+                      'known_certs.log','radius.log','modbus.log','notice.log','reporter.log',
+                      'notice.log','software.log','snmp.log','socks.log',
+                      'syslog.log','traceroute.log','known_hosts.log']
+    validFields = {
+    "http" :{'UID': -1,'TS':-1, "ID": -1, "TRANS_DEPTH": -1, "METHOD": -1, "HOST":-1, "URI": -1, "REFERRER": -1,
+            "USER_AGENT": -1, "REQUEST_BODY_LEN": -1,"STATUS_CODE":-1, "STATUS_MSG":-1, "INFO_CODE":-1, "INFO_MSG":-1,
+             "TAGS": -1, "USERNAME":-1,"PASSWORD":-1, "PROXIED":-1,"ORIG_FUIDS":-1, "ORIG_MEME_TYPES":-1, "ORIG_FUID":-1,
+            "RESP_MEME_TY":-1},  # this dictionary will store the indecies of lof fileds for each file
 
-    'ftp' :{"UID": 0, "ts": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
+    'ftp' :{"UID": 0, "TS": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
            "MIME_TYPE": 0, "FILE_SIZE": 0, "REPLY_CODE": 0, "REPLY_MSG": 0,
            "DATA_CHANNEL": 0, "FUID": 0},
 
@@ -461,10 +526,10 @@ if __name__ == "__main__":  # main module
              "MISSING_BYTES": 0, "OVERFLOW_BYTES": 0, "TIMEDOUT": 0, "PARENT_FUID": 0,
              "MD5A/SHA1/SHA256": 0, "EXTRACTED": 0} , # CHECK THIS AGAIN
 
-    'irc' : {"UID": 0, "ID": 0, "NICK": 0, "USER": 0, "COMMAND": 0, "VALUE": 0, "ADDI": 0,
-           "DCC_FILE_NAME": 0, "DCC_FILE_SIZE": 0, "DCC_MIME_TYPE": 0, "FUID": 0},
+    'irc' : {"UID": -1,'TS':-1, "ID": -1, "NICK": -1, "USER": -1, "COMMAND": -1, "VALUE": -1, "ADDI": -1,
+           "DCC_FILE_NAME": -1, "DCC_FILE_SIZE": -1, "DCC_MIME_TYPE": -1, "FUID": 1},
 
-    'smtp' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": 0, "rcptto": 0
+    'smtp' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": -1, "rcptto": 0
         , "date": 0, "from": 0, "to": 0, "reply_to": 0, "msg_id": 0, "in_reply_to": 0, "subject": 0
         , "x_originating_ip": 0, "first_received": 0,
             "second_received": 0, "last_reply": 0, "path": 0, "user_agent": 0,
@@ -484,7 +549,7 @@ if __name__ == "__main__":  # main module
     'conn':{"UID": 0, "ID_ORIG_H": 0, "ID_ORIG_P": 0, "ID_RESP_H": 0, "ID_RESP_P": 0, "PROTO": 0, "SERVICE": 0,
             "DURATION": 0, "ORIG_BYTES": 0,
             "RESP_BYTES": 0, "CONN_STATE": 0, "LOCAL_ORIG": 0, "MISSED_BYTES": 0, "HISTORY": 0, "ORIG_PKTS": 0,
-            "ORIG_IP_BYTES": 0,"RESP_PKTS": 0, "RESP_IP_BYTES": 0, "TUNNEL_PARENTS": 0, "ORIG_CC": 0, "RESP_CC": 0}
+            "ORIG_IP_BYTES": 0,"RESP_PKTS": 0, "RESP_IP_BYTES": 0, "TUNNEL_PARENTS": 0, "ORIG_CC": 0, "RESP_CC": 0},
 
     'dhcp':{"UID": 0, "ID": 0, "MAC": 0, "ASSIGNED_IP": 0, "LEASE_TIME ": 0, "TRANS_ID": 0},
 
