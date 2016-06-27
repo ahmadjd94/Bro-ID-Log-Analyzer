@@ -268,7 +268,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                        )
                                     )
 
-                if fname == 'signature' or fname=="SIGNATURE":  # no hardcoded indecies of fields
+                if fname == 'signature' or fname=="SIGNATURE":
                     con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
                     con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
                     con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
@@ -286,7 +286,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    )
                                 )
 
-                if fname == 'dns' or fname== "DNS":  # no hardcoded indecies of fields
+                if fname == 'dns' or fname== "DNS":
                     con.execute("insert into main (%s)" % line[validFields['dns']['uid']])
                     con.execute("insert into main (%s)" % line[validFields['dns']['ts']])
                     con.execute(
@@ -314,7 +314,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                )
                             )
 
-                if fname == 'SSH' or fname=="ssh":  # no hardcoded indecies of fields
+                if fname == 'SSH' or fname=="ssh":
                     con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
                     con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
                     con.execute(
@@ -329,7 +329,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                            )
                     )
 
-                if fname == 'SSL' or fname=="ssl":  # no hardcoded indecies of fields
+                if fname == 'SSL' or fname=="ssl":
                     con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
                     con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
                     con.execute(
@@ -352,14 +352,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                                )
                         )
-                if fname == 'SMTP' or fname=="smtp":  # no hardcoded indecies of fields
+                if fname == 'SMTP' or fname=="smtp":
                     con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
                     con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
                     con.execute(
-                        """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-                        % ((line[validFields['SMTP']['UID']]
+                        """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
+                        % (line[validFields['SMTP']['UID']]
                            , line[validFields["SMTP"]['ID']]
-                           , line[validFields["SMTP"]["TRANS_DEPTH"]]
+                           , int(line[validFields["SMTP"]["TRANS_DEPTH"]])
                            , line[validFields['SMTP']['HELO']]
                            , line[validFields["SMTP"]['MAILFROM']]
                            , line[validFields['SMTP']['RCPTTO']]
@@ -376,12 +376,71 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                            ,line[validFields["SMTP"]["LAST_REPLY"]]
                            ,line[validFields["SMTP"]["PATH"]]
                            ,line[validFields["SMTP"]["USER_AGENT"]]
-                           ,line[validFields["SMTP"]["TLS"]]
+                           ,int(line[validFields["SMTP"]["TLS"]])
                            ,line[validFields["SMTP"]["FUID"]]
-                           ,line[validFields["SMTP"]["IS_WEBMAIL"]]
-
+                           ,int(line[validFields["SMTP"]["IS_WEBMAIL"]])
                            )
                     )
+
+                if fname== 'dhcp' or fname == "DHCP":
+                        con.execute("insert into main (%s)" % line[validFields['DHCP']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['DHCP']['ts']])
+                        con.execute(
+                            """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
+                            % ((line[validFields['DHCP']['UID']])
+                               , line[validFields["DHCP"]['ID']]
+                               , (line[validFields["DHCP"]["MAC"]])
+                               , (line[validFields['DHCP']['ASSIGNED_IP']])
+                               , (line[validFields["DHCP"]['LEASE_TIME']])
+                               , line[validFields['DHCP']['TRANS_ID']]
+
+                               )
+                        )
+
+                if fname == 'WEIRD' or fname == "weird":
+                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
+                            con.execute(
+                                """insert into DHCP (%s,%s,%s,%s,%s,%d)"""
+                                % ((line[validFields['WEIRD']['UID']])
+                                   , line[validFields["WEIRD"]['ID']]
+                                   , (line[validFields["WEIRD"]["NAME"]])
+                                   , (line[validFields['WEIRD']['ADDI']])
+                                   , int(line[validFields["WEIRD"]['NOTICE']])
+                                   , (line[validFields['WEIRD']['PEER']])
+
+                                   )
+                            )
+
+                if fname == 'FILES' or fname == "files":
+                    con.execute("insert into main (%s)" % line[validFields['FILES']['uid']])
+                    con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
+                    con.execute(
+                        """insert into FILES (%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s)"""
+                        % (line[validFields['FILES']['TS']]
+                           , line[validFields["FILES"]['FUID']]
+                           , (line[validFields["FILES"]["TX_HOSTS"]])
+                           , line[validFields['FILES']['RX_HOSTS']]
+                           , line[validFields["FILES"]['CONN_UIDS']]
+                           , line[validFields['FILES']['SOURCE']]
+                           ,int(line[validFields["FILES"]["DEPTH"]])
+                           , line[validFields["FILES"]["ANALYZERS"]]
+                           , line[validFields["FILES"]["MIME_TYPE"]]
+                           , line[validFields["FILES"]["FILENAME"]]
+                           , line[validFields["FILES"]["DURATION"]]
+                           ,int(line[validFields["FILES"]["LOCAL_ORIG"]])
+                           ,int(line[validFields["FILES"]["IS_ORIG"]])
+                           ,int(line[validFields["FILES"]["SEEN_BYTES"]])
+                           ,int( line[validFields["FILES"]["TOTAL_BYTES"]])
+                           ,int(line[validFields["FILES"]["MISSING_BYTES"]])
+                           ,int( line[validFields["FILES"]["OVERFLOW_BYTES"]])
+                           ,int (line[validFields["FILES"]["TIMEDOUT"]])
+                           ,(line[validFields["FILES"]["PARENT_FUID"]])
+                           , line[validFields["FILES"]["MD5_SHA1_SHA256"]]
+                           , (line[validFields["FILES"]["EXTRACTED"]])
+                           )
+                    )
+
 
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
@@ -481,7 +540,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                     print("step3")
 
-                if each == "dhcp" or each == "DCHP":
+                if each == "dhcp" or each == "DCHP":  #DONE
                     con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                     , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
                     print("step2")
@@ -491,7 +550,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step4")
 
-                if each == "weird.log" or each == "WEIRD.log":
+                if each == "weird.log" or each == "WEIRD.log": #DONE
                     con.execute("""CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,
                     ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step5")
@@ -537,7 +596,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step11")
 
-                if each == "FILES.log" or each == "files.log":
+                if each == "FILES.log" or each == "files.log": #DONE
                     con.execute(
                         """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
                             ANALYZERS TEXT,MIME_TYPE TEXT,
@@ -545,7 +604,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                             MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
 
-                if each == "smtp.log" or each == "SMTP.log":
+                if each == "smtp.log" or each == "SMTP.log":  #DONE
                     con.execute("""CREATE TABLE SMTP (uid TEXT ,id INT,trans_depth INT ,helo TEXT,mailfrom STRING,rcptto BLOB
               ,date TEXT ,from TEXT ,to BLOB,reply_to TEXT,msg_id TEXT ,in_reply_to TEXT ,subject TEXT
               ,x_originating_ip TEXT,first_received TEXT ,
@@ -715,16 +774,16 @@ if __name__ == "__main__":  # main module
             con.execute("DROP TABLE main")  # 1
             con.execute("DROP TABLE DHCP")  # 2
             con.execute("DROP TABLE SMTP")  # 3
-            con.execute("DROP TABLE irc")  # 4
-            con.execute("DROP TABLE weird")  # 5
-            con.execute("DROP TABLE ssh")  # 6
-            con.execute("DROP TABLE conn")  # 7
-            con.execute("DROP TABLE http")  # 8
-            con.execute("DROP TABLE dns")  # 9
-            con.execute("DROP TABLE signature")  # 10
-            con.execute("DROP TABLE ssl")  # 11
+            con.execute("DROP TABLE IRC")  # 4
+            con.execute("DROP TABLE WEIRD")  # 5
+            con.execute("DROP TABLE SSH")  # 6
+            con.execute("DROP TABLE CONN")  # 7
+            con.execute("DROP TABLE HTTP")  # 8
+            con.execute("DROP TABLE DNS")  # 9
+            con.execute("DROP TABLE SIGNATURE")  # 10
+            con.execute("DROP TABLE SSL")  # 11
             con.execute("DROP TABLE IDS")  # 12
-            con.execute("DROP TABLE files")  # 13
+            con.execute("DROP TABLE FILES")  # 13
 
         except:
             print("table doest exist")
