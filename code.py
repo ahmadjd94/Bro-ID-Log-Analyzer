@@ -15,6 +15,7 @@ import os  # module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import json
+import hashlib
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
@@ -23,10 +24,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []
-    valid = ['conn', 'dhcp', 'dns', 'ftp', 'http', 'irc',
-             'smtp','ssl', 'files','signatures','weird']
 
-    # this list stores the valid log files in a directory
+    valid = ['conn', 'dhcp', 'dns', 'ftp', 'http', 'irc',
+             'smtp','ssl', 'files','signatures','weird']     # this list stores the valid log files in a directory
+
+    UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_loss.log', 'dnp3.log', 'intel.log',
+                        'known_certs.log', 'radius.log', 'modbus.log', 'notice.log', 'reporter.log',
+                        'notice.log', 'software.log', 'snmp.log', 'socks.log',
+                        'syslog.log', 'traceroute.log',
+                        'known_hosts.log']  # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
+
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -441,7 +448,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                            )
                     )
 
-
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
         s = False
@@ -490,7 +496,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         if self.loaded:
             reply = QMessageBox.question(self.message, 'Message',
-                                         "there is files already loaded into databse ,are you sure you want to load files",
+                                         "there is files already loaded into database ,are you sure you want to load files",
                                          QMessageBox.Yes,
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
@@ -654,10 +660,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
                 file.close()
-            else:
-                self.message.setText("make sure you selected a valid file")
+            elif name in self.UnsupportedFiles:
+                self.message.setText("BILA does not currently support the file you are trying to use")
                 self.message.show()
                 self.lineEdit.clear()
+            else :
+                self.message.setText("make sure you are trying to load a valid log files")
+                self.message.show()
+                self.lineEdit.clear()
+
         except:  # handling incorrect file directories / paths
             self.label.show()
 
@@ -708,54 +719,50 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 if __name__ == "__main__":  # main module
     import sys
 
-    UnsupportedFiles=['x509.log','packet_filter.log','app_stats.log','capture_loss.log','dnp3.log','intel.log',
-                      'known_certs.log','radius.log','modbus.log','notice.log','reporter.log',
-                      'notice.log','software.log','snmp.log','socks.log',
-                      'syslog.log','traceroute.log','known_hosts.log']
     validFields = {
-    "http" :{'UID': -1,'TS':-1, "ID": -1, "TRANS_DEPTH": -1, "METHOD": -1, "HOST":-1, "URI": -1, "REFERRER": -1,
+    "HTTP" :{'UID': -1,'TS':-1, "ID": -1, "TRANS_DEPTH": -1, "METHOD": -1, "HOST":-1, "URI": -1, "REFERRER": -1,
             "USER_AGENT": -1, "REQUEST_BODY_LEN": -1,"STATUS_CODE":-1, "STATUS_MSG":-1, "INFO_CODE":-1, "INFO_MSG":-1,
              "TAGS": -1, "USERNAME":-1,"PASSWORD":-1, "PROXIED":-1,"ORIG_FUIDS":-1, "ORIG_MEME_TYPES":-1, "ORIG_FUID":-1,
             "RESP_MEME_TY":-1},  # this dictionary will store the indecies of lof fileds for each file
 
-    'ftp' :{"UID": 0, "TS": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
+    'FTP' :{"UID": 0, "TS": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
            "MIME_TYPE": 0, "FILE_SIZE": 0, "REPLY_CODE": 0, "REPLY_MSG": 0,
            "DATA_CHANNEL": 0, "FUID": 0},
 
-    "files": {"TS": 0, "FUID": 0, "tx_hosts": 0, "rx_hosts": 0, "CONN_UIDS": 0, "SOURCE": 0, "DEPTH": 0,
+    "FILES": {"TS": 0, "FUID": 0, "tx_hosts": 0, "rx_hosts": 0, "CONN_UIDS": 0, "SOURCE": 0, "DEPTH": 0,
              "ANALYZERS": 0, "MIME_TYPE": 0,
              "FILENAME": 0, "DURATION": 0, "LOCAL_ORIG": 0, "IS_ORIG": 0, "SEEN_BYTES": 0, "TOTAL_BYTES": 0,
              "MISSING_BYTES": 0, "OVERFLOW_BYTES": 0, "TIMEDOUT": 0, "PARENT_FUID": 0,
              "MD5A/SHA1/SHA256": 0, "EXTRACTED": 0} , # CHECK THIS AGAIN
 
-    'irc' : {"UID": -1,'TS':-1, "ID": -1, "NICK": -1, "USER": -1, "COMMAND": -1, "VALUE": -1, "ADDI": -1,
+    'IRC' : {"UID": -1,'TS':-1, "ID": -1, "NICK": -1, "USER": -1, "COMMAND": -1, "VALUE": -1, "ADDI": -1,
            "DCC_FILE_NAME": -1, "DCC_FILE_SIZE": -1, "DCC_MIME_TYPE": -1, "FUID": 1},
 
-    'smtp' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": -1, "rcptto": 0
+    'SMTP' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": -1, "rcptto": 0
         , "date": 0, "from": 0, "to": 0, "reply_to": 0, "msg_id": 0, "in_reply_to": 0, "subject": 0
         , "x_originating_ip": 0, "first_received": 0,
             "second_received": 0, "last_reply": 0, "path": 0, "user_agent": 0,
             "tls": 0, "fuids": 0, "is_webmail": 0},
 
-    'ssh' : {"UID": 0, "STATUS": 0, "DIRECTION": 0, "CLIENT": 0, "SERVER": 0, "RESP_SIZE": 0},
+    'SSH' : {"UID": 0, "STATUS": 0, "DIRECTION": 0, "CLIENT": 0, "SERVER": 0, "RESP_SIZE": 0},
 
-    'ssl' : {"UID": 0, "VERSION": 0, "CIPHER": 0,
+    'SSL' : {"UID": 0,"ID.ORIG_H":0,"id.orig_p":0,"id.resp_h":0,"id.resp_p":0,"VERSION": 0, "CIPHER": 0,
            "SERVER_NAME": 0, "SESSION_ID": 0, "SUBJECT": 0,
            "ISSUER_SUBJECT": 0, "NOT_VALID_BEFORE": 0,
            "LAST_ALERT": 0, "CLIENT_SUBJECT": 0, "CLNT_ISSUER_SUBJECT": 0, "CERT_HASH": 0, "VALIDATION_STATUS": 0},
 
-    'weird' :{"UID": 0, "ID": 0, "NAME": 0, "ADDI": 0, "NOTICE": 0, "PEER": 0},
+    'WEIRD' :{"UID": 0, "ID": 0, "NAME": 0, "ADDI": 0, "NOTICE": 0, "PEER": 0},
 
-    'signatures':{"sss":0},
+    'SIGNATURES':{"sss":0},
 
-    'conn':{"UID": 0, "ID_ORIG_H": 0, "ID_ORIG_P": 0, "ID_RESP_H": 0, "ID_RESP_P": 0, "PROTO": 0, "SERVICE": 0,
+    'CONN':{"UID": 0, "ID_ORIG_H": 0, "ID_ORIG_P": 0, "ID_RESP_H": 0, "ID_RESP_P": 0, "PROTO": 0, "SERVICE": 0,
             "DURATION": 0, "ORIG_BYTES": 0,
             "RESP_BYTES": 0, "CONN_STATE": 0, "LOCAL_ORIG": 0, "MISSED_BYTES": 0, "HISTORY": 0, "ORIG_PKTS": 0,
             "ORIG_IP_BYTES": 0,"RESP_PKTS": 0, "RESP_IP_BYTES": 0, "TUNNEL_PARENTS": 0, "ORIG_CC": 0, "RESP_CC": 0},
 
-    'dhcp':{"UID": 0, "ID": 0, "MAC": 0, "ASSIGNED_IP": 0, "LEASE_TIME ": 0, "TRANS_ID": 0},
+    'DHCP':{"UID": 0, "ID": 0, "MAC": 0, "ASSIGNED_IP": 0, "LEASE_TIME ": 0, "TRANS_ID": 0},
 
-    'dns':{"UID": 0, 'ts': 0, "ID": 0, "PROTO": 0, "TRAN_ID": 0,
+    'DNS':{"UID": 0, 'ts': 0, "ID": 0, "PROTO": 0, "TRAN_ID": 0,
            "QUERY": 0, "QCLASS": 0, "QCLASS_NAME": 0, "QTYPE": 0, "QTYPE_NAME": 0, "RCODE": 0, "RCODE_NAME": 0, "QR": 0,
            "AA": 0,"TC": 0, "RD": 0, "RA": 0, "Z": 0, "ANSWERS": 0, "TTLS": 0, "REJECTED BOOL": 0}
     }
@@ -769,9 +776,13 @@ if __name__ == "__main__":  # main module
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
+        try :
+            history=open("history.log","a")  # this block adds files history to log file
+        finally:
+            pass
 
         try:
-            con.execute("DROP TABLE main")  # 1
+            con.execute("DROP TABLE MAIN")  # 1
             con.execute("DROP TABLE DHCP")  # 2
             con.execute("DROP TABLE SMTP")  # 3
             con.execute("DROP TABLE IRC")  # 4
@@ -791,7 +802,8 @@ if __name__ == "__main__":  # main module
         finally:
             print("final")
             con.execute("""CREATE TABLE MAIN( UID TEXT PRIMARY KEY, TIMESTAMP TIME )""")
-            # con.execute("CREATE TABLE IDS ()")
+            con.execute("""CREATE TABLE IDS(UID TEXT ,ID_ORIG_H TEXT,ID_ORIG_P INT,
+                         ID_RESP_H TEXT,ID_RESP_P ,FOREIGN KEY (UID) REFERENCES MAIN (UID))""")
             print("step1")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
