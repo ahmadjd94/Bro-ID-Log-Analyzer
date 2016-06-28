@@ -16,6 +16,7 @@ import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import json
 import hashlib
+import codecs
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
@@ -171,282 +172,297 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def uMan(self):
         self.label_2.setVisible(False)
+
     def traverse(self,fname):
+        try:
+            hashTemp=""
+            f=open(fname+'.log','r')
 
-        f=open(fname+'.log','r')
-        for i in f:
-            if i[0]=="#":
-                if i[:7]=="#fields" or "Fields" :
-                    fields=(i[7:].split())
-                    for field in fields:
-                        validFields[fname][field]=fields.index(field)
+            for i in f:
+                hashTemp += i
+                if i[0]=="#":
+                    if i[:7]=="#fields" or "Fields" :
+                        fields=(i[7:].split())
+                        for field in fields:
+                            validFields[fname][field]=fields.index(field)
+                    else:
+                        continue
                 else:
-                    continue
-            else:
-                line = i.split()
+                    line = i.split()
 
-                if fname == 'http' or fname=="HTTP":  #no hardcoded indecies of fields  / PYTHON HAS NO SWITCH SYNTAX SO ....
-                    con.execute("insert into main (%s)"%line[validFields['http']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['http']['ts']])
-                    con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
-                                            %s,%s,%s,%s,%s,
-                                            %s)"""
-                                %(line [validFields['http']['UID']]
-                                , int(line[validFields["http"]['ID']])
-                                , int(line[validFields["http"]["TRANS_DEPTH"]])
-                                , line[validFields['http']['METHOD']]
-                                , line[validFields["http"]['HOST']]
-                                , line[validFields['http']['URI']]
-                                , line[validFields["http"]["REFERRER"]]
-                                , line[validFields['http']['USER_AGENT']]
-                                , int(line[validFields["http"]["REQUEST_BODY_LEN"]])
-                                , int (validFields["HTTP"]["STATUS_CODE"])
-                                , line[validFields["http"]["STATUS_MSG"]]
-                                , int(line[validFields["http"]["INFO_CODE"]])
-                                , line[validFields['http']['INFO_MSG']]
-                                , line[validFields["http"]["TAGS"]]
-                                , line[validFields['http']['USERNAME']]
-                                , line[validFields["http"]["PASSWORD"]]
-                                , line[validFields["http"]['PROXIED']]
-                                , line[validFields['http']["ORIG_FUIDS"]]
-                                , line[validFields["http"]['ORIG_MEME_TYPES']]
-                                , line[validFields["http"]['ORIG_FUID']]
-                                , line[validFields["http"]['RESP_MEME_TY']]
-                                ))
+                    if fname == 'http' or fname=="HTTP":  #no hardcoded indecies of fields  / PYTHON HAS NO SWITCH SYNTAX SO ....
+                        con.execute("insert into main (%s)"%line[validFields['http']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['http']['ts']])
+                        con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
+                                                %s,%s,%s,%s,%s,
+                                                %s)"""
+                                    %(line [validFields['http']['UID']]
+                                    , int(line[validFields["http"]['ID']])
+                                    , int(line[validFields["http"]["TRANS_DEPTH"]])
+                                    , line[validFields['http']['METHOD']]
+                                    , line[validFields["http"]['HOST']]
+                                    , line[validFields['http']['URI']]
+                                    , line[validFields["http"]["REFERRER"]]
+                                    , line[validFields['http']['USER_AGENT']]
+                                    , int(line[validFields["http"]["REQUEST_BODY_LEN"]])
+                                    , int (validFields["HTTP"]["STATUS_CODE"])
+                                    , line[validFields["http"]["STATUS_MSG"]]
+                                    , int(line[validFields["http"]["INFO_CODE"]])
+                                    , line[validFields['http']['INFO_MSG']]
+                                    , line[validFields["http"]["TAGS"]]
+                                    , line[validFields['http']['USERNAME']]
+                                    , line[validFields["http"]["PASSWORD"]]
+                                    , line[validFields["http"]['PROXIED']]
+                                    , line[validFields['http']["ORIG_FUIDS"]]
+                                    , line[validFields["http"]['ORIG_MEME_TYPES']]
+                                    , line[validFields["http"]['ORIG_FUID']]
+                                    , line[validFields["http"]['RESP_MEME_TY']]
+                                    ))
 
-                if fname == 'ftp' or fname=="FTP":  # no hardcoded indecies of fields
-                    con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
-                    con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
-                                % ( line[validFields['ftp']['user']]
-                                   , line[validFields["ftp"]['PASSWORD']]
-                                   , line[validFields["ftp"]["COMMAND"]]
-                                   , line[validFields['ftp']['ARG']]
-                                   , line[validFields["ftp"]['MIME_TYPE']]
-                                   , int(line[validFields['ftp']['FILE_SIZE']])
-                                   , int(line[validFields["ftp"]["REPLY_CODE"]])
-                                   , line[validFields['ftp']['REPLY_MSG']]
-                                   , line[validFields["ftp"]["DATA_CHANNEL"]]
-                                   , line[validFields["ftp"]["FUID"]]
-                                   ))
+                    if fname == 'ftp' or fname=="FTP":  # no hardcoded indecies of fields
+                        con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
+                        con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
+                                    % ( line[validFields['ftp']['user']]
+                                       , line[validFields["ftp"]['PASSWORD']]
+                                       , line[validFields["ftp"]["COMMAND"]]
+                                       , line[validFields['ftp']['ARG']]
+                                       , line[validFields["ftp"]['MIME_TYPE']]
+                                       , int(line[validFields['ftp']['FILE_SIZE']])
+                                       , int(line[validFields["ftp"]["REPLY_CODE"]])
+                                       , line[validFields['ftp']['REPLY_MSG']]
+                                       , line[validFields["ftp"]["DATA_CHANNEL"]]
+                                       , line[validFields["ftp"]["FUID"]]
+                                       ))
 
-                if fname == 'irc'or fname=="IRC":   # no hardcoded indecies of fields
-                    con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
-                    con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
-                                    % (int(line[validFields['irc']['ID']])
-                                       , line[validFields["irc"]['NICK']]
-                                       , line[validFields["irc"]["USER"]]
-                                       , line[validFields['irc']['COMMAND']]
-                                       , line[validFields["irc"]['VALUE']]
-                                       , (line[validFields['irc']['ADDI']])
-                                       , line[validFields["irc"]["DCC_FILE_NAME"]]
-                                       , int(line[validFields['irc']['DCC_FILE_SIZE']])
-                                       ,line[validFields['irs']['DCC_FILE_TYPE']]
-                                       , line[validFields["irc"]["FUID"]]
+                    if fname == 'irc'or fname=="IRC":   # no hardcoded indecies of fields
+                        con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
+                        con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
+                                        % (int(line[validFields['irc']['ID']])
+                                           , line[validFields["irc"]['NICK']]
+                                           , line[validFields["irc"]["USER"]]
+                                           , line[validFields['irc']['COMMAND']]
+                                           , line[validFields["irc"]['VALUE']]
+                                           , (line[validFields['irc']['ADDI']])
+                                           , line[validFields["irc"]["DCC_FILE_NAME"]]
+                                           , int(line[validFields['irc']['DCC_FILE_SIZE']])
+                                           ,line[validFields['irs']['DCC_FILE_TYPE']]
+                                           , line[validFields["irc"]["FUID"]]
+                                           )
+                                        )
+
+                    if fname == 'conn'or fname=="CONN":  # no hardcoded indecies of fields
+                        con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
+                        con.execute("""insert into conn (%s,%s,%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%s,%s,%s)"""
+                                        % ((line[validFields['CONN']['uid']])
+                                           , line[validFields["CONN"]['ID_ORIG_H']]
+                                           , int(line[validFields["CONN"]["ID_ORIG_P"]])
+                                           , line[validFields['CONN']['ID_RESP_H']]
+                                           , int(line[validFields["CONN"]['RESP_P']])
+                                           , (line[validFields['CONN']['PROTO']])
+                                           , line[validFields["CONN"]["SERVICE"]]
+                                           , (line[validFields['CONN']['DURATION']])
+                                           , line[validFields['CONN']['ORIG_BYTES']]
+                                           , line[validFields["CONN"]["RESP_BYTES"]]
+                                           ,line[validFields["CONN"]["CONN_STATE"]]
+                                           ,line[validFields["CONN"]["LOCAL_ORIG"]]
+                                           ,line[validFields["CONN"]["MISSED_BYTES"]]
+                                           ,line[validFields["CONN"]["HISTORY"]]
+                                           ,line[validFields["CONN"]["ORIG_PKTS"]]
+                                           ,int(line[validFields["CONN"]["ORIG_IP_BYTES"]])
+                                           ,int(line[validFields["CONN"]["RESP_PKTS"]])
+                                           ,int(line[validFields["CONN"]["RESP_IP_BYTES"]])
+                                           ,line[validFields["CONN"]["TUNNEL_PARENTS"]]
+                                           ,line[validFields["CONN"]["ORIG_CC"]]
+                                           ,line[validFields["CONN"]["RESP_CC"]]
+                                           )
+                                        )
+
+                    if fname == 'signature' or fname=="SIGNATURE":
+                        con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
+                        con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
+                                    % (int(line[validFields['signature']['ts']])
+                                       , line[validFields["signature"]['SRC_ADDR']]
+                                       , int(line[validFields["signature"]["SRC_PORT"]])
+                                       , line[validFields['signature']['DST_ADDR']]
+                                       , int(line[validFields["signature"]['DST_PORT']])
+                                       , (line[validFields['signature']['NOTE']])
+                                       , line[validFields["signature"]["SIG_ID"]]
+                                       , (line[validFields['signature']['EVENT_MSG']])
+                                       , line[validFields['signature']['SUB_MSG']]
+                                       , int(line[validFields["signature"]["SIG_COUNT"]])
+                                       , int(line[validFields["signature"]["host_COUNT"]])
                                        )
                                     )
 
-                if fname == 'conn'or fname=="CONN":  # no hardcoded indecies of fields
-                    con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
-                    con.execute("""insert into conn (%s,%s,%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%s,%s,%s)"""
-                                    % ((line[validFields['CONN']['uid']])
-                                       , line[validFields["CONN"]['ID_ORIG_H']]
-                                       , int(line[validFields["CONN"]["ID_ORIG_P"]])
-                                       , line[validFields['CONN']['ID_RESP_H']]
-                                       , int(line[validFields["CONN"]['RESP_P']])
-                                       , (line[validFields['CONN']['PROTO']])
-                                       , line[validFields["CONN"]["SERVICE"]]
-                                       , (line[validFields['CONN']['DURATION']])
-                                       , line[validFields['CONN']['ORIG_BYTES']]
-                                       , line[validFields["CONN"]["RESP_BYTES"]]
-                                       ,line[validFields["CONN"]["CONN_STATE"]]
-                                       ,line[validFields["CONN"]["LOCAL_ORIG"]]
-                                       ,line[validFields["CONN"]["MISSED_BYTES"]]
-                                       ,line[validFields["CONN"]["HISTORY"]]
-                                       ,line[validFields["CONN"]["ORIG_PKTS"]]
-                                       ,int(line[validFields["CONN"]["ORIG_IP_BYTES"]])
-                                       ,int(line[validFields["CONN"]["RESP_PKTS"]])
-                                       ,int(line[validFields["CONN"]["RESP_IP_BYTES"]])
-                                       ,line[validFields["CONN"]["TUNNEL_PARENTS"]]
-                                       ,line[validFields["CONN"]["ORIG_CC"]]
-                                       ,line[validFields["CONN"]["RESP_CC"]]
-                                       )
-                                    )
-
-                if fname == 'signature' or fname=="SIGNATURE":
-                    con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
-                    con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
-                                % (int(line[validFields['signature']['ts']])
-                                   , line[validFields["signature"]['SRC_ADDR']]
-                                   , int(line[validFields["signature"]["SRC_PORT"]])
-                                   , line[validFields['signature']['DST_ADDR']]
-                                   , int(line[validFields["signature"]['DST_PORT']])
-                                   , (line[validFields['signature']['NOTE']])
-                                   , line[validFields["signature"]["SIG_ID"]]
-                                   , (line[validFields['signature']['EVENT_MSG']])
-                                   , line[validFields['signature']['SUB_MSG']]
-                                   , int(line[validFields["signature"]["SIG_COUNT"]])
-                                   , int(line[validFields["signature"]["host_COUNT"]])
+                    if fname == 'dns' or fname== "DNS":
+                        con.execute("insert into main (%s)" % line[validFields['dns']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['dns']['ts']])
+                        con.execute(
+                                """insert into dns (%s,%s,%s,%d,%s,%d,%s,%d,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s,%d)"""
+                                % ((line[validFields['DNS']['UID']])
+                                   , line[validFields["DNS"]['ID']]
+                                   , (line[validFields["DNS"]["PROTO"]])
+                                   , int(line[validFields['DNS']['TRANS_ID']])
+                                   , (line[validFields["DNS"]['QUERY']])
+                                   , int((line[validFields['DNS']['QCLASS']]))
+                                   , line[validFields["DNS"]["QCLASS_NAME"]]
+                                   , int(line[validFields["DNS"]["QTYPE"]])
+                                   , line[validFields["DNS"]["QTYPE_NAME"]]
+                                   , int((line[validFields['DNS']['RCODE']]))
+                                   , line[validFields['DNS']['RCODE_NAME']]
+                                   , int(line[validFields["DNS"]["QR"]])
+                                   , int(line[validFields["DNS"]["AA"]])
+                                   , int(line[validFields["DNS"]["TC"]])
+                                   , int(line[validFields["DNS"]["RD"]])
+                                   , int(line[validFields["DNS"]["RA"]])
+                                   , int(line[validFields["DNS"]["Z"]])
+                                   , (line[validFields["DNS"]["ANSWERS"]])
+                                   , (line[validFields["DNS"]["TTLS"]])
+                                   , int(line[validFields["DNS"]["REJECTED"]])
                                    )
                                 )
 
-                if fname == 'dns' or fname== "DNS":
-                    con.execute("insert into main (%s)" % line[validFields['dns']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['dns']['ts']])
-                    con.execute(
-                            """insert into dns (%s,%s,%s,%d,%s,%d,%s,%d,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s,%d)"""
-                            % ((line[validFields['DNS']['UID']])
-                               , line[validFields["DNS"]['ID']]
-                               , (line[validFields["DNS"]["PROTO"]])
-                               , int(line[validFields['DNS']['TRANS_ID']])
-                               , (line[validFields["DNS"]['QUERY']])
-                               , int((line[validFields['DNS']['QCLASS']]))
-                               , line[validFields["DNS"]["QCLASS_NAME"]]
-                               , int(line[validFields["DNS"]["QTYPE"]])
-                               , line[validFields["DNS"]["QTYPE_NAME"]]
-                               , int((line[validFields['DNS']['RCODE']]))
-                               , line[validFields['DNS']['RCODE_NAME']]
-                               , int(line[validFields["DNS"]["QR"]])
-                               , int(line[validFields["DNS"]["AA"]])
-                               , int(line[validFields["DNS"]["TC"]])
-                               , int(line[validFields["DNS"]["RD"]])
-                               , int(line[validFields["DNS"]["RA"]])
-                               , int(line[validFields["DNS"]["Z"]])
-                               , (line[validFields["DNS"]["ANSWERS"]])
-                               , (line[validFields["DNS"]["TTLS"]])
-                               , int(line[validFields["DNS"]["REJECTED"]])
-                               )
-                            )
-
-                if fname == 'SSH' or fname=="ssh":
-                    con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
-                    con.execute(
-                        """insert into dns (%s,%s,%s,%s,%s,%s,%d)"""
-                        % ((line[validFields['SSH']['UID']])
-                           , line[validFields["SSH"]['ID']]
-                           , (line[validFields["SSH"]["STATUS"]])
-                           , (line[validFields['SSH']['DIRECTION']])
-                           , (line[validFields["SSH"]['CLIENT']])
-                           , line[validFields['SSH']['SERVER']]
-                           , int(line[validFields["SSH"]["RESP_SIZE"]])
-                           )
-                    )
-
-                if fname == 'SSL' or fname=="ssl":
-                    con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
-                    con.execute(
-                            """insert into SSL (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-                            % ((line[validFields['SSL']['UID']])
-                               , line[validFields["SSL"]['ID']]
-                               , (line[validFields["SSL"]["VERSION"]])
-                               , (line[validFields['SSL']['CIPHER']])
-                               , (line[validFields["SSL"]['SERVER_NAME']])
-                               , line[validFields['SSL']['SESSIONS_ID']]
-                               , (line[validFields["SSL"]["SUBJECT"]])
-                               ,(line[validFields["SSL"]["ISSUER_SUBJECT"]])
-                               ,(line[validFields["SSL"]["NOT_VALID_BEFORE"]])
-                               ,(line[validFields["SSL"]["NOT_VALID_AFTER"]])
-                               ,(line[validFields["SSL"]["LAST_ALERT"]])
-                               ,(line[validFields["SSL"]["CLEINT_SUBJECT"]])
-                               ,(line[validFields["SSL"]["CLNT_ISSUER_SUBJECT"]])
-                               ,(line[validFields["SSL"]["CERT_HASH"]])
-                               ,(line[validFields["SSL"]["VALIDATION_STATUS"]])
-
-                               )
-                        )
-                if fname == 'SMTP' or fname=="smtp":
-                    con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
-                    con.execute(
-                        """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
-                        % (line[validFields['SMTP']['UID']]
-                           , line[validFields["SMTP"]['ID']]
-                           , int(line[validFields["SMTP"]["TRANS_DEPTH"]])
-                           , line[validFields['SMTP']['HELO']]
-                           , line[validFields["SMTP"]['MAILFROM']]
-                           , line[validFields['SMTP']['RCPTTO']]
-                           , line[validFields["SMTP"]["DATE"]]
-                           , line[validFields["SMTP"]["FROM"]]
-                           , line[validFields["SMTP"]["TO"]]
-                           , line[validFields["SMTP"]["REPLY_TP"]]
-                           , line[validFields["SMTP"]["MSG_ID"]]
-                           , line[validFields["SMTP"]["IN_REPLY_TO"]]
-                           , line[validFields["SMTP"]["SUBJECT"]]
-                           , line[validFields["SMTP"]["X_ORIGINATING_IP"]]
-                           , line[validFields["SMTP"]["FIRST_RECEIVED"]]
-                           ,line[validFields["SMTP"]["SECOND_RECEIVED"]]
-                           ,line[validFields["SMTP"]["LAST_REPLY"]]
-                           ,line[validFields["SMTP"]["PATH"]]
-                           ,line[validFields["SMTP"]["USER_AGENT"]]
-                           ,int(line[validFields["SMTP"]["TLS"]])
-                           ,line[validFields["SMTP"]["FUID"]]
-                           ,int(line[validFields["SMTP"]["IS_WEBMAIL"]])
-                           )
-                    )
-
-                if fname== 'dhcp' or fname == "DHCP":
-                        con.execute("insert into main (%s)" % line[validFields['DHCP']['uid']])
-                        con.execute("insert into main (%s)" % line[validFields['DHCP']['ts']])
+                    if fname == 'SSH' or fname=="ssh":
+                        con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
                         con.execute(
-                            """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
-                            % ((line[validFields['DHCP']['UID']])
-                               , line[validFields["DHCP"]['ID']]
-                               , (line[validFields["DHCP"]["MAC"]])
-                               , (line[validFields['DHCP']['ASSIGNED_IP']])
-                               , (line[validFields["DHCP"]['LEASE_TIME']])
-                               , line[validFields['DHCP']['TRANS_ID']]
-
+                            """insert into dns (%s,%s,%s,%s,%s,%s,%d)"""
+                            % ((line[validFields['SSH']['UID']])
+                               , line[validFields["SSH"]['ID']]
+                               , (line[validFields["SSH"]["STATUS"]])
+                               , (line[validFields['SSH']['DIRECTION']])
+                               , (line[validFields["SSH"]['CLIENT']])
+                               , line[validFields['SSH']['SERVER']]
+                               , int(line[validFields["SSH"]["RESP_SIZE"]])
                                )
                         )
 
-                if fname == 'WEIRD' or fname == "weird":
-                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
-                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
+                    if fname == 'SSL' or fname=="ssl":
+                        con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
+                        con.execute(
+                                """insert into SSL (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                                % ((line[validFields['SSL']['UID']])
+                                   , line[validFields["SSL"]['ID']]
+                                   , (line[validFields["SSL"]["VERSION"]])
+                                   , (line[validFields['SSL']['CIPHER']])
+                                   , (line[validFields["SSL"]['SERVER_NAME']])
+                                   , line[validFields['SSL']['SESSIONS_ID']]
+                                   , (line[validFields["SSL"]["SUBJECT"]])
+                                   ,(line[validFields["SSL"]["ISSUER_SUBJECT"]])
+                                   ,(line[validFields["SSL"]["NOT_VALID_BEFORE"]])
+                                   ,(line[validFields["SSL"]["NOT_VALID_AFTER"]])
+                                   ,(line[validFields["SSL"]["LAST_ALERT"]])
+                                   ,(line[validFields["SSL"]["CLEINT_SUBJECT"]])
+                                   ,(line[validFields["SSL"]["CLNT_ISSUER_SUBJECT"]])
+                                   ,(line[validFields["SSL"]["CERT_HASH"]])
+                                   ,(line[validFields["SSL"]["VALIDATION_STATUS"]])
+
+                                   )
+                            )
+                    if fname == 'SMTP' or fname=="smtp":
+                        con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
+                        con.execute(
+                            """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
+                            % (line[validFields['SMTP']['UID']]
+                               , line[validFields["SMTP"]['ID']]
+                               , int(line[validFields["SMTP"]["TRANS_DEPTH"]])
+                               , line[validFields['SMTP']['HELO']]
+                               , line[validFields["SMTP"]['MAILFROM']]
+                               , line[validFields['SMTP']['RCPTTO']]
+                               , line[validFields["SMTP"]["DATE"]]
+                               , line[validFields["SMTP"]["FROM"]]
+                               , line[validFields["SMTP"]["TO"]]
+                               , line[validFields["SMTP"]["REPLY_TP"]]
+                               , line[validFields["SMTP"]["MSG_ID"]]
+                               , line[validFields["SMTP"]["IN_REPLY_TO"]]
+                               , line[validFields["SMTP"]["SUBJECT"]]
+                               , line[validFields["SMTP"]["X_ORIGINATING_IP"]]
+                               , line[validFields["SMTP"]["FIRST_RECEIVED"]]
+                               ,line[validFields["SMTP"]["SECOND_RECEIVED"]]
+                               ,line[validFields["SMTP"]["LAST_REPLY"]]
+                               ,line[validFields["SMTP"]["PATH"]]
+                               ,line[validFields["SMTP"]["USER_AGENT"]]
+                               ,int(line[validFields["SMTP"]["TLS"]])
+                               ,line[validFields["SMTP"]["FUID"]]
+                               ,int(line[validFields["SMTP"]["IS_WEBMAIL"]])
+                               )
+                        )
+
+                    if fname== 'dhcp' or fname == "DHCP":
+                            con.execute("insert into main (%s)" % line[validFields['DHCP']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['DHCP']['ts']])
                             con.execute(
-                                """insert into DHCP (%s,%s,%s,%s,%s,%d)"""
-                                % ((line[validFields['WEIRD']['UID']])
-                                   , line[validFields["WEIRD"]['ID']]
-                                   , (line[validFields["WEIRD"]["NAME"]])
-                                   , (line[validFields['WEIRD']['ADDI']])
-                                   , int(line[validFields["WEIRD"]['NOTICE']])
-                                   , (line[validFields['WEIRD']['PEER']])
+                                """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
+                                % ((line[validFields['DHCP']['UID']])
+                                   , line[validFields["DHCP"]['ID']]
+                                   , (line[validFields["DHCP"]["MAC"]])
+                                   , (line[validFields['DHCP']['ASSIGNED_IP']])
+                                   , (line[validFields["DHCP"]['LEASE_TIME']])
+                                   , line[validFields['DHCP']['TRANS_ID']]
 
                                    )
                             )
 
-                if fname == 'FILES' or fname == "files":
-                    con.execute("insert into main (%s)" % line[validFields['FILES']['uid']])
-                    con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
-                    con.execute(
-                        """insert into FILES (%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s)"""
-                        % (line[validFields['FILES']['TS']]
-                           , line[validFields["FILES"]['FUID']]
-                           , (line[validFields["FILES"]["TX_HOSTS"]])
-                           , line[validFields['FILES']['RX_HOSTS']]
-                           , line[validFields["FILES"]['CONN_UIDS']]
-                           , line[validFields['FILES']['SOURCE']]
-                           ,int(line[validFields["FILES"]["DEPTH"]])
-                           , line[validFields["FILES"]["ANALYZERS"]]
-                           , line[validFields["FILES"]["MIME_TYPE"]]
-                           , line[validFields["FILES"]["FILENAME"]]
-                           , line[validFields["FILES"]["DURATION"]]
-                           ,int(line[validFields["FILES"]["LOCAL_ORIG"]])
-                           ,int(line[validFields["FILES"]["IS_ORIG"]])
-                           ,int(line[validFields["FILES"]["SEEN_BYTES"]])
-                           ,int( line[validFields["FILES"]["TOTAL_BYTES"]])
-                           ,int(line[validFields["FILES"]["MISSING_BYTES"]])
-                           ,int( line[validFields["FILES"]["OVERFLOW_BYTES"]])
-                           ,int (line[validFields["FILES"]["TIMEDOUT"]])
-                           ,(line[validFields["FILES"]["PARENT_FUID"]])
-                           , line[validFields["FILES"]["MD5_SHA1_SHA256"]]
-                           , (line[validFields["FILES"]["EXTRACTED"]])
-                           )
-                    )
+                    if fname == 'WEIRD' or fname == "weird":
+                                con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
+                                con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
+                                con.execute(
+                                    """insert into DHCP (%s,%s,%s,%s,%s,%d)"""
+                                    % ((line[validFields['WEIRD']['UID']])
+                                       , line[validFields["WEIRD"]['ID']]
+                                       , (line[validFields["WEIRD"]["NAME"]])
+                                       , (line[validFields['WEIRD']['ADDI']])
+                                       , int(line[validFields["WEIRD"]['NOTICE']])
+                                       , (line[validFields['WEIRD']['PEER']])
+
+                                       )
+                                )
+
+                    if fname == 'FILES' or fname == "files":
+                        con.execute("insert into main (%s)" % line[validFields['FILES']['uid']])
+                        con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
+                        con.execute(
+                            """insert into FILES (%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s)"""
+                            % (line[validFields['FILES']['TS']]
+                               , line[validFields["FILES"]['FUID']]
+                               , (line[validFields["FILES"]["TX_HOSTS"]])
+                               , line[validFields['FILES']['RX_HOSTS']]
+                               , line[validFields["FILES"]['CONN_UIDS']]
+                               , line[validFields['FILES']['SOURCE']]
+                               ,int(line[validFields["FILES"]["DEPTH"]])
+                               , line[validFields["FILES"]["ANALYZERS"]]
+                               , line[validFields["FILES"]["MIME_TYPE"]]
+                               , line[validFields["FILES"]["FILENAME"]]
+                               , line[validFields["FILES"]["DURATION"]]
+                               ,int(line[validFields["FILES"]["LOCAL_ORIG"]])
+                               ,int(line[validFields["FILES"]["IS_ORIG"]])
+                               ,int(line[validFields["FILES"]["SEEN_BYTES"]])
+                               ,int( line[validFields["FILES"]["TOTAL_BYTES"]])
+                               ,int(line[validFields["FILES"]["MISSING_BYTES"]])
+                               ,int( line[validFields["FILES"]["OVERFLOW_BYTES"]])
+                               ,int (line[validFields["FILES"]["TIMEDOUT"]])
+                               ,(line[validFields["FILES"]["PARENT_FUID"]])
+                               , line[validFields["FILES"]["MD5_SHA1_SHA256"]]
+                               , (line[validFields["FILES"]["EXTRACTED"]])
+                               )
+                        )
+            with open(historyLog) as csvfile:
+                wr1 = csv.writer(csvfile, 'a', delimiter=' ')
+
+                digestive=hashlib.md5(codecs.encode( hashTemp))
+                csvfile.write([fname,digestive.hexdigest()])
+        except :
+            with open(historyLog) as csvfile:
+                wr1 = csv.writer(csvfile, 'a', delimiter=' ')
+                csvfile.write([fname, "FAILED"])
+        finally:
+           f.close
 
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
@@ -460,7 +476,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         pass
                         # this lines should insert the result of select statments into the tableview
 
-            if "insert" in command:
+            if "insert" in command:         # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO
 
                 con.execute(command)
             else:
@@ -537,42 +553,42 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             f.close()
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":  # creating db tables will be moved here
-            v = 100 / len(self.validFiles)
+            progress = 100 / len(self.validFiles) #not so accurate, progress bar will be filled according to progress in file , not according to line numbers
             for each in self.validFiles:
-                eachIgnorecase= each
-                if each == "ftp" or each == "FTP":   #DONE
+                each = str.lower(each)
+                if each == "ftp" :   #DONE
                     con.execute("""CREATE TABLE FTP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                     MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                     DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                     print("step3")
 
-                if each == "dhcp" or each == "DCHP":  #DONE
+                if each == "dhcp":  #DONE
                     con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                     , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
                     print("step2")
 
-                if each == "irc" or each == "IRC": #DONE
+                if each == "irc" : #DONE
                     con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                     DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step4")
 
-                if each == "weird.log" or each == "WEIRD.log": #DONE
+                if each == "weird.log": #DONE
                     con.execute("""CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,
                     ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step5")
 
-                if each == "ssh.log" or each == "SSH.log": #DONE
+                if each == "ssh.log" :#DONE
                     con.execute("""CREATE TABLE SSH( UID TEXT,STATUS TEXT,
                     DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step6")
 
-                if each == "conn.log" or each == "CONN.log": #DONE
+                if each == "conn.log": #DONE
                     con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                     RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                     RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step7")
 
-                if each == "http.log" or each == "HTTP.log":  #DONE
+                if each == "http.log":  #DONE
                     con.execute("""CREATE TABLE  HTTP (UID TEXT,
                                             ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                             USER_AGENT TEXT,REQUEST_BODY_LEN INT,
@@ -582,19 +598,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                             RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
                     print("step8")
 
-                if each == "DNS.log" or each == "dns.log":   #DONE
+                if each == "dns.log":   #DONE
                     con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
                                             QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                             RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                     print("step9")
 
-                if each == "signatrue.log" or each == "SIGNATURE.log":  #DONE
+                if each == "signature.log" :  #DONE
                     con.execute("""CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDR TEXT ,
                                 SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
                                 EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                     print("step10")
 
-                if each == "SSL.log" or each == "ssl.log":  #DONE
+                if each == "ssl.log":  #DONE
                     con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
                     SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                     ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
@@ -602,7 +618,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step11")
 
-                if each == "FILES.log" or each == "files.log": #DONE
+                if each == "files.log": #DONE
                     con.execute(
                         """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
                             ANALYZERS TEXT,MIME_TYPE TEXT,
@@ -610,7 +626,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                             MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
 
-                if each == "smtp.log" or each == "SMTP.log":  #DONE
+                if each == "smtp.log" :  #DONE
                     con.execute("""CREATE TABLE SMTP (uid TEXT ,id INT,trans_depth INT ,helo TEXT,mailfrom STRING,rcptto BLOB
               ,date TEXT ,from TEXT ,to BLOB,reply_to TEXT,msg_id TEXT ,in_reply_to TEXT ,subject TEXT
               ,x_originating_ip TEXT,first_received TEXT ,
@@ -618,7 +634,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             tls BOOL,fuids BLOB,is_webmail BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
 
                #function moved to top#
-                self.progressBar.setValue(self.progressBar.value() + v)
+                self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)
             self.analysis.setTabEnabled(2, True)
             self.loaded = True
@@ -718,7 +734,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 if __name__ == "__main__":  # main module
     import sys
-
+    import csv
+    from datetime import datetime
+    OriDir = os.getcwd()  # this variable will store the original
+    historyLog = os.getcwd() + '/history.csv'
     validFields = {
     "HTTP" :{'UID': -1,'TS':-1, "ID": -1, "TRANS_DEPTH": -1, "METHOD": -1, "HOST":-1, "URI": -1, "REFERRER": -1,
             "USER_AGENT": -1, "REQUEST_BODY_LEN": -1,"STATUS_CODE":-1, "STATUS_MSG":-1, "INFO_CODE":-1, "INFO_MSG":-1,
@@ -776,10 +795,20 @@ if __name__ == "__main__":  # main module
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
-        try :
-            history=open("history.log","a")  # this block adds files history to log file
-        finally:
-            pass
+        if "history.csv" in os.listdir():
+                with open(historyLog,'a') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(["new session",str (datetime.now())[:19]])
+        else:
+              #SUGGESTED FEATURE ! HISTORY FILE SHOULD BE A CSV FILE
+            print(historyLog)
+            f=open(historyLog,"w")
+            f.close()
+            with open(historyLog , 'a') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(["new session", str(datetime.now())[:19]])
+
+
 
         try:
             con.execute("DROP TABLE MAIN")  # 1
