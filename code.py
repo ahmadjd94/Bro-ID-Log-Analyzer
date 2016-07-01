@@ -26,8 +26,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []
 
-    valid = ['conn', 'dhcp', 'dns', 'ftp', 'http', 'irc',
-             'smtp','ssl', 'files','signatures','weird']     # this list stores the valid log files in a directory
+    valid = ['conn.log', 'dhcp.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log',
+             'smtp.log','ssl.log', 'files.log','signatures.log','weird.log']     # this list stores the valid log files in a directory
 
     UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_loss.log', 'dnp3.log', 'intel.log',
                         'known_certs.log', 'radius.log', 'modbus.log', 'notice.log', 'reporter.log',
@@ -553,6 +553,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             f.close()
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":  # creating db tables will be moved here
+
             progress = 100 / len(self.validFiles) #not so accurate, progress bar will be filled according to progress in file , not according to line numbers
             for each in self.validFiles:
                 each = str.lower(each)
@@ -712,9 +713,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
-                if each in self.valid:
+                #if each in self.valid:
                     print(each)
                     self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
+                    print (self.validFiles)
+
+            dropped = filter(droptables(con), tables) # fix ?
+            print(dropped + "this is dropped tables ") #fix ?
+            print(tables - dropped + "non dropped tables ") #fix ?
+
 
             self.label.setText(
                 "the directory you have selected have " + str(len(self.validFiles)) + " valid files")
@@ -730,7 +737,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
         # reset timeline
-
+def droptables (connection,table):
+    try:
+        connection.execute("drop table %s"%(table) )
+        return True
+    except :
+        return False
 
 if __name__ == "__main__":  # main module
     import sys
@@ -791,6 +803,7 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+    tables={"MAIN":0,"DHCP":0,"SMTP":0,"IRC":0,"WEIRD":0,"SSH":0,"CONN":0,"HTTP":0,"DNS":0,"SIGNATURE":0,"SSL":0,"IDS":0,"FILES":0}
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
@@ -800,7 +813,7 @@ if __name__ == "__main__":  # main module
                     writer = csv.writer(csvfile)
                     writer.writerow(["new session",str (datetime.now())[:19]])
         else:
-              #SUGGESTED FEATURE ! HISTORY FILE SHOULD BE A CSV FILE
+
             print(historyLog)
             f=open(historyLog,"w")
             f.close()
@@ -809,31 +822,6 @@ if __name__ == "__main__":  # main module
                 writer.writerow(["new session", str(datetime.now())[:19]])
 
 
-
-        try:
-            con.execute("DROP TABLE MAIN")  # 1
-            con.execute("DROP TABLE DHCP")  # 2
-            con.execute("DROP TABLE SMTP")  # 3
-            con.execute("DROP TABLE IRC")  # 4
-            con.execute("DROP TABLE WEIRD")  # 5
-            con.execute("DROP TABLE SSH")  # 6
-            con.execute("DROP TABLE CONN")  # 7
-            con.execute("DROP TABLE HTTP")  # 8
-            con.execute("DROP TABLE DNS")  # 9
-            con.execute("DROP TABLE SIGNATURE")  # 10
-            con.execute("DROP TABLE SSL")  # 11
-            con.execute("DROP TABLE IDS")  # 12
-            con.execute("DROP TABLE FILES")  # 13
-
-        except:
-            print("table doest exist")
-
-        finally:
-            print("final")
-            con.execute("""CREATE TABLE MAIN( UID TEXT PRIMARY KEY, TIMESTAMP TIME )""")
-            con.execute("""CREATE TABLE IDS(UID TEXT ,ID_ORIG_H TEXT,ID_ORIG_P INT,
-                         ID_RESP_H TEXT,ID_RESP_P ,FOREIGN KEY (UID) REFERENCES MAIN (UID))""")
-            print("step1")
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
