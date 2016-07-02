@@ -452,17 +452,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                , (line[validFields["FILES"]["EXTRACTED"]])
                                )
                         )
-            with open(historyLog) as csvfile:
-                wr1 = csv.writer(csvfile, 'a', delimiter=' ')
+            with open(historyLog,'a') as csvfile:
+                wr1 = csv.writer(csvfile, delimiter=' ')
 
                 digestive=hashlib.md5(codecs.encode( hashTemp))
                 csvfile.write([fname,digestive.hexdigest()])
         except :
-            with open(historyLog) as csvfile:
-                wr1 = csv.writer(csvfile, 'a', delimiter=' ')
-                csvfile.write([fname, "FAILED"])
-        finally:
-           f.close
+            with open(historyLog,'a') as csvfile:
+                wr1 = csv.writer(csvfile, delimiter=' ')
+                wr1.writerow([fname, "FAILED"])
+
 
     def executeSQL(self):
         command = self.textEdit.toPlainText().lower()
@@ -548,9 +547,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         # do some operations to the input line
                         # do pattern matching
 
-                self.progressBar.setValue((i / self.linesCount) * 100)
+                self.progressBar.setValue((i / self.linesCount) * 100)f.close()
 """
-            f.close()
+
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":  # creating db tables will be moved here
 
@@ -634,6 +633,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             second_received TEXT ,last_reply TEXT ,path BLOB,user_agent TEXT ,
             tls BOOL,fuids BLOB,is_webmail BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
 
+                self.traverse(each)
+
                #function moved to top#
                 self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)
@@ -713,15 +714,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
-                #if each in self.valid:
-                    print(each)
+                if each in self.valid:
                     self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
                     print (self.validFiles)
-
-            dropped = filter(droptables(con), tables) # fix ?
-            print(dropped + "this is dropped tables ") #fix ?
-            print(tables - dropped + "non dropped tables ") #fix ?
-
 
             self.label.setText(
                 "the directory you have selected have " + str(len(self.validFiles)) + " valid files")
@@ -737,14 +732,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
         # reset timeline
-def droptables (connection,table):
-    try:
-        connection.execute("drop table %s"%(table) )
-        return True
-    except :
-        return False
 
 if __name__ == "__main__":  # main module
+    def droptables(table):
+        try:
+            con.execute("drop table %s" % (table))
+            return 1
+        except sqlite3.OperationalError as a:
+            if  "no such table" in str(a):
+                return 0
+
     import sys
     import csv
     from datetime import datetime
@@ -808,6 +805,11 @@ if __name__ == "__main__":  # main module
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
+        dropped = map(droptables, tables)  # fix ?
+        print(list(dropped))
+        print(str(list(dropped)) + "this is dropped tables ")  # fix ?
+        # print(tables - dropped + "non dropped tables ") #fix ?
+
         if "history.csv" in os.listdir():
                 with open(historyLog,'a') as csvfile:
                     writer = csv.writer(csvfile)
