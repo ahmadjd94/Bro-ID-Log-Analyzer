@@ -18,8 +18,9 @@ import json
 import hashlib
 import codecs
 
-true=True
+
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
+
     ################################  defining global variable ###################################
     global con  # connection to DB
     linesCount = 0  # count of lines
@@ -34,7 +35,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         'notice.log', 'software.log', 'snmp.log', 'socks.log',
                         'syslog.log', 'traceroute.log',
                         'known_hosts.log']  # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
-
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -173,7 +173,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def uMan(self):
         self.label_2.setVisible(False)
 
-    def tableCreator(self,fname):
+    def tableCreator(self,fname):   # this function creates tables based on the fname argument
 
         if fname == "ftp.log":  # DONE
             try:
@@ -184,7 +184,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return True
             except :
                 return False
-
 
         elif fname == "dhcp.log":  # DONE
             try:
@@ -301,13 +300,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (type (fname))
         print (fname)
         try:
-            fname= (fname.split('.')[0])
+            fname= (fname.split('.')[0])      # this statment splits the fname and neglects the .log part of it
             print ("this is the name"+str(fname))
-            hashTemp=""
-            f=open(fname+'.log','r')
+            hashTemp=""                       #this variable stores the entire log file to calculate it's hash value
+            f=open(fname+'.log','r')          #open the log file Read-Only mode
 
             for i in f:
-                    hashTemp += i
+                    hashTemp += i               #concatenate the lines being read to the string
 
                     if i[:7]=="#fields" or i[:7]=="Fields" :
                             print (i)
@@ -317,10 +316,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                             print ("dfdsfds",validFields[fname])
 
-                    elif i[0]!="#":
+                    elif i[0]!="#":         #this line ignores the log lines that start with # , #indecates a commented line
                         line = i.split()
                         print (i)
-                        if fname == 'http' or fname=="HTTP":  #no hardcoded indecies of fields  / PYTHON HAS NO SWITCH SYNTAX SO ....
+                        # no hardcoded indecies of
+                        # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
+                        if fname == 'http' or fname == "HTTP":   # this inserts the log data of http files into http table
                             try :
                                 print (validFields["http"]+"printing fields")
                                 con.execute("insert into main (%s)"%line[validFields['http']['uid']])
@@ -350,10 +351,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                             , line[validFields["http"]['ORIG_FUID']]
                                             , line[validFields["http"]['RESP_MEME_TY']]
                                             ))
-                            except sqlite3.Error as http:
+                            except sqlite3.Error as http: #exceptions renaming , cathcing sqlite3 exceptions
                                 print (str (http))
 
-                        if fname == 'ftp' or fname=="FTP":  # no hardcoded indecies of fields
+                        if fname == 'ftp' or fname == "FTP":  # inserts data of ftp logs into ftp table
                             try:
                                 con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
@@ -372,7 +373,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             except sqlite3.Error as ftp:
                                 print (str (ftp))
 
-                        if fname == 'irc'or fname=="IRC":   # no hardcoded indecies of fields
+                        if fname == 'irc'or fname=="IRC":   # data into IRC table
                             try :
                                 con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
@@ -389,10 +390,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                                    , line[validFields["irc"]["FUID"]]
                                                    )
                                                 )
-                            except sqlite3.Error as irc:
+                            except sqlite3.Error as irc:  #exception renaming
                                 print (str (irc))
 
-                        if fname == 'conn'or fname=="CONN":  # no hardcoded indecies of fields
+                        if fname == 'conn'or fname=="CONN":  # data into Conn table
                             try :
                                 con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
@@ -420,10 +421,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                                    ,line[validFields["CONN"]["RESP_CC"]]
                                                    )
                                                 )
-                            except sqlite3.Error as conn :
+                            except sqlite3.Error as conn :   # exception renaming
                                 print (str (conn))
 
-                        if fname == 'signature' or fname=="SIGNATURE":
+                        if fname == 'signature' or fname=="SIGNATURE":     #data into signatures table
                             try :
                                 con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
@@ -441,7 +442,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                                , int(line[validFields["signature"]["host_COUNT"]])
                                                )
                                             )
-                            except sqlite3.Error as sign:
+                            except sqlite3.Error as sign:   #exception renaming
                                 print (str(sign))
 
                         if fname == 'dns' or fname== "DNS":
@@ -474,7 +475,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         )
                             except sqlite3.Error as dns :
                                 print (str (dns))
-                        if fname == 'SSH' or fname=="ssh":
+                        if fname == 'SSH' or fname=="ssh":   #data into ssh table
                             try :
                                 con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
@@ -621,16 +622,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print(i+"neglected")
             f.close()
 
-            with open(historyLog,'a') as csvfile:
+            with open(historyLog,'a') as csvfile:    # open log file to log the state of operation
                 wr1 = csv.writer(csvfile, delimiter=' ')
+                digestive=hashlib.md5(codecs.encode(hashTemp)) # string must be converted to bytes to calculate hash
+                #calculate the hash of the file
+                # this block is only performed when no exceptions happen , all of data inserted into DB successfully
+                csvfile.write([fname,digestive.hexdigest()]) # the digested value combined
 
-                digestive=hashlib.md5(codecs.encode( hashTemp))
-                csvfile.write([fname,digestive.hexdigest()])
-        except :
+        except :  #this block is executed in case of failure of instering
             with open(historyLog,'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=' ')
                 wr1.writerow([fname, "FAILED"])
-
 
     def executeSQL(self):                         # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
@@ -644,9 +646,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         pass
                         # this lines should insert the result of select statments into the tableview
 
-            if "insert" in command:         # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO
-
-                con.execute(command)
+            if "insert" in command:
+                              # TODO: THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TOinsert data into db
+                self.message.setText("are you trying to insert data into DB ? \n "
+                                     "the program prohibits the user from inserting data into db")
+                self.message.show()
             else:
                 con.execute(command)
                 self.label_2.setStyleSheet("color: green")
@@ -658,10 +662,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             if s:
                 self.message.setText("error selecting rows from data base")
-
-            else:
-                self.message.setText("error inserting rows into database")
-
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
             self.label_2.setStyleSheet("color : red")
@@ -669,15 +669,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.message.show()
 
         except:
-
             self.message.show()
 
     def load(self):  # this function loads the content of the log files into the DB
-
-        # this function should use regex to find and match patterns from log files
-        timeIndex = uidIndex = sipIndex = spIndex = dipIndex = dpIndex = protoIndex = serviceIndex = durationIndex = countOriginBytesIndex = countResponseBytesIndex = 0
-        connStateIndex = localOrig = localResp = missedBytes = history = origPkts = origIPBytes = respPkts = respIPBytes = tunnelParents = 0
-
         if self.loaded:
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
