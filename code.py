@@ -329,27 +329,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
                                                         %s,%s,%s,%s,%s,
                                                         %s)"""
-                                            %(line [validFields['http']['UID']]
-                                            , int(line[validFields["http"]['ID']])
-                                            , int(line[validFields["http"]["TRANS_DEPTH"]])
-                                            , line[validFields['http']['METHOD']]
-                                            , line[validFields["http"]['HOST']]
-                                            , line[validFields['http']['URI']]
-                                            , line[validFields["http"]["REFERRER"]]
-                                            , line[validFields['http']['USER_AGENT']]
-                                            , int(line[validFields["http"]["REQUEST_BODY_LEN"]])
-                                            , int (validFields["HTTP"]["STATUS_CODE"])
-                                            , line[validFields["http"]["STATUS_MSG"]]
-                                            , int(line[validFields["http"]["INFO_CODE"]])
-                                            , line[validFields['http']['INFO_MSG']]
-                                            , line[validFields["http"]["TAGS"]]
-                                            , line[validFields['http']['USERNAME']]
-                                            , line[validFields["http"]["PASSWORD"]]
-                                            , line[validFields["http"]['PROXIED']]
-                                            , line[validFields['http']["ORIG_FUIDS"]]
-                                            , line[validFields["http"]['ORIG_MEME_TYPES']]
-                                            , line[validFields["http"]['ORIG_FUID']]
-                                            , line[validFields["http"]['RESP_MEME_TY']]
+                                            %(line [validFields['http']['uid']]
+                                            , int(line[validFields["http"]['id']])
+                                            , int(line[validFields["http"]["trans_depth"]])
+                                            , line[validFields['http']['method']]
+                                            , line[validFields["http"]['host']]
+                                            , line[validFields['http']['uri']]
+                                            , line[validFields["http"]["referrer"]]
+                                            , line[validFields['http']['user_agent']]
+                                            , int(line[validFields["http"]["request_body_len"]])
+                                            , int (validFields["http"]["status_code"])
+                                            , line[validFields["http"]["status_msg"]]
+                                            , int(line[validFields["http"]["info_code"]])
+                                            , line[validFields['http']['info_msg']]
+                                            , line[validFields["http"]["tags"]]
+                                            , line[validFields['http']['username']]
+                                            , line[validFields["http"]["password"]]
+                                            , line[validFields["http"]['proxied']]
+                                            , line[validFields['http']["orig_fuids"]]
+                                            , line[validFields["http"]['orig_meme_types']]
+                                            , line[validFields["http"]['orig_fuid']]
+                                            , line[validFields["http"]['resp_meme_ty']]
                                             ))
                             except sqlite3.Error as http: #exceptions renaming , cathcing sqlite3 exceptions
                                 print (str (http))
@@ -360,15 +360,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
                                 con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
                                             % ( line[validFields['ftp']['user']]
-                                               , line[validFields["ftp"]['PASSWORD']]
-                                               , line[validFields["ftp"]["COMMAND"]]
-                                               , line[validFields['ftp']['ARG']]
-                                               , line[validFields["ftp"]['MIME_TYPE']]
-                                               , int(line[validFields['ftp']['FILE_SIZE']])
-                                               , int(line[validFields["ftp"]["REPLY_CODE"]])
-                                               , line[validFields['ftp']['REPLY_MSG']]
-                                               , line[validFields["ftp"]["DATA_CHANNEL"]]
-                                               , line[validFields["ftp"]["FUID"]]
+                                               , line[validFields["ftp"]['password']]
+                                               , line[validFields["ftp"]["command"]]
+                                               , line[validFields['ftp']['arg']]
+                                               , line[validFields["ftp"]['mime_type']]
+                                               , int(line[validFields['ftp']['file_size']])
+                                               , int(line[validFields["ftp"]["reply_code"]])
+                                               , line[validFields['ftp']['reply_msg']]
+                                               , line[validFields["ftp"]["data_channel"]]
+                                               , line[validFields["ftp"]["fuid"]]
                                                ))
                             except sqlite3.Error as ftp:
                                 print (str (ftp))
@@ -378,16 +378,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
                                 con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
-                                                % (int(line[validFields['irc']['ID']])
-                                                   , line[validFields["irc"]['NICK']]
-                                                   , line[validFields["irc"]["USER"]]
-                                                   , line[validFields['irc']['COMMAND']]
-                                                   , line[validFields["irc"]['VALUE']]
-                                                   , (line[validFields['irc']['ADDI']])
-                                                   , line[validFields["irc"]["DCC_FILE_NAME"]]
-                                                   , int(line[validFields['irc']['DCC_FILE_SIZE']])
-                                                   ,line[validFields['irs']['DCC_FILE_TYPE']]
-                                                   , line[validFields["irc"]["FUID"]]
+                                                % (int(line[validFields['irc']['id']])
+                                                   , line[validFields["irc"]['nick']]
+                                                   , line[validFields["irc"]["user"]]
+                                                   , line[validFields['irc']['command']]
+                                                   , line[validFields["irc"]['value']]
+                                                   , (line[validFields['irc']['addi']])
+                                                   , line[validFields["irc"]["dcc_file_name"]]
+                                                   , int(line[validFields['irc']['dcc_file_size']])
+                                                   ,line[validFields['irs']['dcc_file_type']]
+                                                   , line[validFields["irc"]["fuid"]]
                                                    )
                                                 )
                             except sqlite3.Error as irc:  #exception renaming
@@ -398,27 +398,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
                                 con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
                                 con.execute("""insert into conn (%s,%s,%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%s,%s,%s)"""
-                                                % ((line[validFields['CONN']['uid']])
-                                                   , line[validFields["CONN"]['ID_ORIG_H']]
-                                                   , int(line[validFields["CONN"]["ID_ORIG_P"]])
-                                                   , line[validFields['CONN']['ID_RESP_H']]
-                                                   , int(line[validFields["CONN"]['RESP_P']])
-                                                   , (line[validFields['CONN']['PROTO']])
-                                                   , line[validFields["CONN"]["SERVICE"]]
-                                                   , (line[validFields['CONN']['DURATION']])
-                                                   , line[validFields['CONN']['ORIG_BYTES']]
-                                                   , line[validFields["CONN"]["RESP_BYTES"]]
-                                                   ,line[validFields["CONN"]["CONN_STATE"]]
-                                                   ,line[validFields["CONN"]["LOCAL_ORIG"]]
-                                                   ,line[validFields["CONN"]["MISSED_BYTES"]]
-                                                   ,line[validFields["CONN"]["HISTORY"]]
-                                                   ,line[validFields["CONN"]["ORIG_PKTS"]]
-                                                   ,int(line[validFields["CONN"]["ORIG_IP_BYTES"]])
-                                                   ,int(line[validFields["CONN"]["RESP_PKTS"]])
-                                                   ,int(line[validFields["CONN"]["RESP_IP_BYTES"]])
-                                                   ,line[validFields["CONN"]["TUNNEL_PARENTS"]]
-                                                   ,line[validFields["CONN"]["ORIG_CC"]]
-                                                   ,line[validFields["CONN"]["RESP_CC"]]
+                                                % ((line[validFields['conn']['uid']])
+                                                   , line[validFields["conn"]['id_orig_h']]
+                                                   , int(line[validFields["conn"]["id_orig_p"]])
+                                                   , line[validFields['conn']['id_resp_h']]
+                                                   , int(line[validFields["conn"]['resp_p']])
+                                                   , (line[validFields['conn']['proto']])
+                                                   , line[validFields["conn"]["service"]]
+                                                   , (line[validFields['conn']['duration']])
+                                                   , line[validFields['conn']['orig_bytes']]
+                                                   , line[validFields["conn"]["resp_bytes"]]
+                                                   ,line[validFields["conn"]["conn_state"]]
+                                                   ,line[validFields["conn"]["local_orig"]]
+                                                   ,line[validFields["conn"]["missed_bytes"]]
+                                                   ,line[validFields["conn"]["history"]]
+                                                   ,line[validFields["conn"]["orig_pkts"]]
+                                                   ,int(line[validFields["conn"]["orig_ip_bytes"]])
+                                                   ,int(line[validFields["conn"]["resp_pkts"]])
+                                                   ,int(line[validFields["conn"]["resp_ip_bytes"]])
+                                                   ,line[validFields["conn"]["tunnel_parents"]]
+                                                   ,line[validFields["conn"]["orig_cc"]]
+                                                   ,line[validFields["conn"]["resp_cc"]]
                                                    )
                                                 )
                             except sqlite3.Error as conn :   # exception renaming
@@ -430,16 +430,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
                                 con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
                                             % (int(line[validFields['signature']['ts']])
-                                               , line[validFields["signature"]['SRC_ADDR']]
-                                               , int(line[validFields["signature"]["SRC_PORT"]])
-                                               , line[validFields['signature']['DST_ADDR']]
-                                               , int(line[validFields["signature"]['DST_PORT']])
-                                               , (line[validFields['signature']['NOTE']])
-                                               , line[validFields["signature"]["SIG_ID"]]
-                                               , (line[validFields['signature']['EVENT_MSG']])
-                                               , line[validFields['signature']['SUB_MSG']]
-                                               , int(line[validFields["signature"]["SIG_COUNT"]])
-                                               , int(line[validFields["signature"]["host_COUNT"]])
+                                               , line[validFields["signature"]['src_addr']]
+                                               , int(line[validFields["signature"]["src_port"]])
+                                               , line[validFields['signature']['dst_addr']]
+                                               , int(line[validFields["signature"]['dst_port']])
+                                               , (line[validFields['signature']['note']])
+                                               , line[validFields["signature"]["sig_id"]]
+                                               , (line[validFields['signature']['event_msg']])
+                                               , line[validFields['signature']['sub_msg']]
+                                               , int(line[validFields["signature"]["sig_count"]])
+                                               , int(line[validFields["signature"]["host_count"]])
                                                )
                                             )
                             except sqlite3.Error as sign:   #exception renaming
@@ -451,26 +451,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['dns']['ts']])
                                 con.execute(
                                         """insert into dns (%s,%s,%s,%d,%s,%d,%s,%d,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s,%d)"""
-                                        % ((line[validFields['DNS']['UID']])
-                                           , line[validFields["DNS"]['ID']]
-                                           , (line[validFields["DNS"]["PROTO"]])
-                                           , int(line[validFields['DNS']['TRANS_ID']])
-                                           , (line[validFields["DNS"]['QUERY']])
-                                           , int((line[validFields['DNS']['QCLASS']]))
-                                           , line[validFields["DNS"]["QCLASS_NAME"]]
-                                           , int(line[validFields["DNS"]["QTYPE"]])
-                                           , line[validFields["DNS"]["QTYPE_NAME"]]
-                                           , int((line[validFields['DNS']['RCODE']]))
-                                           , line[validFields['DNS']['RCODE_NAME']]
-                                           , int(line[validFields["DNS"]["QR"]])
-                                           , int(line[validFields["DNS"]["AA"]])
-                                           , int(line[validFields["DNS"]["TC"]])
-                                           , int(line[validFields["DNS"]["RD"]])
-                                           , int(line[validFields["DNS"]["RA"]])
-                                           , int(line[validFields["DNS"]["Z"]])
-                                           , (line[validFields["DNS"]["ANSWERS"]])
-                                           , (line[validFields["DNS"]["TTLS"]])
-                                           , int(line[validFields["DNS"]["REJECTED"]])
+                                        % ((line[validFields['dns']['uid']])
+                                           , line[validFields["dns"]['id']]
+                                           , (line[validFields["dns"]["proto"]])
+                                           , int(line[validFields['dns']['trans_id']])
+                                           , (line[validFields["dns"]['query']])
+                                           , int((line[validFields['dns']['qclass']]))
+                                           , line[validFields["dns"]["qclass_name"]]
+                                           , int(line[validFields["dns"]["qtype"]])
+                                           , line[validFields["dns"]["qtype_name"]]
+                                           , int((line[validFields['dns']['rcode']]))
+                                           , line[validFields['dns']['rcode_name']]
+                                           , int(line[validFields["dns"]["qr"]])
+                                           , int(line[validFields["dns"]["aa"]])
+                                           , int(line[validFields["dns"]["tc"]])
+                                           , int(line[validFields["dns"]["rd"]])
+                                           , int(line[validFields["dns"]["ra"]])
+                                           , int(line[validFields["dns"]["z"]])
+                                           , (line[validFields["dns"]["answers"]])
+                                           , (line[validFields["dns"]["ttls"]])
+                                           , int(line[validFields["dns"]["rejected"]])
                                            )
                                         )
                             except sqlite3.Error as dns :
@@ -481,13 +481,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
                                 con.execute(
                                     """insert into dns (%s,%s,%s,%s,%s,%s,%d)"""
-                                    % ((line[validFields['SSH']['UID']])
-                                       , line[validFields["SSH"]['ID']]
-                                       , (line[validFields["SSH"]["STATUS"]])
-                                       , (line[validFields['SSH']['DIRECTION']])
-                                       , (line[validFields["SSH"]['CLIENT']])
-                                       , line[validFields['SSH']['SERVER']]
-                                       , int(line[validFields["SSH"]["RESP_SIZE"]])
+                                    % ((line[validFields['ssh']['uid']])
+                                       , line[validFields["ssh"]['id']]
+                                       , (line[validFields["ssh"]["status"]])
+                                       , (line[validFields['ssh']['direction']])
+                                       , (line[validFields["ssh"]['client']])
+                                       , line[validFields['ssh']['server']]
+                                       , int(line[validFields["ssh"]["resp_size"]])
                                        )
                                 )
                             except sqlite3.Error as ssh:
@@ -495,25 +495,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                         if fname == 'SSL' or fname=="ssl":
                             try:
-                                con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
+                                con.execute("insert into main (%s)" % line[validFields['ssl']['uid']])
+                                con.execute("insert into main (%s)" % line[validFields['ssl']['ts']])
                                 con.execute(
-                                        """insert into SSL (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-                                        % ((line[validFields['SSL']['UID']])
-                                           , line[validFields["SSL"]['ID']]
-                                           , (line[validFields["SSL"]["VERSION"]])
-                                           , (line[validFields['SSL']['CIPHER']])
-                                           , (line[validFields["SSL"]['SERVER_NAME']])
-                                           , line[validFields['SSL']['SESSIONS_ID']]
-                                           , (line[validFields["SSL"]["SUBJECT"]])
-                                           ,(line[validFields["SSL"]["ISSUER_SUBJECT"]])
-                                           ,(line[validFields["SSL"]["NOT_VALID_BEFORE"]])
-                                           ,(line[validFields["SSL"]["NOT_VALID_AFTER"]])
-                                           ,(line[validFields["SSL"]["LAST_ALERT"]])
-                                           ,(line[validFields["SSL"]["CLEINT_SUBJECT"]])
-                                           ,(line[validFields["SSL"]["CLNT_ISSUER_SUBJECT"]])
-                                           ,(line[validFields["SSL"]["CERT_HASH"]])
-                                           ,(line[validFields["SSL"]["VALIDATION_STATUS"]])
+                                        """insert into ssl (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                                        % ((line[validFields['ssl']['uid']])
+                                           , line[validFields["ssl"]['id']]
+                                           , (line[validFields["ssl"]["version"]])
+                                           , (line[validFields['ssl']['cipher']])
+                                           , (line[validFields["ssl"]['server_name']])
+                                           , line[validFields['ssl']['sessions_id']]
+                                           , (line[validFields["ssl"]["subject"]])
+                                           ,(line[validFields["ssl"]["issuer_subject"]])
+                                           ,(line[validFields["ssl"]["not_valid_before"]])
+                                           ,(line[validFields["ssl"]["not_valid_after"]])
+                                           ,(line[validFields["ssl"]["last_alert"]])
+                                           ,(line[validFields["ssl"]["cleint_subject"]])
+                                           ,(line[validFields["ssl"]["clnt_issuer_subject"]])
+                                           ,(line[validFields["ssl"]["cert_hash"]])
+                                           ,(line[validFields["ssl"]["validation_status"]])
 
                                            )
                                     )
@@ -522,32 +522,32 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                         if fname == 'SMTP' or fname=="smtp":
                             try:
-                                con.execute("insert into main (%s)" % line[validFields['SSL']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['SSL']['ts']])
+                                con.execute("insert into main (%s)" % line[validFields['smtp']['uid']])
+                                con.execute("insert into main (%s)" % line[validFields['smtp']['ts']])
                                 con.execute(
                                     """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
-                                    % (line[validFields['SMTP']['UID']]
-                                       , line[validFields["SMTP"]['ID']]
-                                   , int(line[validFields["SMTP"]["TRANS_DEPTH"]])
-                                   , line[validFields['SMTP']['HELO']]
-                                   , line[validFields["SMTP"]['MAILFROM']]
-                                   , line[validFields['SMTP']['RCPTTO']]
-                                   , line[validFields["SMTP"]["DATE"]]
-                                   , line[validFields["SMTP"]["FROM"]]
-                                   , line[validFields["SMTP"]["TO"]]
-                                   , line[validFields["SMTP"]["REPLY_TP"]]
-                                   , line[validFields["SMTP"]["MSG_ID"]]
-                                   , line[validFields["SMTP"]["IN_REPLY_TO"]]
-                                   , line[validFields["SMTP"]["SUBJECT"]]
-                                   , line[validFields["SMTP"]["X_ORIGINATING_IP"]]
-                                   , line[validFields["SMTP"]["FIRST_RECEIVED"]]
-                                   ,line[validFields["SMTP"]["SECOND_RECEIVED"]]
-                                   ,line[validFields["SMTP"]["LAST_REPLY"]]
-                                   ,line[validFields["SMTP"]["PATH"]]
-                                   ,line[validFields["SMTP"]["USER_AGENT"]]
-                                   ,int(line[validFields["SMTP"]["TLS"]])
-                                   ,line[validFields["SMTP"]["FUID"]]
-                                   ,int(line[validFields["SMTP"]["IS_WEBMAIL"]])
+                                    % (line[validFields['smtp']['uid']]
+                                       , line[validFields["smtp"]['id']]
+                                   , int(line[validFields["smtp"]["trans_depth"]])
+                                   , line[validFields['smtp']['helo']]
+                                   , line[validFields["smtp"]['mailfrom']]
+                                   , line[validFields['smtp']['rcptto']]
+                                   , line[validFields["smtp"]["date"]]
+                                   , line[validFields["smtp"]["from"]]
+                                   , line[validFields["smtp"]["to"]]
+                                   , line[validFields["smtp"]["reply_tp"]]
+                                   , line[validFields["smtp"]["msg_id"]]
+                                   , line[validFields["smtp"]["in_reply_to"]]
+                                   , line[validFields["smtp"]["subject"]]
+                                   , line[validFields["smtp"]["x_originating_ip"]]
+                                   , line[validFields["smtp"]["first_received"]]
+                                   ,line[validFields["smtp"]["second_received"]]
+                                   ,line[validFields["smtp"]["last_reply"]]
+                                   ,line[validFields["smtp"]["path"]]
+                                   ,line[validFields["smtp"]["user_agent"]]
+                                   ,int(line[validFields["smtp"]["tls"]])
+                                   ,line[validFields["smtp"]["fuid"]]
+                                   ,int(line[validFields["smtp"]["is_webmail"]])
                                    )
                             )
                             except sqlite3.Error as s:
@@ -555,16 +555,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                         if fname== 'dhcp' or fname == "DHCP":
                             try :
-                                con.execute("insert into main (%s)" % line[validFields['DHCP']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['DHCP']['ts']])
+                                con.execute("insert into main (%s)" % line[validFields['dhcp']['uid']])
+                                con.execute("insert into main (%s)" % line[validFields['dhcp']['ts']])
                                 con.execute(
                                     """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
-                                    % ((line[validFields['DHCP']['UID']])
-                                       , line[validFields["DHCP"]['ID']]
-                                       , (line[validFields["DHCP"]["MAC"]])
-                                       , (line[validFields['DHCP']['ASSIGNED_IP']])
-                                       , (line[validFields["DHCP"]['LEASE_TIME']])
-                                       , line[validFields['DHCP']['TRANS_ID']]
+                                    % ((line[validFields['dhcp']['uid']])
+                                       , line[validFields["dhcp"]['id']]
+                                       , (line[validFields["dhcp"]["mac"]])
+                                       , (line[validFields['dhcp']['assigned_ip']])
+                                       , (line[validFields["dhcp"]['lease_time']])
+                                       , line[validFields['dhcp']['trans_id']]
 
                                        )
                                 )
@@ -576,13 +576,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                     con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
                                     con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
                                     con.execute(
-                                        """insert into DHCP (%s,%s,%s,%s,%s,%d)"""
-                                        % ((line[validFields['WEIRD']['UID']])
-                                           , line[validFields["WEIRD"]['ID']]
-                                           , (line[validFields["WEIRD"]["NAME"]])
-                                           , (line[validFields['WEIRD']['ADDI']])
-                                           , int(line[validFields["WEIRD"]['NOTICE']])
-                                           , (line[validFields['WEIRD']['PEER']])
+                                        """insert into dhcp (%s,%s,%s,%s,%s,%d)"""
+                                        % ((line[validFields['weird']['uid']])
+                                           , line[validFields["weird"]['id']]
+                                           , (line[validFields["weird"]["name"]])
+                                           , (line[validFields['weird']['addi']])
+                                           , int(line[validFields["weird"]['notice']])
+                                           , (line[validFields['weird']['peer']])
 
                                            )
                                     )
@@ -594,27 +594,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
                                 con.execute(
                                 """insert into FILES (%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s)"""
-                                % (line[validFields['FILES']['TS']]
-                                   , line[validFields["FILES"]['FUID']]
-                                   , (line[validFields["FILES"]["TX_HOSTS"]])
-                                   , line[validFields['FILES']['RX_HOSTS']]
-                                   , line[validFields["FILES"]['CONN_UIDS']]
-                                   , line[validFields['FILES']['SOURCE']]
-                                   ,int(line[validFields["FILES"]["DEPTH"]])
-                                   , line[validFields["FILES"]["ANALYZERS"]]
-                                   , line[validFields["FILES"]["MIME_TYPE"]]
-                                   , line[validFields["FILES"]["FILENAME"]]
-                                   , line[validFields["FILES"]["DURATION"]]
-                                   ,int(line[validFields["FILES"]["LOCAL_ORIG"]])
-                                   ,int(line[validFields["FILES"]["IS_ORIG"]])
-                                   ,int(line[validFields["FILES"]["SEEN_BYTES"]])
-                                   ,int( line[validFields["FILES"]["TOTAL_BYTES"]])
-                                   ,int(line[validFields["FILES"]["MISSING_BYTES"]])
-                                   ,int( line[validFields["FILES"]["OVERFLOW_BYTES"]])
-                                   ,int (line[validFields["FILES"]["TIMEDOUT"]])
-                                   ,(line[validFields["FILES"]["PARENT_FUID"]])
-                                   , line[validFields["FILES"]["MD5_SHA1_SHA256"]]
-                                   , (line[validFields["FILES"]["EXTRACTED"]])
+                                % (line[validFields['files']['ts']]
+                                   , line[validFields["files"]['fuid']]
+                                   , (line[validFields["files"]["tx_hosts"]])
+                                   , line[validFields['files']['rx_hosts']]
+                                   , line[validFields["files"]['conn_uids']]
+                                   , line[validFields['files']['source']]
+                                   ,int(line[validFields["files"]["depth"]])
+                                   , line[validFields["files"]["analyzers"]]
+                                   , line[validFields["files"]["mime_type"]]
+                                   , line[validFields["files"]["filename"]]
+                                   , line[validFields["files"]["duration"]]
+                                   ,int(line[validFields["files"]["local_orig"]])
+                                   ,int(line[validFields["files"]["is_orig"]])
+                                   ,int(line[validFields["files"]["seen_bytes"]])
+                                   ,int( line[validFields["files"]["total_bytes"]])
+                                   ,int(line[validFields["files"]["missing_bytes"]])
+                                   ,int( line[validFields["files"]["overflow_bytes"]])
+                                   ,int (line[validFields["files"]["timedout"]])
+                                   ,(line[validFields["files"]["parent_fuid"]])
+                                   , line[validFields["files"]["md5_sha1_sha256"]]
+                                   , (line[validFields["files"]["extracted"]])
                                    ))
                             except sqlite3.Error as f:
                                 print ("error inserting into table"+str (f))
@@ -826,51 +826,53 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
     validFields = {
-    "HTTP" :{'UID': -1,'TS':-1, "ID": -1, "TRANS_DEPTH": -1, "METHOD": -1, "HOST":-1, "URI": -1, "REFERRER": -1,
-            "USER_AGENT": -1, "REQUEST_BODY_LEN": -1,"STATUS_CODE":-1, "STATUS_MSG":-1, "INFO_CODE":-1, "INFO_MSG":-1,
-             "TAGS": -1, "USERNAME":-1,"PASSWORD":-1, "PROXIED":-1,"ORIG_FUIDS":-1, "ORIG_MEME_TYPES":-1, "ORIG_FUID":-1,
-            "RESP_MEME_TY":-1},  # this dictionary will store the indecies of lof fileds for each file
+         "http" :{'uid': -1,'ts':-1, "id": -1, "trans_depth": -1, "method": -1, "host":-1, "uri": -1, "referrer": -1,
+            "user_agent": -1, "request_body_len": -1,"status_code":-1, "status_msg":-1, "info_code":-1, "info_msg":-1,
+             "tags": -1, "username":-1,"password":-1, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1,
+             "resp_meme_ty":-1},  # this dictionary will store the indecies of lof fileds for each file
 
-    'FTP' :{"UID": 0, "TS": 0, "ID": 0, "USER": 0, "PASSWORD": 0, "COMMAND": 0, "ARG": 0,
-           "MIME_TYPE": 0, "FILE_SIZE": 0, "REPLY_CODE": 0, "REPLY_MSG": 0,
-           "DATA_CHANNEL": 0, "FUID": 0},
+         'ftp' :{"uid": 0, "ts": 0, "id": 0, "user": 0, "password": 0, "command": 0, "arg": 0,
+           "mime_type": 0, "file_size": 0, "reply_code": 0, "reply_msg": 0,
+           "data_channel": 0, "fuid": 0},
 
-    "FILES": {"TS": 0, "FUID": 0, "tx_hosts": 0, "rx_hosts": 0, "CONN_UIDS": 0, "SOURCE": 0, "DEPTH": 0,
-             "ANALYZERS": 0, "MIME_TYPE": 0,
-             "FILENAME": 0, "DURATION": 0, "LOCAL_ORIG": 0, "IS_ORIG": 0, "SEEN_BYTES": 0, "TOTAL_BYTES": 0,
-             "MISSING_BYTES": 0, "OVERFLOW_BYTES": 0, "TIMEDOUT": 0, "PARENT_FUID": 0,
-             "MD5A/SHA1/SHA256": 0, "EXTRACTED": 0} , # CHECK THIS AGAIN
+         "files": {"ts": 0, "fuid": 0, "tx_hosts": 0, "rx_hosts": 0, "conn_uids": 0, "source": 0, "depth": 0,
+             "analyzers": 0, "mime_type": 0,
+             "filename": 0, "duration": 0, "local_orig": 0, "is_orig": 0, "seen_bytes": 0, "total_bytes": 0,
+             "missing_bytes": 0, "overflow_bytes": 0, "timedout": 0, "parent_fuid": 0,
+             "md5a/sha1/sha256": 0, "extracted": 0} , # check this again
 
-    'IRC' : {"UID": -1,'TS':-1, "ID": -1, "NICK": -1, "USER": -1, "COMMAND": -1, "VALUE": -1, "ADDI": -1,
-           "DCC_FILE_NAME": -1, "DCC_FILE_SIZE": -1, "DCC_MIME_TYPE": -1, "FUID": 1},
+         'irc' : {"uid": -1,'ts':-1, "id": -1, "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
+           "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
 
-    'SMTP' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": -1, "rcptto": 0
+        'smtp' : {'ts': 0, 'uid': 0, 'id': 0, 'trans_depth': 0, "helo": 0, "mailfrom": -1, "rcptto": 0
         , "date": 0, "from": 0, "to": 0, "reply_to": 0, "msg_id": 0, "in_reply_to": 0, "subject": 0
-        , "x_originating_ip": 0, "first_received": 0,
-            "second_received": 0, "last_reply": 0, "path": 0, "user_agent": 0,
-            "tls": 0, "fuids": 0, "is_webmail": 0},
+        , "x_originating_ip": 0, "first_received": 0
+        ,"second_received": 0, "last_reply": 0, "path": 0, "user_agent": 0
+        ,"tls": 0, "fuids": 0, "is_webmail": 0},
 
-    'SSH' : {"UID": 0, "STATUS": 0, "DIRECTION": 0, "CLIENT": 0, "SERVER": 0, "RESP_SIZE": 0},
+         'ssh' : {"uid": 0, "status": 0, "direction": 0, "client": 0, "server": 0, "resp_size": 0},
 
-    'SSL' : {"UID": 0,"ID.ORIG_H":0,"id.orig_p":0,"id.resp_h":0,"id.resp_p":0,"VERSION": 0, "CIPHER": 0,
-           "SERVER_NAME": 0, "SESSION_ID": 0, "SUBJECT": 0,
-           "ISSUER_SUBJECT": 0, "NOT_VALID_BEFORE": 0,
-           "LAST_ALERT": 0, "CLIENT_SUBJECT": 0, "CLNT_ISSUER_SUBJECT": 0, "CERT_HASH": 0, "VALIDATION_STATUS": 0},
+         'ssl' : {"uid": 0,"id.orig_h":0,"id.orig_p":0,"id.resp_h":0,"id.resp_p":0,"version": 0, "cipher": 0,
+                 "server_name": 0, "session_id": 0, "subject": 0,
+                   "issuer_subject": 0, "not_valid_before": 0,
+                  "last_alert": 0, "client_subject": 0, "clnt_issuer_subject": 0, "cert_hash": 0, "validation_status": 0},
 
-    'WEIRD' :{"UID": 0, "ID": 0, "NAME": 0, "ADDI": 0, "NOTICE": 0, "PEER": 0},
+         'weird' :{"uid": 0, "id": 0, "name": 0, "addi": 0, "notice": 0, "peer": 0},
 
-    'SIGNATURES':{"sss":0},
+        'signatures':{"ts":0,'src_addr':0 ,
+                            'src_port':0,'dst_adr':0,'dst_port':0 ,'note':0 ,'sig_id':0,
+                            'event_msg' :0 ,'sub_msg':0 ,'sig_count':0,'host_count':0 },
 
-    'CONN':{"UID": 0, "ID_ORIG_H": 0, "ID_ORIG_P": 0, "ID_RESP_H": 0, "ID_RESP_P": 0, "PROTO": 0, "SERVICE": 0,
-            "DURATION": 0, "ORIG_BYTES": 0,
-            "RESP_BYTES": 0, "CONN_STATE": 0, "LOCAL_ORIG": 0, "MISSED_BYTES": 0, "HISTORY": 0, "ORIG_PKTS": 0,
-            "ORIG_IP_BYTES": 0,"RESP_PKTS": 0, "RESP_IP_BYTES": 0, "TUNNEL_PARENTS": 0, "ORIG_CC": 0, "RESP_CC": 0},
+        'conn':{"uid": 0, "id_orig_h": 0, "id_orig_p": 0, "id_resp_h": 0, "id_resp_p": 0, "proto": 0, "service": 0,
+            "duration": 0, "orig_bytes": 0,
+            "resp_bytes": 0, "conn_state": 0, "local_orig": 0, "missed_bytes": 0, "history": 0, "orig_pkts": 0,
+            "orig_ip_bytes": 0,"resp_pkts": 0, "resp_ip_bytes": 0, "tunnel_parents": 0, "orig_cc": 0, "resp_cc": 0},
 
-    'DHCP':{"UID": 0, "ID": 0, "MAC": 0, "ASSIGNED_IP": 0, "LEASE_TIME ": 0, "TRANS_ID": 0},
+         'dhcp':{"uid": 0, "id": 0, "mac": 0, "assigned_ip": 0, "lease_time ": 0, "trans_id": 0},
 
-    'DNS':{"UID": 0, 'ts': 0, "ID": 0, "PROTO": 0, "TRAN_ID": 0,
-           "QUERY": 0, "QCLASS": 0, "QCLASS_NAME": 0, "QTYPE": 0, "QTYPE_NAME": 0, "RCODE": 0, "RCODE_NAME": 0, "QR": 0,
-           "AA": 0,"TC": 0, "RD": 0, "RA": 0, "Z": 0, "ANSWERS": 0, "TTLS": 0, "REJECTED BOOL": 0}
+         'dns':{"uid": 0, 'ts': 0, "id": 0, "proto": 0, "tran_id": 0,
+           "query": 0, "qclass": 0, "qclass_name": 0, "qtype": 0, "qtype_name": 0, "rcode": 0, "rcode_name": 0, "qr": 0,
+           "aa": 0,"tc": 0, "rd": 0, "ra": 0, "z": 0, "answers": 0, "ttls": 0, "rejected bool": 0}
         #todo : check tables strucutre !!! normalize conn_ID table
     }
 
@@ -879,7 +881,7 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    tables=["MAIN","DHCP","SMTP","IRC","WEIRD","SSH","CONN","HTTP","DNS","SIGNATURE","SSL","IDS","FILES"]
+    tables=["main","dhcp","smtp","irc","weird","ssh","conn","http","dns","signature","ssl","ids","files"]
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
@@ -889,7 +891,7 @@ if __name__ == "__main__":  # main module
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
         try :
-            con.execute ("create table main (uid int primary KEY , ts string)")
+            con.execute ("create table main (uid TEXT primary KEY , ts string)")
             con.execute ("create table IDs(uid int ,ID_ORIG_H text, ID_ORIG_P int, ID_RESP_H text, ID_RESP_P int)")
         except :
             print ("error dropping main ?")
