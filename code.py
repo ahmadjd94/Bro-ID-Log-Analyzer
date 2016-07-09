@@ -14,7 +14,6 @@ import sqlite3
 import os  # module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
-import json
 import hashlib
 import codecs
 
@@ -23,12 +22,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     ################################  defining global variable ###################################
     global con  # connection to DB
+    single=False   #indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
-    validFiles = []
+    validFiles = []   #this list stores the valid file found in a DIR
 
     valid = ['conn.log', 'dhcp.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log',
-             'smtp.log','ssl.log', 'files.log','signatures.log','weird.log','ssh.log']     # this list stores the valid log files in a directory
+             'smtp.log','ssl.log', 'files.log','signatures.log','weird.log','ssh.log']     # this list stores the valid log files bila can deal with
 
     UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_loss.log', 'dnp3.log', 'intel.log',
                         'known_certs.log', 'radius.log', 'modbus.log', 'notice.log', 'reporter.log',
@@ -305,18 +305,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             hashTemp=""                       #this variable stores the entire log file to calculate it's hash value
             f=open(fname+'.log','r')          #open the log file Read-Only mode
 
-            for i in f:
+            for i in f:                         #todo : modify function to increase the progress bar
                     hashTemp += i               #concatenate the lines being read to the string
 
-                    if i[:7]=="#fields" or i[:7]=="Fields" :
+                    if i[:7] == "#fields" or i[:7] == "Fields" :
                             print (i)
                             fields=(i[7:].split())
                             for field in fields:
-                                print(fields.index(field))
+                                print(fields.index(field),field)
 
                             print ("dfdsfds",validFields[fname])
 
-                    elif i[0]!="#":         #this line ignores the log lines that start with # , #indecates a commented line
+                    elif i[0] != "#":         #this line ignores the log lines that start with # , #indecates a commented line
                         line = i.split()
                         print (i)
                         # no hardcoded indecies of
@@ -738,6 +738,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
+        single=True
         try:
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
@@ -806,12 +807,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
-        # reset timeline
+                                #todo : drop tables
+                                #todo  reset timeline
 
 if __name__ == "__main__":  # main module
-    def droptables(table):
+
+    def droptables(table):  # a map function drops tables , return 1 on success
         try:
-            con.execute("drop table %s" % (table))
+            con.execute("drop table %s" % table)
             return 1
         except sqlite3.OperationalError as a:
             if  "no such table" in str(a):
@@ -868,6 +871,7 @@ if __name__ == "__main__":  # main module
     'DNS':{"UID": 0, 'ts': 0, "ID": 0, "PROTO": 0, "TRAN_ID": 0,
            "QUERY": 0, "QCLASS": 0, "QCLASS_NAME": 0, "QTYPE": 0, "QTYPE_NAME": 0, "RCODE": 0, "RCODE_NAME": 0, "QR": 0,
            "AA": 0,"TC": 0, "RD": 0, "RA": 0, "Z": 0, "ANSWERS": 0, "TTLS": 0, "REJECTED BOOL": 0}
+        #todo : check tables strucutre !!! normalize conn_ID table
     }
 
     app = QtWidgets.QApplication(sys.argv)
@@ -886,6 +890,7 @@ if __name__ == "__main__":  # main module
         # print(tables - dropped + "non dropped tables ") #fix ?
         try :
             con.execute ("create table main (uid int primary KEY , ts string)")
+            con.execute ("create table IDs(uid int ,ID_ORIG_H text, ID_ORIG_P int, ID_RESP_H text, ID_RESP_P int)")
         except :
             print ("error dropping main ?")
 
