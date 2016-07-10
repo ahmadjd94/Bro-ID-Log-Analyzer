@@ -295,6 +295,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
+    def valuefilter(self,num):
+        if num!=-1:
+            return True
+        else :
+            return False
+
+    def SQLcreator(self,table):  # should use lambda expressions
+#THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
+#HANDLED IN THE CALLER FUNCTION
+            exist=list(filter (lambda x :validFields[table][x]>-1,validFields[table]))   #problem : a UID of transaction may be used multiple time
+
+
     def traverse(self,fname):                 # this function will traverse the file that is based to it
         #todo : major changes (inserting into DB should be dynamic , the function should insert fields according to their values
         #if the field value is -1 , the field should be neglected )
@@ -833,11 +845,33 @@ if __name__ == "__main__":  # main module
     from datetime import datetime
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
+
+    types={'uid':int,'ts':float,"id": -1, "trans_depth": int, "method": str, "host":str, "uri": str, "referrer": str
+        ,"user_agent": str, "request_body_len": int,"status_code":int, "status_msg":str, "info_code":int, "info_msg":str
+        ,"tags": -1, "username":str,"password":str, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1
+        ,"resp_meme_ty":-1
+        ,"command": str, "arg": str
+        ,"mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
+        ,"data_channel": -1, "fuid": str
+        ,"tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": str, "depth": int
+        ,"analyzers": -1,"filename": str, "duration": -1, "local_orig": bool, "is_orig": bool, "seen_bytes": int, "total_bytes": int
+        ,"missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
+        ,"md5": str, "sha1": str, "sha256": str, "extracted": str
+        ,"nick": str, "user": str, "value": str, "addi": str
+        ,"dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
+        ,'trans_depth': int, "helo": str, "mailfrom": str, "rcptto": -1
+        , "date": -1, "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
+        , "x_originating_ip": str, "first_received": str
+        , "second_received": str, "last_reply": str, "path": -1
+        , "tls": bool, "fuids": -1, "is_webmail": bool
+        ,"status":str, "direction":str, "client":str, "server":str, "resp_size":int
+           } # this dictionary will declare the datatypes for each field in the database
+
     validFields = {    #todo : check fields of every log file (DNS done,
          "http" :{'uid': -1,'ts':-1, "id": -1, "trans_depth": -1, "method": -1, "host":-1, "uri": -1, "referrer": -1,
             "user_agent": -1, "request_body_len": -1,"status_code":-1, "status_msg":-1, "info_code":-1, "info_msg":-1,
              "tags": -1, "username":-1,"password":-1, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1,
-             "resp_meme_ty":-1},  # this dictionary will store the indecies of lof fileds for each file
+             "resp_meme_ty":-1,},  # this dictionary will store the indecies of lof fileds for each file
 
          'ftp' :{"uid":-1, "ts":-1, "id":-1, "user":-1, "password":-1, "command":-1, "arg":-1,
            "mime_type":-1, "file_size":-1, "reply_code":-1, "reply_msg":-1,
