@@ -22,6 +22,7 @@ import codecs
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
+    global line  # this line will strore
     global con  # connection to DB
     single=False   #indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
@@ -37,6 +38,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         'syslog.log', 'traceroute.log',
                         'known_hosts.log']  # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
+                                # END OF GLOVAL VARIABLES DEFENITION
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(709, 489)
@@ -223,7 +225,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "conn.log":  # DONE
             try :
-                con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                con.execute("""CREATE TABLE CONN(UID TEXT,id_orig_h TEXT,id_orig_p INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step7")
@@ -303,9 +305,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             return False
 
     def SQLcreator(self,table):  # should use lambda expressions
-#THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
-#HANDLED IN THE CALLER FUNCTION
-            exist=list(filter (lambda x :validFields[table][x]>-1,validFields[table]))   #problem : a UID of transaction may be used multiple time
+                                 #THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
+                                 #HANDLED IN THE CALLER FUNCTION
+        exist=list(filter (lambda x :validFields[table][x]>-1,validFields[table]))   #problem : a UID of transaction may be used multiple time
+        insert="insert into %s ("%(table)
+        fields=values=""
+        for i in exist:
+            fields+=i+','
+        fields=fields[:len(fields)-1] # this line will remove the colon at the end of fileds string
+        for i in exist:
+            values+=line[validFields[table][i]]
+
+
+
+
 
 
     def traverse(self,fname):                 # this function will traverse the file that is based to it
@@ -327,7 +340,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             fields=(i[7:].split())
                             for field in fields:
                                 if field in validFields[fname]:
-                                    validFields[fname][field]=fields.index(field)
+                                    validFields[fname][field]=fields.index(field)   # this line stores the index of field in the dictionary
                                 print(fields.index(field), field)
 
                             print ("dfdsfds",validFields[fname])
@@ -667,8 +680,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         pass
                         # this lines should insert the result of select statments into the tableview
 
-            if "insert" in command:
-                              # TODO: THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TOinsert data into db
+            if "insert" in command: # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
                 self.message.setText("are you trying to insert data into DB ? \n "
                                      "the program prohibits the user from inserting data into db")
                 self.message.show()
@@ -754,7 +766,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.message.setText(
             "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
         self.message.setDetailedText(
-            "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer")  ####################3333
+            "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer\n"
+            "https: // tree.taiga.io / project / ahmadjd94 - bila")
         self.message.show()
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
@@ -847,18 +860,17 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types={'uid':int,'ts':float,"id": -1, "trans_depth": int, "method": str, "host":str, "uri": str, "referrer": str
+    types={"uid":int,"ts":float,"id": -1, "trans_depth": int, "method": str, "host":str, "uri": str, "referrer": str
         ,"user_agent": str, "request_body_len": int,"status_code":int, "status_msg":str, "info_code":int, "info_msg":str
         ,"tags": -1, "username":str,"password":str, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1
-        ,"resp_meme_ty":-1
-        ,"command": str, "arg": str
+        ,"resp_meme_ty":-1,"command": str, "arg": str
         ,"mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
         ,"data_channel": -1, "fuid": str
         ,"tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": str, "depth": int
         ,"analyzers": -1,"filename": str, "duration": -1, "local_orig": bool, "is_orig": bool, "seen_bytes": int, "total_bytes": int
         ,"missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
         ,"md5": str, "sha1": str, "sha256": str, "extracted": str
-        ,"nick": str, "user": str, "value": str, "addi": str
+        ,"nick": str, "user": str, "value": str, 'addi': str
         ,"dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
         ,'trans_depth': int, "helo": str, "mailfrom": str, "rcptto": -1
         , "date": -1, "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
@@ -866,7 +878,21 @@ if __name__ == "__main__":  # main module
         , "second_received": str, "last_reply": str, "path": -1
         , "tls": bool, "fuids": -1, "is_webmail": bool
         ,"status":str, "direction":str, "client":str, "server":str, "resp_size":int
-           } # this dictionary will declare the datatypes for each field in the database
+        ,"id_orig_h":str,"id_orig_p":int,"id.resp_h":int,"id.resp_p":int,"version":str, "cipher":str,
+        "server_name":str, "session_id":str,"issuer_subject":str, "not_valid_before":str,
+        "last_alert":str, "client_subject":str, "clnt_issuer_subject":str, "cert_hash":str, "validation_status":-1 # todo :resolve vectors issues
+        ,"name":-1, "notice":-1, "peer":-1
+        ,"src_addr":str,"src_port":int,"dst_adr":str,"dst_port":int,"note":str,"sig_id":str
+        ,"event_msg":str,"sub_msg":str,"sig_count":int,"host_count":int
+        ,"id_resp_h":str,"id_resp_p":int, "proto":str, "service":str
+        ,"orig_bytes":int,"resp_bytes":int, "conn_state":str,"missed_bytes":int, "history":str, "orig_pkts":int
+        ,"orig_ip_bytes":int,"resp_pkts":int, "resp_ip_bytes":int, "tunnel_parents":-1, "orig_cc":str, "resp_cc":str
+        , "mac":str, "assigned_ip":str, "lease_time ":str
+        ,"query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int, "rcode_name": str
+        ,"QR": bool,"AA":bool, "TC": bool, "RD": bool,"RA":bool, "Z": int, "answers": -1, "TTLs": -1, "rejected bool": bool
+
+           }
+            # this dictionary will declare the datatypes for each field in the database
 
     validFields = {    #todo : check fields of every log file (DNS done,
          "http" :{'uid': -1,'ts':-1, "id": -1, "trans_depth": -1, "method": -1, "host":-1, "uri": -1, "referrer": -1,
@@ -895,7 +921,7 @@ if __name__ == "__main__":  # main module
 
          'ssh' : {"uid":-1, "status":-1, "direction":-1, "client":-1, "server":-1, "resp_size":-1},
 
-         'ssl' : {"uid":-1,"id.orig_h":-1,"id.orig_p":-1,"id.resp_h":-1,"id.resp_p":-1,"version":-1, "cipher":-1,
+         'ssl' : {"uid":-1,"id_orig_h":-1,"id_orig_p":-1,"id.resp_h":-1,"id.resp_p":-1,"version":-1, "cipher":-1,
                  "server_name":-1, "session_id":-1, "subject":-1,
                    "issuer_subject":-1, "not_valid_before":-1,
                   "last_alert":-1, "client_subject":-1, "clnt_issuer_subject":-1, "cert_hash":-1, "validation_status":-1},
@@ -935,7 +961,7 @@ if __name__ == "__main__":  # main module
         # print(tables - dropped + "non dropped tables ") #fix ?
         try :
             con.execute ("create table main (uid TEXT primary KEY , ts string)")
-            con.execute ("create table IDs(uid int ,ID_ORIG_H text, ID_ORIG_P int, ID_RESP_H text"
+            con.execute ("create table IDs(uid int ,id_orig_h text, id_orig_p int, ID_RESP_H text"
                          ", ID_RESP_P int,foreign key(uid) references main (uid))")
         except :
             print ("error dropping main ?")
