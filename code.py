@@ -82,6 +82,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_3.setObjectName("pushButton_3")
 
         self.analysis.addTab(self.tab, "")
+        self.progressBar.setStyleSheet("background-color:#333333")
+        self.analysis.setStyleSheet("background-color:#333333")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
@@ -126,7 +128,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         MainWindow.setStatusBar(self.statusBar)
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
-
+        self.tab_3.setStyleSheet("background-color:#333333")
+        self.tab_2.setStyleSheet("background-color:#333333")
+        self.tab.setStyleSheet("background-color:#333333")
+        self.menuBar.setStyleSheet("background-color:#333333")
         self.message = QtWidgets.QMessageBox(MainWindow)
         self.__message2__ = QtWidgets.QMessageBox(MainWindow)
         self.menuHelp.addSeparator()
