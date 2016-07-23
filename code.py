@@ -458,6 +458,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def SQLcreator(self, table):  # should use lambda expressions
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
         # HANDLED IN THE CALLER FUNCTION
+        #use time.time to get the current time in epoch format
+
         exist = list(filter(lambda x: validFields[table][x] > -1,
                             validFields[table]))  # problem : a UID of transaction may be used multiple time
         insert = "insert into %s (" % (table)
