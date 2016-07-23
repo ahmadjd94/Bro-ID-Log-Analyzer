@@ -24,13 +24,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     ################################  defining global variable ###################################
     global line  # this line will strore
     global con  # connection to DB
-    single=False   #indicates if user is dealing with a signle file / DIR
+    single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
-    validFiles = []   #this list stores the valid file found in a DIR
+    validFiles = []  # this list stores the valid file found in a DIR
 
     valid = ['conn.log', 'dhcp.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log',
-             'smtp.log','ssl.log', 'files.log','signatures.log','weird.log','ssh.log']     # this list stores the valid log files bila can deal with
+             'smtp.log', 'ssl.log', 'files.log', 'signatures.log', 'weird.log',
+             'ssh.log']  # this list stores the valid log files bila can deal with
 
     UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_loss.log', 'dnp3.log', 'intel.log',
                         'known_certs.log', 'radius.log', 'modbus.log', 'notice.log', 'reporter.log',
@@ -38,7 +39,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         'syslog.log', 'traceroute.log',
                         'known_hosts.log']  # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
-                                # END OF GLOVAL VARIABLES DEFENITION
+    # END OF GLOVAL VARIABLES DEFENITION
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(709, 489)
@@ -176,7 +177,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def uMan(self):
         self.label_2.setVisible(False)
 
-    def tableCreator(self,fname):   # this function creates tables based on the fname argument
+        # creating db tables will be moved here
+
+    def tableCreator(self, fname):  # this function creates tables based on the fname argument
 
         if fname == "ftp.log":  # DONE
             try:
@@ -185,7 +188,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step3")
                 return True
-            except :
+            except:
                 return False
 
         elif fname == "dhcp.log":  # DONE
@@ -209,7 +212,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "weird.log":  # DONE
             try:
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,"
-                "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))")
+                            "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))")
                 print("step5")
             except:
                 return False
@@ -224,7 +227,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
 
         elif fname == "conn.log":  # DONE
-            try :
+            try:
                 con.execute("""CREATE TABLE CONN(UID TEXT,id_orig_h TEXT,id_orig_p INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
@@ -246,7 +249,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
         elif fname == "dns.log":  # DONE
-            try :
+            try:
                 con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                         RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
@@ -255,17 +258,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
 
         elif fname == "signature.log":  # DONE
-            try :
+            try:
                 con.execute("""CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 print("step10")
                 return True
-            except :
+            except:
                 return False
 
         elif fname == "ssl.log":  # DONE
-            try :
+            try:
                 con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
@@ -273,13 +276,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step11")
                 return True
-            except :
+            except:
                 return False
 
         elif fname == "files.log":  # DONE
             try:
                 con.execute(
-                """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
+                    """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
                     ANALYZERS TEXT,MIME_TYPE TEXT,
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
@@ -298,268 +301,268 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-    def valuefilter(self,num):
-        if num!=-1:
+    def valuefilter(self, num):
+        if num != -1:
             return True
-        else :
+        else:
             return False
 
-    def SQLcreator(self,table):  # should use lambda expressions
-                                 #THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
-                                 #HANDLED IN THE CALLER FUNCTION
-        exist=list(filter (lambda x :validFields[table][x]>-1,validFields[table]))   #problem : a UID of transaction may be used multiple time
-        insert="insert into %s ("%(table)
-        fields=values=""
+    def SQLcreator(self, table):  # should use lambda expressions
+        # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
+        # HANDLED IN THE CALLER FUNCTION
+        exist = list(filter(lambda x: validFields[table][x] > -1,
+                            validFields[table]))  # problem : a UID of transaction may be used multiple time
+        insert = "insert into %s (" % (table)
+        fields = values = ""
         for i in exist:
-            fields+=i+','
-        fields=fields[:len(fields)-1] # this line will remove the colon at the end of fileds string
+            fields += i + ','
+        fields = fields[:len(fields) - 1]  # this line will remove the colon at the end of fileds string
         for i in exist:
-            values+=line[validFields[table][i]]
+            values += line[validFields[table][i]]
 
-
-
-
-
-
-    def traverse(self,fname):                 # this function will traverse the file that is based to it
-        #todo : major changes (inserting into DB should be dynamic , the function should insert fields according to their values
-        #if the field value is -1 , the field should be neglected )
-        print ("traversing"+str(fname))
-        print (type (fname))
-        print (fname)
+    def traverse(self, fname):  # this function will traverse the file that is based to it
+        # todo : major changes (inserting into DB should be dynamic , the function should insert fields according to their values
+        # if the field value is -1 , the field should be neglected )
+        print("traversing" + str(fname))
+        print(type(fname))
+        print(fname)
+        progress = 0
         try:
-            fname= (fname.split('.')[0])      # this statment splits the fname and neglects the .log part of it
-            hashTemp=""                       #this variable stores the entire log file to calculate it's hash value
-            f=open(fname+'.log','r')          #open the log file Read-Only mode
+            fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
+            hashTemp = ""  # this variable stores the entire log file to calculate it's hash value
+            f = open(fname + '.log', 'r')  # open the log file Read-Only mode
 
-            for i in f:                         #todo : modify function to increase the progress bar
-                    hashTemp += i               #concatenate the lines being read to the string
+            for i in f:  # todo : modify function to increase the progress bar
+                hashTemp += i  # concatenate the lines being read to the string
 
-                    if i[:7] == "#fields" or i[:7] == "Fields" :   #field loading algorithm
-                            print (i)
-                            fields=(i[7:].split())
-                            for field in fields:
-                                if field in validFields[fname]:
-                                    validFields[fname][field]=fields.index(field)   # this line stores the index of field in the dictionary
-                                print(fields.index(field), field)
+                if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
+                    print(i)
+                    fields = (i[7:].split())
+                    for field in fields:
+                        if field in validFields[fname]:
+                            validFields[fname][field] = fields.index(
+                                field)  # this line stores the index of field in the dictionary
+                        print(fields.index(field), field)
 
-                            print ("dfdsfds",validFields[fname])
+                    print("dfdsfds", validFields[fname])
 
-                    elif i[0] != "#":         #this line ignores the log lines that start with # , #indecates a commented line
-                        line = i.split()
-                        print (i)
-                        # no hardcoded indecies of
-                        # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
-                        #todo : the algorithm is not handling undefined fields , sprint's extended to thursday 
-                        if fname == 'http' or fname == "HTTP":   # this inserts the log data of http files into http table
-                            try :
-                                print (validFields["http"]+"printing fields")
-                                con.execute("insert into main (%s)"%line[validFields['http']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['http']['ts']])
-                                con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
+                elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
+                    line = i.split()
+                    print(i)
+                    # no hardcoded indecies of
+                    # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
+                    # todo : the algorithm is not handling undefined fields , sprint's extended to thursday
+                    if fname == 'http' or fname == "HTTP":  # this inserts the log data of http files into http table
+                        try:
+                            print(validFields["http"] + "printing fields")
+                            con.execute("insert into main (%s)" % line[validFields['http']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['http']['ts']])
+                            con.execute("""insert into http (%s,%d,%d,%s,%s,%s,%s,%s,%d,%d,%s,%d,%s,%s,%s,
                                                         %s,%s,%s,%s,%s,
                                                         %s)"""
-                                            %(line [validFields['http']['uid']]
-                                            , int(line[validFields["http"]['id']])
-                                            , int(line[validFields["http"]["trans_depth"]])
-                                            , line[validFields['http']['method']]
-                                            , line[validFields["http"]['host']]
-                                            , line[validFields['http']['uri']]
-                                            , line[validFields["http"]["referrer"]]
-                                            , line[validFields['http']['user_agent']]
-                                            , int(line[validFields["http"]["request_body_len"]])
-                                            , int (validFields["http"]["status_code"])
-                                            , line[validFields["http"]["status_msg"]]
-                                            , int(line[validFields["http"]["info_code"]])
-                                            , line[validFields['http']['info_msg']]
-                                            , line[validFields["http"]["tags"]]
-                                            , line[validFields['http']['username']]
-                                            , line[validFields["http"]["password"]]
-                                            , line[validFields["http"]['proxied']]
-                                            , line[validFields['http']["orig_fuids"]]
-                                            , line[validFields["http"]['orig_meme_types']]
-                                            , line[validFields["http"]['orig_fuid']]
-                                            , line[validFields["http"]['resp_meme_ty']]
-                                            ))
-                            except sqlite3.Error as http: #exceptions renaming , cathcing sqlite3 exceptions
-                                print (str (http))
+                                        % (line[validFields['http']['uid']]
+                                           , int(line[validFields["http"]['id']])
+                                           , int(line[validFields["http"]["trans_depth"]])
+                                           , line[validFields['http']['method']]
+                                           , line[validFields["http"]['host']]
+                                           , line[validFields['http']['uri']]
+                                           , line[validFields["http"]["referrer"]]
+                                           , line[validFields['http']['user_agent']]
+                                           , int(line[validFields["http"]["request_body_len"]])
+                                           , int(validFields["http"]["status_code"])
+                                           , line[validFields["http"]["status_msg"]]
+                                           , int(line[validFields["http"]["info_code"]])
+                                           , line[validFields['http']['info_msg']]
+                                           , line[validFields["http"]["tags"]]
+                                           , line[validFields['http']['username']]
+                                           , line[validFields["http"]["password"]]
+                                           , line[validFields["http"]['proxied']]
+                                           , line[validFields['http']["orig_fuids"]]
+                                           , line[validFields["http"]['orig_meme_types']]
+                                           , line[validFields["http"]['orig_fuid']]
+                                           , line[validFields["http"]['resp_meme_ty']]
+                                           ))
+                        except sqlite3.Error as http:  # exceptions renaming , cathcing sqlite3 exceptions
+                            print(str(http))
 
-                        if fname == 'ftp' or fname == "FTP":  # inserts data of ftp logs into ftp table
-                            try:
-                                con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
-                                con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
-                                            % ( line[validFields['ftp']['user']]
-                                               , line[validFields["ftp"]['password']]
-                                               , line[validFields["ftp"]["command"]]
-                                               , line[validFields['ftp']['arg']]
-                                               , line[validFields["ftp"]['mime_type']]
-                                               , int(line[validFields['ftp']['file_size']])
-                                               , int(line[validFields["ftp"]["reply_code"]])
-                                               , line[validFields['ftp']['reply_msg']]
-                                               , line[validFields["ftp"]["data_channel"]]
-                                               , line[validFields["ftp"]["fuid"]]
-                                               ))
-                            except sqlite3.Error as ftp:
-                                print (str (ftp))
+                    if fname == 'ftp' or fname == "FTP":  # inserts data of ftp logs into ftp table
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['ftp']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['ftp']['ts']])
+                            con.execute("""insert into ftp (%s,%s,%s,%s,%s,%d,%d,%s,%s,%s)"""
+                                        % (line[validFields['ftp']['user']]
+                                           , line[validFields["ftp"]['password']]
+                                           , line[validFields["ftp"]["command"]]
+                                           , line[validFields['ftp']['arg']]
+                                           , line[validFields["ftp"]['mime_type']]
+                                           , int(line[validFields['ftp']['file_size']])
+                                           , int(line[validFields["ftp"]["reply_code"]])
+                                           , line[validFields['ftp']['reply_msg']]
+                                           , line[validFields["ftp"]["data_channel"]]
+                                           , line[validFields["ftp"]["fuid"]]
+                                           ))
+                        except sqlite3.Error as ftp:
+                            print(str(ftp))
 
-                        if fname == 'irc'or fname=="IRC":   # data into IRC table
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
-                                con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
-                                                % (int(line[validFields['irc']['id']])
-                                                   , line[validFields["irc"]['nick']]
-                                                   , line[validFields["irc"]["user"]]
-                                                   , line[validFields['irc']['command']]
-                                                   , line[validFields["irc"]['value']]
-                                                   , (line[validFields['irc']['addi']])
-                                                   , line[validFields["irc"]["dcc_file_name"]]
-                                                   , int(line[validFields['irc']['dcc_file_size']])
-                                                   ,line[validFields['irs']['dcc_file_type']]
-                                                   , line[validFields["irc"]["fuid"]]
-                                                   )
-                                                )
-                            except sqlite3.Error as irc:  #exception renaming
-                                print (str (irc))
-
-                        if fname == 'conn'or fname=="CONN":  # data into Conn table
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
-                                con.execute("""insert into conn (%s,%s,%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%s,%s,%s)"""
-                                                % ((line[validFields['conn']['uid']])
-                                                   , line[validFields["conn"]['id_orig_h']]
-                                                   , int(line[validFields["conn"]["id_orig_p"]])
-                                                   , line[validFields['conn']['id_resp_h']]
-                                                   , int(line[validFields["conn"]['resp_p']])
-                                                   , (line[validFields['conn']['proto']])
-                                                   , line[validFields["conn"]["service"]]
-                                                   , (line[validFields['conn']['duration']])
-                                                   , line[validFields['conn']['orig_bytes']]
-                                                   , line[validFields["conn"]["resp_bytes"]]
-                                                   ,line[validFields["conn"]["conn_state"]]
-                                                   ,line[validFields["conn"]["local_orig"]]
-                                                   ,line[validFields["conn"]["missed_bytes"]]
-                                                   ,line[validFields["conn"]["history"]]
-                                                   ,line[validFields["conn"]["orig_pkts"]]
-                                                   ,int(line[validFields["conn"]["orig_ip_bytes"]])
-                                                   ,int(line[validFields["conn"]["resp_pkts"]])
-                                                   ,int(line[validFields["conn"]["resp_ip_bytes"]])
-                                                   ,line[validFields["conn"]["tunnel_parents"]]
-                                                   ,line[validFields["conn"]["orig_cc"]]
-                                                   ,line[validFields["conn"]["resp_cc"]]
-                                                   )
-                                                )
-                            except sqlite3.Error as conn :   # exception renaming
-                                print (str (conn))
-
-                        if fname == 'signature' or fname=="SIGNATURE":     #data into signatures table
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
-                                con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
-                                            % (int(line[validFields['signature']['ts']])
-                                               , line[validFields["signature"]['src_addr']]
-                                               , int(line[validFields["signature"]["src_port"]])
-                                               , line[validFields['signature']['dst_addr']]
-                                               , int(line[validFields["signature"]['dst_port']])
-                                               , (line[validFields['signature']['note']])
-                                               , line[validFields["signature"]["sig_id"]]
-                                               , (line[validFields['signature']['event_msg']])
-                                               , line[validFields['signature']['sub_msg']]
-                                               , int(line[validFields["signature"]["sig_count"]])
-                                               , int(line[validFields["signature"]["host_count"]])
-                                               )
-                                            )
-                            except sqlite3.Error as sign:   #exception renaming
-                                print (str(sign))
-
-                        if fname == 'dns' or fname== "DNS":
-                            try:
-                                con.execute("insert into main (uid,ts) values('test','test1')" )
-                                con.execute("insert into main(uid,ts) values(%s,%s)" % (line[validFields['dns']['uid']],line[validFields['dns']['uid']]))
-                                con.execute(
-                                        """insert into dns (%s,%s,%s,%d,%s,%d,%s,%d,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s,%d)"""
-                                        % ((line[validFields['dns']['uid']])
-                                           , line[validFields["dns"]['id']]
-                                           , (line[validFields["dns"]["proto"]])
-                                           , int(line[validFields['dns']['trans_id']])
-                                           , (line[validFields["dns"]['query']])
-                                           , int((line[validFields['dns']['qclass']]))
-                                           , line[validFields["dns"]["qclass_name"]]
-                                           , int(line[validFields["dns"]["qtype"]])
-                                           , line[validFields["dns"]["qtype_name"]]
-                                           , int((line[validFields['dns']['rcode']]))
-                                           , line[validFields['dns']['rcode_name']]
-                                           , int(line[validFields["dns"]["qr"]])
-                                           , int(line[validFields["dns"]["aa"]])
-                                           , int(line[validFields["dns"]["tc"]])
-                                           , int(line[validFields["dns"]["rd"]])
-                                           , int(line[validFields["dns"]["ra"]])
-                                           , int(line[validFields["dns"]["z"]])
-                                           , (line[validFields["dns"]["answers"]])
-                                           , (line[validFields["dns"]["ttls"]])
-                                           , int(line[validFields["dns"]["rejected"]])
+                    if fname == 'irc' or fname == "IRC":  # data into IRC table
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
+                            con.execute("""insert into irc (%d,%s,%s,%s,%s,%s,%s,%d,%s,%s)"""
+                                        % (int(line[validFields['irc']['id']])
+                                           , line[validFields["irc"]['nick']]
+                                           , line[validFields["irc"]["user"]]
+                                           , line[validFields['irc']['command']]
+                                           , line[validFields["irc"]['value']]
+                                           , (line[validFields['irc']['addi']])
+                                           , line[validFields["irc"]["dcc_file_name"]]
+                                           , int(line[validFields['irc']['dcc_file_size']])
+                                           , line[validFields['irs']['dcc_file_type']]
+                                           , line[validFields["irc"]["fuid"]]
                                            )
                                         )
-                            except sqlite3.Error as dns :
-                                print (str (dns))
-                            except sqlite3.OperationalError as err:
-                                print(str(err))
-                        if fname == 'SSH' or fname=="ssh":   #data into ssh table
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
-                                con.execute(
-                                    """insert into dns (%s,%s,%s,%s,%s,%s,%d)"""
-                                    % ((line[validFields['ssh']['uid']])
-                                       , line[validFields["ssh"]['id']]
-                                       , (line[validFields["ssh"]["status"]])
-                                       , (line[validFields['ssh']['direction']])
-                                       , (line[validFields["ssh"]['client']])
-                                       , line[validFields['ssh']['server']]
-                                       , int(line[validFields["ssh"]["resp_size"]])
-                                       )
+                        except sqlite3.Error as irc:  # exception renaming
+                            print(str(irc))
+
+                    if fname == 'conn' or fname == "CONN":  # data into Conn table
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['conn']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['conn']['ts']])
+                            con.execute(
+                                """insert into conn (%s,%s,%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%d,%s,%s,%s)"""
+                                % ((line[validFields['conn']['uid']])
+                                   , line[validFields["conn"]['id_orig_h']]
+                                   , int(line[validFields["conn"]["id_orig_p"]])
+                                   , line[validFields['conn']['id_resp_h']]
+                                   , int(line[validFields["conn"]['resp_p']])
+                                   , (line[validFields['conn']['proto']])
+                                   , line[validFields["conn"]["service"]]
+                                   , (line[validFields['conn']['duration']])
+                                   , line[validFields['conn']['orig_bytes']]
+                                   , line[validFields["conn"]["resp_bytes"]]
+                                   , line[validFields["conn"]["conn_state"]]
+                                   , line[validFields["conn"]["local_orig"]]
+                                   , line[validFields["conn"]["missed_bytes"]]
+                                   , line[validFields["conn"]["history"]]
+                                   , line[validFields["conn"]["orig_pkts"]]
+                                   , int(line[validFields["conn"]["orig_ip_bytes"]])
+                                   , int(line[validFields["conn"]["resp_pkts"]])
+                                   , int(line[validFields["conn"]["resp_ip_bytes"]])
+                                   , line[validFields["conn"]["tunnel_parents"]]
+                                   , line[validFields["conn"]["orig_cc"]]
+                                   , line[validFields["conn"]["resp_cc"]]
+                                   )
                                 )
-                            except sqlite3.Error as ssh:
-                                    print (str (ssh))
+                        except sqlite3.Error as conn:  # exception renaming
+                            print(str(conn))
 
-                        if fname == 'SSL' or fname=="ssl":
-                            try:
-                                con.execute("insert into main (%s)" % line[validFields['ssl']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['ssl']['ts']])
-                                con.execute(
-                                        """insert into ssl (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-                                        % ((line[validFields['ssl']['uid']])
-                                           , line[validFields["ssl"]['id']]
-                                           , (line[validFields["ssl"]["version"]])
-                                           , (line[validFields['ssl']['cipher']])
-                                           , (line[validFields["ssl"]['server_name']])
-                                           , line[validFields['ssl']['sessions_id']]
-                                           , (line[validFields["ssl"]["subject"]])
-                                           ,(line[validFields["ssl"]["issuer_subject"]])
-                                           ,(line[validFields["ssl"]["not_valid_before"]])
-                                           ,(line[validFields["ssl"]["not_valid_after"]])
-                                           ,(line[validFields["ssl"]["last_alert"]])
-                                           ,(line[validFields["ssl"]["cleint_subject"]])
-                                           ,(line[validFields["ssl"]["clnt_issuer_subject"]])
-                                           ,(line[validFields["ssl"]["cert_hash"]])
-                                           ,(line[validFields["ssl"]["validation_status"]])
-
+                    if fname == 'signature' or fname == "SIGNATURE":  # data into signatures table
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['irc']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['irc']['ts']])
+                            con.execute("""insert into signature (%s,%s,%d,%s,%d,%s,%s,%s,%s,%d,%d)"""
+                                        % (int(line[validFields['signature']['ts']])
+                                           , line[validFields["signature"]['src_addr']]
+                                           , int(line[validFields["signature"]["src_port"]])
+                                           , line[validFields['signature']['dst_addr']]
+                                           , int(line[validFields["signature"]['dst_port']])
+                                           , (line[validFields['signature']['note']])
+                                           , line[validFields["signature"]["sig_id"]]
+                                           , (line[validFields['signature']['event_msg']])
+                                           , line[validFields['signature']['sub_msg']]
+                                           , int(line[validFields["signature"]["sig_count"]])
+                                           , int(line[validFields["signature"]["host_count"]])
                                            )
-                                    )
-                            except sqlite3.Error as ssl:
-                                    print (str (ssl))
+                                        )
+                        except sqlite3.Error as sign:  # exception renaming
+                            print(str(sign))
 
-                        if fname == 'SMTP' or fname=="smtp":
-                            try:
-                                con.execute("insert into main (%s)" % line[validFields['smtp']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['smtp']['ts']])
-                                con.execute(
-                                    """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
-                                    % (line[validFields['smtp']['uid']]
-                                       , line[validFields["smtp"]['id']]
+                    if fname == 'dns' or fname == "DNS":
+                        try:
+                            con.execute("INSERT INTO main (uid,ts) VALUES('test','test1')")
+                            con.execute("insert into main(uid,ts) values(%s,%s)" % (
+                            line[validFields['dns']['uid']], line[validFields['dns']['uid']]))
+                            con.execute(
+                                """insert into dns (%s,%s,%s,%d,%s,%d,%s,%d,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s,%d)"""
+                                % ((line[validFields['dns']['uid']])
+                                   , line[validFields["dns"]['id']]
+                                   , (line[validFields["dns"]["proto"]])
+                                   , int(line[validFields['dns']['trans_id']])
+                                   , (line[validFields["dns"]['query']])
+                                   , int((line[validFields['dns']['qclass']]))
+                                   , line[validFields["dns"]["qclass_name"]]
+                                   , int(line[validFields["dns"]["qtype"]])
+                                   , line[validFields["dns"]["qtype_name"]]
+                                   , int((line[validFields['dns']['rcode']]))
+                                   , line[validFields['dns']['rcode_name']]
+                                   , int(line[validFields["dns"]["qr"]])
+                                   , int(line[validFields["dns"]["aa"]])
+                                   , int(line[validFields["dns"]["tc"]])
+                                   , int(line[validFields["dns"]["rd"]])
+                                   , int(line[validFields["dns"]["ra"]])
+                                   , int(line[validFields["dns"]["z"]])
+                                   , (line[validFields["dns"]["answers"]])
+                                   , (line[validFields["dns"]["ttls"]])
+                                   , int(line[validFields["dns"]["rejected"]])
+                                   )
+                            )
+                        except sqlite3.Error as dns:
+                            print(str(dns))
+                        except sqlite3.OperationalError as err:
+                            print(str(err))
+                    if fname == 'SSH' or fname == "ssh":  # data into ssh table
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['SSH']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['SSH']['ts']])
+                            con.execute(
+                                """insert into dns (%s,%s,%s,%s,%s,%s,%d)"""
+                                % ((line[validFields['ssh']['uid']])
+                                   , line[validFields["ssh"]['id']]
+                                   , (line[validFields["ssh"]["status"]])
+                                   , (line[validFields['ssh']['direction']])
+                                   , (line[validFields["ssh"]['client']])
+                                   , line[validFields['ssh']['server']]
+                                   , int(line[validFields["ssh"]["resp_size"]])
+                                   )
+                            )
+                        except sqlite3.Error as ssh:
+                            print(str(ssh))
+
+                    if fname == 'SSL' or fname == "ssl":
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['ssl']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['ssl']['ts']])
+                            con.execute(
+                                """insert into ssl (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                                % ((line[validFields['ssl']['uid']])
+                                   , line[validFields["ssl"]['id']]
+                                   , (line[validFields["ssl"]["version"]])
+                                   , (line[validFields['ssl']['cipher']])
+                                   , (line[validFields["ssl"]['server_name']])
+                                   , line[validFields['ssl']['sessions_id']]
+                                   , (line[validFields["ssl"]["subject"]])
+                                   , (line[validFields["ssl"]["issuer_subject"]])
+                                   , (line[validFields["ssl"]["not_valid_before"]])
+                                   , (line[validFields["ssl"]["not_valid_after"]])
+                                   , (line[validFields["ssl"]["last_alert"]])
+                                   , (line[validFields["ssl"]["cleint_subject"]])
+                                   , (line[validFields["ssl"]["clnt_issuer_subject"]])
+                                   , (line[validFields["ssl"]["cert_hash"]])
+                                   , (line[validFields["ssl"]["validation_status"]])
+
+                                   )
+                            )
+                        except sqlite3.Error as ssl:
+                            print(str(ssl))
+
+                    if fname == 'SMTP' or fname == "smtp":
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['smtp']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['smtp']['ts']])
+                            con.execute(
+                                """insert into SMTP (%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%d)"""
+                                % (line[validFields['smtp']['uid']]
+                                   , line[validFields["smtp"]['id']]
                                    , int(line[validFields["smtp"]["trans_depth"]])
                                    , line[validFields['smtp']['helo']]
                                    , line[validFields["smtp"]['mailfrom']]
@@ -573,60 +576,60 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    , line[validFields["smtp"]["subject"]]
                                    , line[validFields["smtp"]["x_originating_ip"]]
                                    , line[validFields["smtp"]["first_received"]]
-                                   ,line[validFields["smtp"]["second_received"]]
-                                   ,line[validFields["smtp"]["last_reply"]]
-                                   ,line[validFields["smtp"]["path"]]
-                                   ,line[validFields["smtp"]["user_agent"]]
-                                   ,int(line[validFields["smtp"]["tls"]])
-                                   ,line[validFields["smtp"]["fuid"]]
-                                   ,int(line[validFields["smtp"]["is_webmail"]])
+                                   , line[validFields["smtp"]["second_received"]]
+                                   , line[validFields["smtp"]["last_reply"]]
+                                   , line[validFields["smtp"]["path"]]
+                                   , line[validFields["smtp"]["user_agent"]]
+                                   , int(line[validFields["smtp"]["tls"]])
+                                   , line[validFields["smtp"]["fuid"]]
+                                   , int(line[validFields["smtp"]["is_webmail"]])
                                    )
                             )
-                            except sqlite3.Error as s:
-                                print (str(s))
+                        except sqlite3.Error as s:
+                            print(str(s))
 
-                        if fname== 'dhcp' or fname == "DHCP":
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['dhcp']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['dhcp']['ts']])
-                                con.execute(
-                                    """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
-                                    % ((line[validFields['dhcp']['uid']])
-                                       , line[validFields["dhcp"]['id']]
-                                       , (line[validFields["dhcp"]["mac"]])
-                                       , (line[validFields['dhcp']['assigned_ip']])
-                                       , (line[validFields["dhcp"]['lease_time']])
-                                       , line[validFields['dhcp']['trans_id']]
+                    if fname == 'dhcp' or fname == "DHCP":
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['dhcp']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['dhcp']['ts']])
+                            con.execute(
+                                """insert into DHCP (%s,%s,%s,%s,%s,%s)"""
+                                % ((line[validFields['dhcp']['uid']])
+                                   , line[validFields["dhcp"]['id']]
+                                   , (line[validFields["dhcp"]["mac"]])
+                                   , (line[validFields['dhcp']['assigned_ip']])
+                                   , (line[validFields["dhcp"]['lease_time']])
+                                   , line[validFields['dhcp']['trans_id']]
 
-                                       )
-                                )
-                            except sqlite3.Error as dhcp :
-                                    print (str (dhcp))
-                            except sqlite3.OperationError as err:
-                                print (str(err))
+                                   )
+                            )
+                        except sqlite3.Error as dhcp:
+                            print(str(dhcp))
+                        except sqlite3.OperationError as err:
+                            print(str(err))
 
-                        if fname == 'WEIRD' or fname == "weird":
-                            try:
-                                    con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
-                                    con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
-                                    con.execute(
-                                        """insert into dhcp (%s,%s,%s,%s,%s,%d)"""
-                                        % ((line[validFields['weird']['uid']])
-                                           , line[validFields["weird"]['id']]
-                                           , (line[validFields["weird"]["name"]])
-                                           , (line[validFields['weird']['addi']])
-                                           , int(line[validFields["weird"]['notice']])
-                                           , (line[validFields['weird']['peer']])
+                    if fname == 'WEIRD' or fname == "weird":
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['WEIRD']['ts']])
+                            con.execute(
+                                """insert into dhcp (%s,%s,%s,%s,%s,%d)"""
+                                % ((line[validFields['weird']['uid']])
+                                   , line[validFields["weird"]['id']]
+                                   , (line[validFields["weird"]["name"]])
+                                   , (line[validFields['weird']['addi']])
+                                   , int(line[validFields["weird"]['notice']])
+                                   , (line[validFields['weird']['peer']])
 
-                                           )
-                                    )
-                            except sqlite3.Error as weird :
-                                print (str (weird))
-                        if fname == 'FILES' or fname == "files":
-                            try :
-                                con.execute("insert into main (%s)" % line[validFields['FILES']['uid']])
-                                con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
-                                con.execute(
+                                   )
+                            )
+                        except sqlite3.Error as weird:
+                            print(str(weird))
+                    if fname == 'FILES' or fname == "files":
+                        try:
+                            con.execute("insert into main (%s)" % line[validFields['FILES']['uid']])
+                            con.execute("insert into main (%s)" % line[validFields['FILES']['ts']])
+                            con.execute(
                                 """insert into FILES (%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s)"""
                                 % (line[validFields['files']['ts']]
                                    , line[validFields["files"]['fuid']]
@@ -634,41 +637,42 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    , line[validFields['files']['rx_hosts']]
                                    , line[validFields["files"]['conn_uids']]
                                    , line[validFields['files']['source']]
-                                   ,int(line[validFields["files"]["depth"]])
+                                   , int(line[validFields["files"]["depth"]])
                                    , line[validFields["files"]["analyzers"]]
                                    , line[validFields["files"]["mime_type"]]
                                    , line[validFields["files"]["filename"]]
                                    , line[validFields["files"]["duration"]]
-                                   ,int(line[validFields["files"]["local_orig"]])
-                                   ,int(line[validFields["files"]["is_orig"]])
-                                   ,int(line[validFields["files"]["seen_bytes"]])
-                                   ,int( line[validFields["files"]["total_bytes"]])
-                                   ,int(line[validFields["files"]["missing_bytes"]])
-                                   ,int( line[validFields["files"]["overflow_bytes"]])
-                                   ,int (line[validFields["files"]["timedout"]])
-                                   ,(line[validFields["files"]["parent_fuid"]])
+                                   , int(line[validFields["files"]["local_orig"]])
+                                   , int(line[validFields["files"]["is_orig"]])
+                                   , int(line[validFields["files"]["seen_bytes"]])
+                                   , int(line[validFields["files"]["total_bytes"]])
+                                   , int(line[validFields["files"]["missing_bytes"]])
+                                   , int(line[validFields["files"]["overflow_bytes"]])
+                                   , int(line[validFields["files"]["timedout"]])
+                                   , (line[validFields["files"]["parent_fuid"]])
                                    , line[validFields["files"]["md5_sha1_sha256"]]
                                    , (line[validFields["files"]["extracted"]])
                                    ))
-                            except sqlite3.Error as files:
-                                print ("error inserting into table"+str (f))
-                    else:
-                        print(i+"neglected")
+                        except sqlite3.Error as files:
+                            print("error inserting into table" + str(f))
+                else:
+                    print(i + "neglected")
+                self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
             f.close()
 
-            with open(historyLog,'a') as csvfile:    # open log file to log the state of operation
+            with open(historyLog, 'a') as csvfile:  # open log file to log the state of operation
                 wr1 = csv.writer(csvfile, delimiter=',')
-                digestive=hashlib.md5(codecs.encode(hashTemp)) # string must be converted to bytes to calculate hash
-                #calculate the hash of the file
+                digestive = hashlib.md5(codecs.encode(hashTemp))  # string must be converted to bytes to calculate hash
+                # calculate the hash of the file
                 # this block is only performed when no exceptions happen , all of data inserted into DB successfully
-                csvfile.write(fname,digestive.hexdigest()) # the digested value combined
+                csvfile.write(fname, digestive.hexdigest())  # the digested value combined
 
-        except :  #this block is executed in case of failure of instering
-            with open(historyLog,'a') as csvfile:
+        except:  # this block is executed in case of failure of instering
+            with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
 
-    def executeSQL(self):                         # this function performs the SQL queries in the SQL panel
+    def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
         s = False
         try:
@@ -680,7 +684,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         pass
                         # this lines should insert the result of select statments into the tableview
 
-            if "insert" in command: # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
+            if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
                 self.message.setText("are you trying to insert data into DB ? \n "
                                      "the program prohibits the user from inserting data into db")
                 self.message.show()
@@ -705,6 +709,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.message.show()
 
     def load(self):  # this function loads the content of the log files into the DB
+        # todo : progress bar check
         if self.loaded:
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
@@ -715,15 +720,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             else:
                 return
         if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            fPath=self.lineEdit.text().split('/')
-            fName=fPath[len(fPath)-1]
-            path='/'.join(fPath[:len(fPath)-1])     # -1 since the right slicing operator is excluded
-            print (fName)
-            print (fPath,path)
+            fPath = self.lineEdit.text().split('/')
+            fName = fPath[len(fPath) - 1]
+            path = '/'.join(fPath[:len(fPath) - 1])  # -1 since the right slicing operator is excluded
+            print(fName)
+            print(fPath, path)
             os.chdir(path)
 
             if not self.tableCreator(fName):
-                self.message.setText("error creating table "+str(fName))
+                self.message.setText("error creating table " + str(fName))
 
             self.traverse(fName)
 
@@ -731,17 +736,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
 
-        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":  # creating db tables will be moved here
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":
 
-            progress = 100 / len(self.validFiles) #not so accurate, progress bar will be filled according to progress in file , not according to line numbers
+            progress = 100 / len(
+                self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
             for each in self.validFiles:
                 each = str.lower(each)
-                print (each)
+                print(each)
                 self.tableCreator(each)
-
                 self.traverse(each)
-
-               #function moved to top#
                 self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)
             self.analysis.setTabEnabled(2, True)
@@ -772,11 +775,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
-        single=True
+        single = True
         try:
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
-            print (name +"this")
+            print(name + "this")
             if name in self.valid:
                 print(name)
                 file = open(self.lineEdit.text())
@@ -787,31 +790,32 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.label.setVisible(True)
                 file.close()
             elif name in self.UnsupportedFiles:
-                print ("here")
+                print("here")
                 self.message.setText("BILA does not currently support the file you are trying to use")
                 self.message.show()
                 self.lineEdit.clear()
-            else :
+            else:
                 self.message.setText("make sure you are trying to load a valid log files")
                 self.message.show()
                 self.lineEdit.clear()
 
         except:  # handling incorrect file directories / paths
-            print ("exception raised")
+            print("exception raised")
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
-
+        single = False
         fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
         print(fname)
         self.lineEdit.setText(fname[0])
         try:
             file = open(fname[0])
-            count = 0
+            ui.linesCount = 0
             for i in file:
-                count += 1
-            self.label.setText("the selected file has " + str(count) + " lines")
+                ui.linesCount += 1
+            self.label.setText("the selected file has " + str(ui.linesCount) + " lines")
             self.label.setVisible(True)
+            file.close()
             self.lineEdit.setText(fname[0])
         except FileNotFoundError:
             self.label.show()
@@ -826,23 +830,30 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             for each in files:
                 if each in self.valid:
                     self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
-                    print (self.validFiles)
-
+                    print(self.validFiles)
+            for each in self.validFiles:
+                file = open(each, 'r')
+                for i in file:
+                    ui.linesCount += 1
+                file.close()
             self.label.setText(
-                "the directory you have selected have " + str(len(self.validFiles)) + " valid files")
+                "the directory you have selected have %s valid files with %s lines" % (
+            str(len(self.validFiles)), str(ui.linesCount)))
             self.lineEdit_2.setText(dire)
         except  NotADirectoryError as e:  # exception raised if the selection was not a dir
             self.label.setText("make sure you are entering a dir")
         except:
             self.label.setText("make sure you have selected a directory")
+
         finally:
             self.label.show()
 
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
-                                #todo : drop tables
-                                #todo  reset timeline
+        # todo : drop tables
+        # todo  reset timeline
+
 
 if __name__ == "__main__":  # main module
 
@@ -851,98 +862,116 @@ if __name__ == "__main__":  # main module
             con.execute("drop table %s" % table)
             return 1
         except sqlite3.OperationalError as a:
-            if  "no such table" in str(a):
+            if "no such table" in str(a):
                 return 0
+
 
     import sys
     import csv
     from datetime import datetime
+
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types={"uid":int,"ts":float,"id": -1, "trans_depth": int, "method": str, "host":str, "uri": str, "referrer": str
-        ,"user_agent": str, "request_body_len": int,"status_code":int, "status_msg":str, "info_code":int, "info_msg":str
-        ,"tags": -1, "username":str,"password":str, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1
-        ,"resp_meme_ty":-1,"command": str, "arg": str
-        ,"mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
-        ,"data_channel": -1, "fuid": str
-        ,"tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": str, "depth": int
-        ,"analyzers": -1,"filename": str, "duration": -1, "local_orig": bool, "is_orig": bool, "seen_bytes": int, "total_bytes": int
-        ,"missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
-        ,"md5": str, "sha1": str, "sha256": str, "extracted": str
-        ,"nick": str, "user": str, "value": str, 'addi': str
-        ,"dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
-        ,'trans_depth': int, "helo": str, "mailfrom": str, "rcptto": -1
+    types = {"uid": int, "ts": float, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
+             "referrer": str
+        , "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
+             "info_msg": str
+        , "tags": -1, "username": str, "password": str, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
+             "orig_fuid": -1
+        , "resp_meme_ty": -1, "command": str, "arg": str
+        , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
+        , "data_channel": -1, "fuid": str
+        , "tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": str, "depth": int
+        , "analyzers": -1, "filename": str, "duration": -1, "local_orig": bool, "is_orig": bool, "seen_bytes": int,
+             "total_bytes": int
+        , "missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
+        , "md5": str, "sha1": str, "sha256": str, "extracted": str
+        , "nick": str, "user": str, "value": str, 'addi': str
+        , "dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
+        , 'trans_depth': int, "helo": str, "mailfrom": str, "rcptto": -1
         , "date": -1, "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
         , "x_originating_ip": str, "first_received": str
         , "second_received": str, "last_reply": str, "path": -1
         , "tls": bool, "fuids": -1, "is_webmail": bool
-        ,"status":str, "direction":str, "client":str, "server":str, "resp_size":int
-        ,"id_orig_h":str,"id_orig_p":int,"id.resp_h":int,"id.resp_p":int,"version":str, "cipher":str,
-        "server_name":str, "session_id":str,"issuer_subject":str, "not_valid_before":str,
-        "last_alert":str, "client_subject":str, "clnt_issuer_subject":str, "cert_hash":str, "validation_status":-1 # todo :resolve vectors issues
-        ,"name":-1, "notice":-1, "peer":-1
-        ,"src_addr":str,"src_port":int,"dst_adr":str,"dst_port":int,"note":str,"sig_id":str
-        ,"event_msg":str,"sub_msg":str,"sig_count":int,"host_count":int
-        ,"id_resp_h":str,"id_resp_p":int, "proto":str, "service":str
-        ,"orig_bytes":int,"resp_bytes":int, "conn_state":str,"missed_bytes":int, "history":str, "orig_pkts":int
-        ,"orig_ip_bytes":int,"resp_pkts":int, "resp_ip_bytes":int, "tunnel_parents":-1, "orig_cc":str, "resp_cc":str
-        , "mac":str, "assigned_ip":str, "lease_time ":str
-        ,"query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int, "rcode_name": str
-        ,"QR": bool,"AA":bool, "TC": bool, "RD": bool,"RA":bool, "Z": int, "answers": -1, "TTLs": -1, "rejected bool": bool
+        , "status": str, "direction": str, "client": str, "server": str, "resp_size": int
+        , "id_orig_h": str, "id_orig_p": int, "id.resp_h": int, "id.resp_p": int, "version": str, "cipher": str,
+             "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
+             "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str,
+             "validation_status": -1  # todo :resolve vectors issues
+        , "name": -1, "notice": -1, "peer": -1
+        , "src_addr": str, "src_port": int, "dst_adr": str, "dst_port": int, "note": str, "sig_id": str
+        , "event_msg": str, "sub_msg": str, "sig_count": int, "host_count": int
+        , "id_resp_h": str, "id_resp_p": int, "proto": str, "service": str
+        , "orig_bytes": int, "resp_bytes": int, "conn_state": str, "missed_bytes": int, "history": str, "orig_pkts": int
+        , "orig_ip_bytes": int, "resp_pkts": int, "resp_ip_bytes": int, "tunnel_parents": -1, "orig_cc": str,
+             "resp_cc": str
+        , "mac": str, "assigned_ip": str, "lease_time ": str
+        , "query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int,
+             "rcode_name": str
+        , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int, "answers": -1, "TTLs": -1,
+             "rejected bool": bool
 
-           }
-            # this dictionary will declare the datatypes for each field in the database
+             }
+    # this dictionary will declare the datatypes for each field in the database
 
-    validFields = {    #todo : check fields of every log file (DNS done,
-         "http" :{'uid': -1,'ts':-1, "id": -1, "trans_depth": -1, "method": -1, "host":-1, "uri": -1, "referrer": -1,
-            "user_agent": -1, "request_body_len": -1,"status_code":-1, "status_msg":-1, "info_code":-1, "info_msg":-1,
-             "tags": -1, "username":-1,"password":-1, "proxied":-1,"orig_fuids":-1, "orig_meme_type":-1, "orig_fuid":-1,
-             "resp_meme_ty":-1,},  # this dictionary will store the indecies of lof fileds for each file
+    validFields = {  # todo : check fields of every log file (DNS done,
+        "http": {'uid': -1, 'ts': -1, "id": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
+                 "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
+                 "info_msg": -1,
+                 "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
+                 "orig_fuid": -1,
+                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of lof fileds for each file
 
-         'ftp' :{"uid":-1, "ts":-1, "id":-1, "user":-1, "password":-1, "command":-1, "arg":-1,
-           "mime_type":-1, "file_size":-1, "reply_code":-1, "reply_msg":-1,
-           "data_channel":-1, "fuid":-1},
+        'ftp': {"uid": -1, "ts": -1, "id": -1, "user": -1, "password": -1, "command": -1, "arg": -1,
+                "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
+                "data_channel": -1, "fuid": -1},
 
-         "files": {"ts":-1, "fuid":-1, "tx_hosts":-1, "rx_hosts":-1, "conn_uids":-1, "source":-1, "depth":-1,
-             "analyzers":-1, "mime_type":-1,
-             "filename":-1, "duration":-1, "local_orig":-1, "is_orig":-1, "seen_bytes":-1, "total_bytes":-1,
-             "missing_bytes":-1, "overflow_bytes":-1, "timedout":-1, "parent_fuid":-1,
-             "md5":-1,"sha1":-1,"sha256":-1, "extracted":-1} , # check this again
+        "files": {"ts": -1, "fuid": -1, "tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": -1, "depth": -1,
+                  "analyzers": -1, "mime_type": -1,
+                  "filename": -1, "duration": -1, "local_orig": -1, "is_orig": -1, "seen_bytes": -1, "total_bytes": -1,
+                  "missing_bytes": -1, "overflow_bytes": -1, "timedout": -1, "parent_fuid": -1,
+                  "md5": -1, "sha1": -1, "sha256": -1, "extracted": -1},  # check this again
 
-         'irc' : {"uid": -1,'ts':-1, "id": -1, "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
-           "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
+        'irc': {"uid": -1, 'ts': -1, "id": -1, "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
+                "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
 
-        'smtp' : {'ts':-1, 'uid':-1, 'id':-1, 'trans_depth':-1, "helo":-1, "mailfrom": -1, "rcptto":-1
-        , "date":-1, "from":-1, "to":-1, "reply_to":-1, "msg_id":-1, "in_reply_to":-1, "subject":-1
-        , "x_originating_ip":-1, "first_received":-1
-        ,"second_received":-1, "last_reply":-1, "path":-1, "user_agent":-1
-        ,"tls":-1, "fuids":-1, "is_webmail":-1},
+        'smtp': {'ts': -1, 'uid': -1, 'id': -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
+            , "date": -1, "from": -1, "to": -1, "reply_to": -1, "msg_id": -1, "in_reply_to": -1, "subject": -1
+            , "x_originating_ip": -1, "first_received": -1
+            , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
+            , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-         'ssh' : {"uid":-1, "status":-1, "direction":-1, "client":-1, "server":-1, "resp_size":-1},
+        'ssh': {"uid": -1, "status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
 
-         'ssl' : {"uid":-1,"id_orig_h":-1,"id_orig_p":-1,"id.resp_h":-1,"id.resp_p":-1,"version":-1, "cipher":-1,
-                 "server_name":-1, "session_id":-1, "subject":-1,
-                   "issuer_subject":-1, "not_valid_before":-1,
-                  "last_alert":-1, "client_subject":-1, "clnt_issuer_subject":-1, "cert_hash":-1, "validation_status":-1},
+        'ssl': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
+                "cipher": -1,
+                "server_name": -1, "session_id": -1, "subject": -1,
+                "issuer_subject": -1, "not_valid_before": -1,
+                "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
+                "validation_status": -1},
 
-         'weird' :{"uid":-1, "id":-1, "name":-1, "addi":-1, "notice":-1, "peer":-1},
+        'weird': {"uid": -1, "id": -1, "name": -1, "addi": -1, "notice": -1, "peer": -1},
 
-        'signatures':{"ts":-1,'src_addr':-1 ,
-                            'src_port':-1,'dst_adr':-1,'dst_port':-1 ,'note':-1 ,'sig_id':-1,
-                            'event_msg' :-1 ,'sub_msg':-1 ,'sig_count':-1,'host_count':-1 },
+        'signatures': {"ts": -1, 'src_addr': -1,
+                       'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
+                       'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
 
-        'conn':{"uid":-1, "id_orig_h":-1, "id_orig_p":-1, "id_resp_h":-1, "id_resp_p":-1, "proto":-1, "service":-1,
-            "duration":-1, "orig_bytes":-1,
-            "resp_bytes":-1, "conn_state":-1, "local_orig":-1, "missed_bytes":-1, "history":-1, "orig_pkts":-1,
-            "orig_ip_bytes":-1,"resp_pkts":-1, "resp_ip_bytes":-1, "tunnel_parents":-1, "orig_cc":-1, "resp_cc":-1},
+        'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
+                 "service": -1,
+                 "duration": -1, "orig_bytes": -1,
+                 "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
+                 "orig_pkts": -1,
+                 "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
+                 "resp_cc": -1},
 
-         'dhcp':{"uid":-1, "id":-1, "mac":-1, "assigned_ip":-1, "lease_time ":-1, "trans_id":-1},
+        'dhcp': {"uid": -1, "id": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
-         'dns':{"uid":-1, 'ts':-1, "id":-1, "proto":-1, "trans_id":-1,
-           "query":-1, "qclass":-1, "qclass_name":-1, "qtype":-1, "qtype_name":-1, "rcode":-1, "rcode_name":-1, "QR":-1,
-           "AA":-1,"TC":-1, "RD":-1, "RA":-1, "Z":-1, "answers":-1, "TTLs":-1, "rejected bool":-1}
-        #todo : check tables strucutre !!! normalize conn_ID table
+        'dns': {"uid": -1, 'ts': -1, "id": -1, "proto": -1, "trans_id": -1,
+                "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
+                "rcode_name": -1, "QR": -1,
+                "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected bool": -1}
+        # todo : check tables strucutre !!! normalize conn_ID table
     }
 
     app = QtWidgets.QApplication(sys.argv)
@@ -950,7 +979,8 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    tables=["main","dhcp","smtp","irc","weird","ssh","conn","http","dns","signature","ssl","ids","files",'ssh']
+    tables = ["main", "dhcp", "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files",
+              'ssh']
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
@@ -959,27 +989,25 @@ if __name__ == "__main__":  # main module
         print(list(dropped))
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
-        try :
-            con.execute ("create table main (uid TEXT primary KEY , ts string)")
-            con.execute ("create table IDs(uid int ,id_orig_h text, id_orig_p int, ID_RESP_H text"
-                         ", ID_RESP_P int,foreign key(uid) references main (uid))")
-        except :
-            print ("error dropping main ?")
+        try:
+            con.execute("CREATE TABLE main (uid TEXT PRIMARY KEY , ts string)")
+            con.execute("CREATE TABLE IDs(uid INT ,id_orig_h TEXT, id_orig_p INT, ID_RESP_H TEXT"
+                        ", ID_RESP_P INT,FOREIGN KEY(uid) REFERENCES main (uid))")
+        except:
+            print("error dropping main ?")
 
         if "history.csv" in os.listdir():
-                with open(historyLog,'a') as csvfile:
-                    writer = csv.writer(csvfile)
-                    writer.writerow(["new session",str (datetime.now())[:19]])
+            with open(historyLog, 'a') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(["new session", str(datetime.now())[:19]])
         else:
 
             print(historyLog)
-            f=open(historyLog,"w")
+            f = open(historyLog, "w")
             f.close()
-            with open(historyLog , 'a') as csvfile:
+            with open(historyLog, 'a') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
-
-
 
         """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
