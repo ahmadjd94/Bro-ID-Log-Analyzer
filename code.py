@@ -11,12 +11,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from PyQt5.QtGui import QIcon
-import sqlite3
-import os  # module used for changing Current working directory of the program
+
+# module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
-import hashlib
-import codecs
+import hashlib, codecs, operator, sqlite3, os
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
@@ -352,13 +351,35 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             return False
 
     def SQLcreator(self, table,line):  # should use lambda expressions
-        print(line)
+        print(table)
+        exist=[]
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
         # HANDLED IN THE CALLER FUNCTION
         #use time.time to get the current time in epoch format
+        print('inside creator ',validFields[table])
 
-        exist = list(filter(lambda x: validFields[table][x] > -1,
-                            validFields[table]))  # problem : a UID of transaction may be used multiple time
+        try:
+            exist=validFields[table]
+        except:
+            print ('error making list')
+        print(type(exist))
+        print (exist)
+        # missing cast 
+        k=exist.keys()
+        print(k)
+        v=exist.values()
+        k=k[:v.index(0)]
+        v = v[:v.index(0)]
+        print ('splitted',k,v)
+        try:
+            exist = list(filter(lambda x: x != -1,
+                            exist))  # problem : a UID of transaction may be used multiple time
+            print(exist)
+        except:
+            print ('error filtering')
+
+
+        print ('inside creator',exist)
         insert = "insert into %s (" % (table)
         fields = values = ""
         for i in exist:
@@ -406,12 +427,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print(fields.index(field), field)
 
                     print("dfdsfds", validFields[fname])
+                    try :
+                        validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1))
+                        print ('sorted',validFields[fname])
+                    except:
+                        print ('already sorted ?')
 
 
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
                     line = i.split()
                     #sort dictionary based on key values
-                    print((self.SQLcreator(fname, line)))
+                    try:
+                        print((self.SQLcreator(fname, line)))
+                    except :
+                        print('error creating SQL')
                     print ('end')
                     print(i)
                     # no hardcoded indecies of
