@@ -351,35 +351,50 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             return False
 
     def SQLcreator(self, table,line):  # should use lambda expressions
-        print(table)
-        exist=[]
+
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
         # HANDLED IN THE CALLER FUNCTION
         #use time.time to get the current time in epoch format
-        print('inside creator ',validFields[table])
+        print('inside creator1 ',validFields[table])
+        exist =(dict(validFields[table]))
+        exist = sorted(exist.items(), key=operator.itemgetter(1))
+        print (dict(exis    t))
+        exist=dict(exist)
+        validIndex=[]
+        values=[]
+        exist = sorted(exist.items(), key=operator.itemgetter(1))
+        for i in range (len (exist)):
+            if exist[i][1]!=-1:
+                validIndex.append(exist[i][0])
+                values.append[exist[i][1]]
+        print ('testing indices')
+        for i in len (validIndex):
+            print (validIndex[i]+':'+values[i])
+
+        print(dict(exist))
 
         try:
-            exist=validFields[table]
+            print (type(exist))
         except:
-            print ('error making list')
-        print(type(exist))
-        print (exist)
-        # missing cast 
-        k=exist.keys()
-        print(k)
-        v=exist.values()
-        k=k[:v.index(0)]
-        v = v[:v.index(0)]
-        print ('splitted',k,v)
+             print ('error making list')
+        # print(type(exist))
+        # print (exist)
+        #dict (exist)
+        #k=exist.keys()
+        #print(k)
+        #v=exist.values()
+        #k=k[:v.index(0)]
+        #v = v[:v.index(0)]
+        #print ('splitted',k,v)
         try:
             exist = list(filter(lambda x: x != -1,
                             exist))  # problem : a UID of transaction may be used multiple time
+
             print(exist)
         except:
             print ('error filtering')
 
-
-        print ('inside creator',exist)
+        print ('inside creator2',exist)
         insert = "insert into %s (" % (table)
         fields = values = ""
         for i in exist:
@@ -437,10 +452,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
                     line = i.split()
                     #sort dictionary based on key values
-                    try:
-                        print((self.SQLcreator(fname, line)))
-                    except :
-                        print('error creating SQL')
+
+                    print((self.SQLcreator(fname, line)))
+
+                #        print('error creating SQL')
                     print ('end')
                     print(i)
                     # no hardcoded indecies of
