@@ -350,61 +350,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         else:
             return False
 
-    def SQLcreator(self, table,line):  # should use lambda expressions
-
-        # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
-        # HANDLED IN THE CALLER FUNCTION
-        #use time.time to get the current time in epoch format
-        print('inside creator1 ',validFields[table])
-        exist =(dict(validFields[table]))
-        exist = sorted(exist.items(), key=operator.itemgetter(1))
-        print (dict(exis    t))
-        exist=dict(exist)
-        validIndex=[]
-        values=[]
-        exist = sorted(exist.items(), key=operator.itemgetter(1))
-        for i in range (len (exist)):
-            if exist[i][1]!=-1:
-                validIndex.append(exist[i][0])
-                values.append[exist[i][1]]
-        print ('testing indices')
-        for i in len (validIndex):
-            print (validIndex[i]+':'+values[i])
-
-        print(dict(exist))
-
-        try:
-            print (type(exist))
-        except:
-             print ('error making list')
-        # print(type(exist))
-        # print (exist)
-        #dict (exist)
-        #k=exist.keys()
-        #print(k)
-        #v=exist.values()
-        #k=k[:v.index(0)]
-        #v = v[:v.index(0)]
-        #print ('splitted',k,v)
-        try:
-            exist = list(filter(lambda x: x != -1,
-                            exist))  # problem : a UID of transaction may be used multiple time
-
-            print(exist)
-        except:
-            print ('error filtering')
-
-        print ('inside creator2',exist)
-        insert = "insert into %s (" % (table)
-        fields = values = ""
-        for i in exist:
-            fields += i + ','
-        fields = fields[:len(fields) - 1]  # this line will remove the colon at the end of fileds string
-        for i in exist:
-            values += line[validFields[table][i]]
-        values=values[:len(values)-1]
-        insert+=fields+') values ('+values+')'
-        return insert
 
     def traverse(self, fname):  # this function will traverse the file that is based to it
         # todo : major changes (inserting into DB should be dynamic , the function should insert fields according to their values
@@ -452,10 +397,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
                     line = i.split()
                     #sort dictionary based on key values
+                    try:
+                        con.execute((self.SQLcreator(fname, line)))
+                    except sqlite3.OperationalError as a :
+                        print (str(a))
 
-                    print((self.SQLcreator(fname, line)))
-
-                #        print('error creating SQL')
+                        print('error creating SQL')
                     print ('end')
                     print(i)
                     # no hardcoded indecies of
@@ -482,6 +429,55 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
+
+    def SQLcreator(self, table, line):  # should use lambda expressions
+        print(table)
+        exist = {}
+        # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
+        # HANDLED IN THE CALLER FUNCTION
+        # use time.time to get the current time in epoch format
+        print('inside creator ', validFields[table])
+
+        try:
+            exist = dict(validFields[table])
+        except:
+            print('error making list')
+        print(type(exist))
+        # missing cast
+        k = list(exist.keys())
+        print(type(k))
+        print(k)
+        v = list(exist.values())
+        for i in range(len(v)):
+            for i in range(len(v) - 1):
+                if (v[i] > v[i + 1]):
+                    t = v[i]
+                    t1=k[i]
+                    v[i] = v[i + 1]
+                    k[i]=k[i+1]
+                    v[i + 1] = t
+                    k[i+1]=t1
+        print ('wth',len(k),len(v))
+
+        k = k[v.index(0):]
+        v = v[v.index(0):]
+        print(v,k)
+
+        for i in range(len (v)):
+            print (k[i]+':'+str(v[i]))
+
+        insert = "insert into %s (" %table
+        fields = values = ""
+        for i in k:
+            fields += i + ','
+        fields = fields[:len(fields) - 1]  # this line will remove the colon at the end of fileds string
+        for i in v:
+            print (i)
+            print (line[i])
+            values += line[i]+','
+        values = values[:len(values) - 1]
+        insert += fields + ') values (' + values + ')'
+        return insert
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
