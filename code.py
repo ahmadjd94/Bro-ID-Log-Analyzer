@@ -494,7 +494,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         insert += fields + ') values (' + values + ')'
         print(insert)
         return insert
+    #################################important segments of code ################################
+    #a = con.execute('''insert into dates (d) values (?)''', (datetime.datetime.fromtimestamp(312312312.32112),))
+    #  insert into db after normalizing epoch
 
+    # con.execute('select * from dates where d <"2010-01-01 00:00:00"').fetchall() # selectbased on date and time and fetch from array
+    # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
+    #################################important segments of code ################################
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
         s = False
