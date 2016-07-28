@@ -15,7 +15,7 @@ from PyQt5.QtGui import QIcon
 # module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
-import hashlib, codecs, operator, sqlite3, os
+import hashlib, codecs, operator, sqlite3, os,time
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
@@ -468,15 +468,31 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         insert = "insert into %s (" %table
         fields = values = ""
+        dataTypes=[]
         for i in k:
             fields += i + ','
+            dataTypes.append (types[i])
+        print(dataTypes)
         fields = fields[:len(fields) - 1]  # this line will remove the colon at the end of fileds string
-        for i in v:
-            print (i)
-            print (line[i])
-            values += line[i]+','
+        for i in range(len(v)):
+            print(i)
+            print (line)
+
+            if types[k[i]] == datetime: # checking for datetime type
+                print(line[i],'test')
+                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
+                values+=a+','  # concatenating the value to the values string
+
+            elif types[k[i]] == int:
+                print(line[i], 'test')
+                a = int (line[i])# converting str to int
+                values += str(a) + ','  # concatenating the value to the values string
+
+            else :
+                values += line[i]+','
         values = values[:len(values) - 1]
         insert += fields + ') values (' + values + ')'
+        print(insert)
         return insert
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
@@ -682,7 +698,7 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {"uid": int, "ts": float, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
+    types = {"uid": int, "ts": datetime, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
              "referrer": str
         , "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
              "info_msg": str
