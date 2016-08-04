@@ -473,18 +473,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             fields += i + ','
             dataTypes.append (types[i])
         print(dataTypes)
-        fields = fields[:len(fields) - 1]  # this line will remove the colon at the end of fileds string
+        fields = fields[    :len(fields) - 1]  # this line will remove the colon at the end of fileds string
         for i in range(len(v)):
             print(i)
             print (line)
-
             if types[k[i]] == datetime: # checking for datetime type
-                print(line[i],'test')
+
                 a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
+                print (a)
                 values+=a+','  # concatenating the value to the values string
 
             elif types[k[i]] == int:
-                print(line[i], 'test')
+                print(line[i], 'test1')
                 a = int (line[i])# converting str to int
                 values += str(a) + ','  # concatenating the value to the values string
 
@@ -704,7 +704,7 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {"uid": int, "ts": datetime, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
+    types = {"uid": str, "ts": datetime, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
              "referrer": str
         , "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
              "info_msg": str
@@ -726,7 +726,7 @@ if __name__ == "__main__":  # main module
         , "second_received": str, "last_reply": str, "path": -1
         , "tls": bool, "fuids": -1, "is_webmail": bool
         , "status": str, "direction": str, "client": str, "server": str, "resp_size": int
-        , "id_orig_h": str, "id_orig_p": int, "id.resp_h": int, "id.resp_p": int, "version": str, "cipher": str,
+        , "id.orig_h": str, "id.orig_p": int, "id.resp_h": str, "id.resp_p": int, "version": str, "cipher": str,
              "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
              "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str,
              "validation_status": -1  # todo :resolve vectors issues
