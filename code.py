@@ -467,7 +467,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (k[i]+':'+str(v[i]))
 
         insert = "insert into %s (" %table
-        fields = values = ""
+        fields = values = ''
         dataTypes=[]
         for i in k:
             fields += i + ','
@@ -481,12 +481,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
                 print (a)
-                values+=a+','  # concatenating the value to the values string
+                values+=str(a)+','  # concatenating the value to the values string
 
             elif types[k[i]] == int:
                 print(line[i], 'test1')
-                a = int (line[i])# converting str to int
-                values += str(a) + ','  # concatenating the value to the values string
+                try:
+                    a = int (line[i])# converting str to int
+                    values += '\"'+str(a) + '\",'  # concatenating the value to the values string
+
+                except :
+                    print ('error casting value%s'%line[i])
+                    values += str(line[i]) + ','
+
 
             else :
                 values += line[i]+','
