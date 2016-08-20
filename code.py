@@ -393,18 +393,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     except:
                         print ('already sorted ?')
 
-
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
                     line = i.split()
                     #sort dictionary based on key values
                     try:
-                        con.execute((self.SQLcreator(fname, line)))
-                    except sqlite3.OperationalError as a :
-                        print (str(a))
-
+                        SQLCommand=(self.SQLcreator(fname, line))
+                        con.execute(SQLCommand)
+                    except  :
+                        # print (str(a))
                         print('error creating SQL')
                     print ('end')
-                    print(i)
+                    print(SQLCommand)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
                     # todo : the algorithm is not handling undefined fields , sprint's extended to thursday
@@ -415,16 +414,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 #else:
                  #   print(i + "neglected")
                 #self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
-            f.close()
+            f1.close()
 
             with open(historyLog, 'a') as csvfile:  # open log file to log the state of operation
                 wr1 = csv.writer(csvfile, delimiter=',')
                 digestive = hashlib.md5(codecs.encode(hashTemp))  # string must be converted to bytes to calculate hash
                 # calculate the hash of the file
                 # this block is only performed when no exceptions happen , all of data inserted into DB successfully
-                csvfile.write(fname, digestive.hexdigest())  # the digested value combined
+                try:
+                    csvfile.write(fname, digestive.hexdigest())  # the digested value combined
+                except :
+                    print ('exception in writing')
 
-        except:  # this block is executed in case of failure of instering
+        except Exception as e1:  # this block is executed in case of failure of instering
+            print(str(e1))
             print ('exception occurd')
             with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
@@ -439,70 +442,76 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print('inside creator ', validFields[table])
 
         try:
+            print (validFields[table])
             exist = dict(validFields[table])
         except:
             print('error making list')
-        print(type(exist))
+        print(exist)
         # missing cast
-        k = list(exist.keys())
-        print(type(k))
-        print(k)
-        v = list(exist.values())
-        for i in range(len(v)):
-            for i in range(len(v) - 1):
-                if (v[i] > v[i + 1]):
-                    t = v[i]
-                    t1=k[i]
-                    v[i] = v[i + 1]
-                    k[i]=k[i+1]
-                    v[i + 1] = t
-                    k[i+1]=t1
-        print ('wth',len(k),len(v))
+        keys = list(exist.keys())
+        print(type(keys))
+        print(keys)
+        print (exist.values())
+        print ('prepare to cast ')
+        value = list(exist.values())
+        print ('fucking'+value)
+        for i1 in range(len(value)):
+            for i2 in range(len(value) -1):
+                if (value[i2] > value[i2 + 1]):
+                    valuetemp = value[i2]
+                    keytemp=keys[i2]
+                    value[i2] = value[i2 + 1]
+                    keys[i2]=keys[i2+1]
+                    value[i2 + 1] = valuetemp
+                    keys[i2+1]=keytemp
+        print ('wth',len(keys),len(value))
 
-        k = k[v.index(0):]
-        v = v[v.index(0):]
-        print(v,k)
+        keys = keys[value.index(0):]
+        value = value[value.index(0):]
+        print(value,keys)
 
-        for i in range(len (v)):
-            print (k[i]+':'+str(v[i]))
+        for i in range(len (value)):
+            print (keys[i]+':'+str(value[i]))
 
         insert = "insert into %s (" %table
-        fields = values = ''
+        fields = value = ''
         dataTypes=[]
-        for i in k:
+        for i in keys:
             fields += i + ','
             dataTypes.append (types[i])
         print(dataTypes)
         fields = fields[    :len(fields) - 1]  # this line will remove the colon at the end of fileds string
-        for i in range(len(v)):
+        for i in range(len(value)):
             print(i)
             print (line)
-            if types[k[i]] == datetime: # checking for datetime type
 
+            if types[keys[i]] == datetime: # checking for datetime type
                 a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
                 print (a)
-                values+=str(a)+','  # concatenating the value to the values string
+                value+="\'"+str(a)+"\',"  # concatenating the value to the values string
 
-            elif types[k[i]] == int:
+            elif types[keys[i]] == int:
                 print(line[i], 'test1')
                 try:
                     a = int (line[i])# converting str to int
-                    values += '\"'+str(a) + '\",'  # concatenating the value to the values string
+                    value += +str(a) + ","  # concatenating the value to the values string
 
                 except :
                     print ('error casting value%s'%line[i])
-                    values += str(line[i]) + ','
+                    value += str(line[i]) + ','
 
 
             else :
-                values += line[i]+','
-        values = values[:len(values) - 1]
+                value += line[i]+','
+        values = value[:len(value) - 1]
         insert += fields + ') values (' + values + ')'
         print(insert)
         return insert
     #################################important segments of code ################################
     #a = con.execute('''insert into dates (d) values (?)''', (datetime.datetime.fromtimestamp(312312312.32112),))
     #  insert into db after normalizing epoch
+    # SCREW QUOTATION MARKS RIGHT ?
+    #con.execute("insert into time values('" + str(datetime.datetime.fromtimestamp(312312312.312312)) + "')")
 
     # con.execute('select * from dates where d <"2010-01-01 00:00:00"').fetchall() # selectbased on date and time and fetch from array
     # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
@@ -752,7 +761,10 @@ if __name__ == "__main__":  # main module
              }
     # this dictionary will declare the datatypes for each field in the database
 
-    validFields = {  # todo : check fields of every log file (DNS done,
+    validFields = {  #this line stores the indecies of the fields at each line for every log file type
+        # todo : check fields of every log file (DNS done,
+
+
         "http": {'uid': -1, 'ts': -1, "id": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
                  "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
                  "info_msg": -1,
@@ -827,9 +839,15 @@ if __name__ == "__main__":  # main module
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (uid TEXT PRIMARY KEY , ts string)")
-            con.execute("CREATE TABLE IDs(uid INT ,id_orig_h TEXT, id_orig_p INT, ID_RESP_H TEXT"
-                        ", ID_RESP_P INT,FOREIGN KEY(uid) REFERENCES main (uid))")
+            con.execute("CREATE TABLE main (uid TEXT PRIMARY KEY , ts string)") #creating main table
+
+            con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
+                        ", `id_resp_p` INT,proto text,service text,"
+                        "duration time,orig_bytes int,resp_bytes int,"
+                        "conn_state text,local_orig bool ,missed_bytes int ,"
+                        "history text ,orig_pkts int ,orig_ip_bytes int,"
+                        "resp_ip_bytes int,tunnel_parents text,"
+                        "orig_cc text,resp_cc string ,FOREIGN KEY(uid) REFERENCES main (uid))")
         except:
             print("error dropping main ?")
 
