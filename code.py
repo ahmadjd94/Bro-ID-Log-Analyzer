@@ -226,7 +226,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         if fname == "ftp.log":  # DONE
             try:
-                con.execute("""CREATE TABLE FTP(UID TEXT,ID INT,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
+                con.execute("""CREATE TABLE FTP(UID TEXT,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
+                ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                 DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step3")
@@ -236,7 +237,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "dhcp.log":  # DONE
             try:
-                con.execute("""CREATE TABLE DHCP(UID TEXT ,ID INTEGER ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
+                con.execute("""CREATE TABLE DHCP(UID TEXT ,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
+                ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                 , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
                 print("step2")
                 return True
@@ -245,7 +247,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "irc.log":  # DONE
             try:
-                con.execute("""CREATE TABLE IRC (UID TEXT,ID INT, NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
+                con.execute("""CREATE TABLE IRC (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
+                , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                 DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step4")
                 return True
@@ -254,7 +257,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "weird.log":  # DONE
             try:
-                con.execute("CREATE TABLE WEIRD(UID TEXT,ID INT ,NAME TEXT,"
+                con.execute("CREATE TABLE WEIRD(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT,"
+                            " ID_RESP_H TEXT, ID_RESP_P INT,NAME TEXT,"
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))")
                 print("step5")
             except:
@@ -262,7 +266,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "ssh.log":  # DONE
             try:
-                con.execute("""CREATE TABLE SSH( UID TEXT,STATUS TEXT,
+                con.execute("""CREATE TABLE SSH( UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,STATUS TEXT,
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step6")
                 return True
@@ -271,7 +275,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "conn.log":  # DONE
             try:
-                con.execute("""CREATE TABLE CONN(UID TEXT,id_orig_h TEXT,id_orig_p INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step7")
@@ -282,7 +286,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE
             try:
                 con.execute("""CREATE TABLE  HTTP (UID TEXT,
-                                        ID INT,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
+                                        ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
+                                        ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS TEXT,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
@@ -293,7 +298,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
         elif fname == "dns.log":  # DONE
             try:
-                con.execute("""CREATE TABLE DNS (UID TEXT,ID INT,PROTO TEXT,TRAN_ID INT,
+                con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,PROTO TEXT,TRAN_ID INT,
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                         RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step9")
@@ -312,7 +317,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "ssl.log":  # DONE
             try:
-                con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
+                con.execute("""CREATE TABLE SSL(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
@@ -325,7 +330,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "files.log":  # DONE
             try:
                 con.execute(
-                    """CREATE TABLE FILES (TS TIME , FUID TEXT,tx_hosts TEXT,rx_hosts TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
+                    """CREATE TABLE FILES (TS TIME , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
                     ANALYZERS TEXT,MIME_TYPE TEXT,
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
@@ -335,11 +340,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "smtp.log":  # DONE
             try:
-                con.execute("""CREATE TABLE SMTP (uid TEXT ,id INT,trans_depth INT ,helo TEXT,mailfrom STRING,rcptto BLOB
-          ,date TEXT ,from TEXT ,to BLOB,reply_to TEXT,msg_id TEXT ,in_reply_to TEXT ,subject TEXT
-          ,x_originating_ip TEXT,first_received TEXT ,
-        second_received TEXT ,last_reply TEXT ,path BLOB,user_agent TEXT ,
-        tls BOOL,fuids BLOB,is_webmail BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+                #todo : resolve blob issues
+                con.execute("""CREATE TABLE SMTP (UID TEXT ,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
+                TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO BLOB
+                ,DATE TEXT ,FROM TEXT ,TO BLOB,REPLY_TO TEXT,MSG_ID TEXT ,IN_REPLY_TO TEXT ,SUBJECT TEXT
+                ,X_ORIGINATING_IP TEXT,FIRST_RECEIVED TEXT ,
+                SECOND_RECEIVED TEXT ,LAST_REPLY TEXT ,PATH BLOB,USER_AGENT TEXT ,
+                TLS BOOL,FUIDS BLOB,IS_WEBMAIL BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
                 return True
             except:
                 return False
@@ -768,14 +775,14 @@ if __name__ == "__main__":  # main module
         # todo : check fields of every log file (DNS done,
 
 
-        "http": {'uid': -1, 'ts': -1, "id": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
+        "http": {'uid': -1, 'ts': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
                  "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
                  "info_msg": -1,
                  "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
                  "orig_fuid": -1,
                  "resp_meme_ty": -1,},  # this dictionary will store the indecies of lof fileds for each file
 
-        'ftp': {"uid": -1, "ts": -1, "id": -1, "user": -1, "password": -1, "command": -1, "arg": -1,
+        'ftp': {"uid": -1, "ts": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
                 "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
                 "data_channel": -1, "fuid": -1},
 
@@ -785,16 +792,16 @@ if __name__ == "__main__":  # main module
                   "missing_bytes": -1, "overflow_bytes": -1, "timedout": -1, "parent_fuid": -1,
                   "md5": -1, "sha1": -1, "sha256": -1, "extracted": -1},  # check this again
 
-        'irc': {"uid": -1, 'ts': -1, "id": -1, "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
+        'irc': {"uid": -1, 'ts': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,  "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
                 "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
 
-        'smtp': {'ts': -1, 'uid': -1, 'id': -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
+        'smtp': {'ts': -1, 'uid': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
             , "date": -1, "from": -1, "to": -1, "reply_to": -1, "msg_id": -1, "in_reply_to": -1, "subject": -1
             , "x_originating_ip": -1, "first_received": -1
             , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-        'ssh': {"uid": -1, "status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
+        'ssh': {"uid": -1,"id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
 
         'ssl': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
@@ -803,19 +810,21 @@ if __name__ == "__main__":  # main module
                 "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
                 "validation_status": -1},
 
-        'weird': {"uid": -1, "id": -1, "name": -1, "addi": -1, "notice": -1, "peer": -1},
+        'weird': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
 
-        'signatures': {"ts": -1, 'src_addr': -1,
+        'signatures': {"ts": -1, 'src_addr': -1,"id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,
                        'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
                        'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
+                    #"""#TODO : THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
+                    #1 DHCP ,2 DNS,3 HTTP,4 IRC,5 FTP,6 SMTP,7 SSL,8 SSH,9 WEIRD
 
-        'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
-                 "service": -1,
-                 "duration": -1, "orig_bytes": -1,
-                 "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
-                 "orig_pkts": -1,
-                 "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
-                 "resp_cc": -1}, #todo : handling insertion into connn table ?
+        # 'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
+        #          "service": -1,
+        #          "duration": -1, "orig_bytes": -1,
+        #          "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
+        #          "orig_pkts": -1,
+        #          "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
+        #          "resp_cc": -1}, #todo : handling insertion into connn table ?
 
         'dhcp': {"uid": -1, "id": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
