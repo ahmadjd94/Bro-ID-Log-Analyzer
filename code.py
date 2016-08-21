@@ -719,43 +719,46 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {"uid": str, "ts": datetime, "id": -1, "trans_depth": int, "method": str, "host": str, "uri": str,
-             "referrer": str
-        , "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
-             "info_msg": str
-        , "tags": -1, "username": str, "password": str, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
-             "orig_fuid": -1
-        , "resp_meme_ty": -1, "command": str, "arg": str
+    types = {# the following lines denote the types that require a set
+        #################sets##############
+        "tags": str,"proxied": str , "analyzers": str,
+        "orig_fuid": str,"resp_meme_ty": str,"orig_meme_type": str,
+        "conn_uids": str,"data_channel":str, "rcptto": str,
+        "rx_hosts": str,"path": str, "tx_hosts": str,"validation_status": str,
+         "name": str,"tunnel_parents": str, "TTLs": -1, "answers": str, "fuids": str,
+        #################end of sets##############
+        "uid": str, "ts": datetime, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
+        "referrer": str, "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
+         "info_msg": str, "username": str, "password": str, "command": str, "arg": str
         , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
-        , "data_channel": -1, "fuid": str
-        , "tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": str, "depth": int
-        , "analyzers": -1, "filename": str, "duration": -1, "local_orig": bool, "is_orig": bool, "seen_bytes": int,
+        , "fuid": str, "source": str, "depth": int
+        , "filename": str, "duration": str, "local_orig": bool, "is_orig": bool, "seen_bytes": int,
              "total_bytes": int
         , "missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
         , "md5": str, "sha1": str, "sha256": str, "extracted": str
         , "nick": str, "user": str, "value": str, 'addi': str
         , "dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
-        , 'trans_depth': int, "helo": str, "mailfrom": str, "rcptto": -1
-        , "date": -1, "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
+        , 'trans_depth': int, "helo": str, "mailfrom": str
+        , "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
         , "x_originating_ip": str, "first_received": str
-        , "second_received": str, "last_reply": str, "path": -1
-        , "tls": bool, "fuids": -1, "is_webmail": bool
+        , "second_received": str, "last_reply": str
+        , "tls": bool, "is_webmail": bool
         , "status": str, "direction": str, "client": str, "server": str, "resp_size": int
         , "id.orig_h": str, "id.orig_p": int, "id.resp_h": str, "id.resp_p": int, "version": str, "cipher": str,
-             "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
-             "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str,
-             "validation_status": -1  # todo :resolve vectors issues
-        , "name": -1, "notice": -1, "peer": -1
+        "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
+        "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str
+             # todo :resolve vectors issues
+        , "notice": bool, "peer": str
         , "src_addr": str, "src_port": int, "dst_adr": str, "dst_port": int, "note": str, "sig_id": str
         , "event_msg": str, "sub_msg": str, "sig_count": int, "host_count": int
         , "id_resp_h": str, "id_resp_p": int, "proto": str, "service": str
         , "orig_bytes": int, "resp_bytes": int, "conn_state": str, "missed_bytes": int, "history": str, "orig_pkts": int
-        , "orig_ip_bytes": int, "resp_pkts": int, "resp_ip_bytes": int, "tunnel_parents": -1, "orig_cc": str,
+        , "orig_ip_bytes": int, "resp_pkts": int, "resp_ip_bytes": int, "orig_cc": str,
              "resp_cc": str
         , "mac": str, "assigned_ip": str, "lease_time ": str
         , "query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int,
              "rcode_name": str
-        , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int, "answers": -1, "TTLs": -1,
+        , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int,
              "rejected bool": bool
 
              }
@@ -812,7 +815,7 @@ if __name__ == "__main__":  # main module
                  "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
                  "orig_pkts": -1,
                  "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
-                 "resp_cc": -1},
+                 "resp_cc": -1}, #todo : handling insertion into connn table ?
 
         'dhcp': {"uid": -1, "id": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
@@ -839,15 +842,15 @@ if __name__ == "__main__":  # main module
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (uid TEXT PRIMARY KEY , ts string)") #creating main table
+            con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` string)") #creating main table
 
             con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
-                        ", `id_resp_p` INT,proto text,service text,"
-                        "duration time,orig_bytes int,resp_bytes int,"
-                        "conn_state text,local_orig bool ,missed_bytes int ,"
-                        "history text ,orig_pkts int ,orig_ip_bytes int,"
-                        "resp_ip_bytes int,tunnel_parents text,"
-                        "orig_cc text,resp_cc string ,FOREIGN KEY(uid) REFERENCES main (uid))")
+                        ", `id_resp_p` INT,`proto` text,`service` text,"
+                        "`duration` time,`orig_bytes` int,`resp_bytes` int,"
+                        "`conn_state` text,`local_orig` bool ,`missed_bytes` int ,"
+                        "`history` text ,`orig_pkts` int ,`orig_ip_bytes` int,"
+                        "`resp_ip_bytes` int,`tunnel_parents` text,"
+                        "`orig_cc` text,`resp_cc` string ,FOREIGN KEY(`uid`) REFERENCES main (`uid`))")
         except:
             print("error dropping main ?")
 
