@@ -289,10 +289,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
-                                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,TAGS TEXT,USERNAME TEXT,
+                                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
                                         ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
                                         RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+                con.execute(
+                    "CREATE TABLE HTTP_TAGS (UID TEXT , TS DATETIME , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))")
+                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
+                              HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                con.execute("""CREATE TABLE ORIG_FUIDS (UID TEXT , TS DATETIME
+                          , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
+                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                    ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
+                con.execute(
+                    """CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
+                    RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
+                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                            , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
                 print("step8")
             except:
                 return False
@@ -301,6 +318,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,PROTO TEXT,TRAN_ID INT,
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                         RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
+                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
+
                 print("step9")
             except:
                 return False
@@ -322,6 +342,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+                con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS DATETIME,VALIDATION_STATUS TEXT)")
                 print("step11")
                 return True
             except:
@@ -335,6 +356,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                     MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
+                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS DATETIME,SOURCE)")
+                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS DATETIME,RECIEPENT TEXT)")
+                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS DATETIME,CONN_UID TEXT)")
+
             except:
                 return False
 
@@ -342,11 +367,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             try:
                 #todo : resolve blob issues
                 con.execute("""CREATE TABLE SMTP (UID TEXT ,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
-                TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO BLOB
-                ,DATE TEXT ,FROM TEXT ,TO BLOB,REPLY_TO TEXT,MSG_ID TEXT ,IN_REPLY_TO TEXT ,SUBJECT TEXT
+                TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
+                ,DATE TEXT ,FROM TEXT ,TO TEXT,REPLY_TO TEXT,MSG_ID TEXT ,IN_REPLY_TO TEXT ,SUBJECT TEXT
                 ,X_ORIGINATING_IP TEXT,FIRST_RECEIVED TEXT ,
                 SECOND_RECEIVED TEXT ,LAST_REPLY TEXT ,PATH BLOB,USER_AGENT TEXT ,
                 TLS BOOL,FUIDS BLOB,IS_WEBMAIL BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+                con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYSIS TEXT)")
+                con.execute("CREATE TABLE  SMTP_RCPTO (UID TEXT , TS DATETIME ,SOURCE TEXT)")
+                con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS DATETIME ,RECEIVER TEXT)")
+                con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS DATETIME , PATH)")
+                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT DATETIME TS,FUID TEXT )")
+                #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
+
+
                 return True
             except:
                 return False
