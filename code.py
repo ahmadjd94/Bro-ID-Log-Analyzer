@@ -411,7 +411,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print('yes')
             f1 = open(fname , 'r')  # open the log file Read-Only mode
             print ('file is now opened')
-
+            #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             for i in f1:  # todo : modify function to increase the progress bar
                 hashTemp += i  # concatenate the lines being read to the string
 
@@ -443,7 +443,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     #sort dictionary based on key values
                     try:
                         SQLCommand=(self.SQLcreator(fname, line))
-                        con.execute(SQLCommand)
+                        sql_command_ids=(self.SQLcreator2(line))
+                        con.execute(SQLCommand,sql_command_ids)
                     except  :
                         # print (str(a))
                         print('error creating SQL')
@@ -479,6 +480,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 wr1.writerow((fname, "FAILED"))
 
     def SQLcreator(self, table, line):  # should use lambda expressions
+                                        # should handle inserting to ids table also
         print(table)
         exist = {}
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
@@ -561,6 +563,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     # con.execute('select * from dates where d <"2010-01-01 00:00:00"').fetchall() # selectbased on date and time and fetch from array
     # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
     #################################important segments of code ################################
+    def SQLcreator2 (self,fname,line):
+
+        command = "insert into ids (uid ,ts ,ID_ORIG_H, ID_ORIG_P, ID_RESP_H , ID_RESP_P ) VALUES ("
+        values = line[validFields[fname]['uid']] +line[validFields[fname]['ts']] +line[validFields['ids']['id.orig_h']] # cast to integers required
+        +line[validFields['ids']['id.orig_p']]+line[validFields['ids']['id.resp_h']]+line[validFields['ids']['id.resp_p']]
+        command = command + values
+        return command
+
+
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
         s = False
@@ -813,14 +824,14 @@ if __name__ == "__main__":  # main module
         # todo : check fields of every log file (DNS done,
 
 
-        "http": {'uid': -1, 'ts': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
+        "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
                  "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
                  "info_msg": -1,
                  "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
                  "orig_fuid": -1,
                  "resp_meme_ty": -1,},  # this dictionary will store the indecies of lof fileds for each file
 
-        'ftp': {"uid": -1, "ts": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
+        'ftp': {"uid": -1, "ts": -1, "id.orig_h": -1, "id.orig_p": .1, "id.resp_h": -1, "id.resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
                 "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
                 "data_channel": -1, "fuid": -1},
 
@@ -830,43 +841,45 @@ if __name__ == "__main__":  # main module
                   "missing_bytes": -1, "overflow_bytes": -1, "timedout": -1, "parent_fuid": -1,
                   "md5": -1, "sha1": -1, "sha256": -1, "extracted": -1},  # check this again
 
-        'irc': {"uid": -1, 'ts': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,  "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
+        'irc': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,  "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
                 "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
 
-        'smtp': {'ts': -1, 'uid': -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
+        'smtp': {'ts': -1, 'uid': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
             , "date": -1, "from": -1, "to": -1, "reply_to": -1, "msg_id": -1, "in_reply_to": -1, "subject": -1
             , "x_originating_ip": -1, "first_received": -1
             , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-        'ssh': {"uid": -1,"id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
+        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
 
-        'ssl': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
+        'ssl': {"uid": -1, "id.orig_h": -1, "id_orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
                 "server_name": -1, "session_id": -1, "subject": -1,
                 "issuer_subject": -1, "not_valid_before": -1,
                 "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
                 "validation_status": -1},
 
-        'weird': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
+        'weird': {"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id_resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
 
-        'signatures': {"ts": -1, 'src_addr': -1,"id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1,
+        'signatures': {"ts": -1, 'src_addr': -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,
                        'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
                        'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
                     #"""#TODO : THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
                     #1 DHCP ,2 DNS,3 HTTP,4 IRC,5 FTP,6 SMTP,7 SSL,8 SSH,9 WEIRD
+        'ids':{"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1},
+        # still can't figure out how to integrate between ids and conn table
 
-        # 'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
-        #          "service": -1,
-        #          "duration": -1, "orig_bytes": -1,
-        #          "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
-        #          "orig_pkts": -1,
-        #          "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
-        #          "resp_cc": -1}, #todo : handling insertion into connn table ?
+        'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
+                  "service": -1,
+                  "duration": -1, "orig_bytes": -1,
+                  "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
+                  "orig_pkts": -1,
+                  "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
+                  "resp_cc": -1}, #todo : handling insertion into connn table ?
 
-        'dhcp': {"uid": -1, "id": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
+        'dhcp': {"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
-        'dns': {"uid": -1, 'ts': -1, "id": -1, "proto": -1, "trans_id": -1,
+        'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
                 "rcode_name": -1, "QR": -1,
                 "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected bool": -1}
@@ -891,13 +904,13 @@ if __name__ == "__main__":  # main module
         try:
             con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` string)") #creating main table
 
-            con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
-                        ", `id_resp_p` INT,`proto` text,`service` text,"
-                        "`duration` time,`orig_bytes` int,`resp_bytes` int,"
-                        "`conn_state` text,`local_orig` bool ,`missed_bytes` int ,"
-                        "`history` text ,`orig_pkts` int ,`orig_ip_bytes` int,"
-                        "`resp_ip_bytes` int,`tunnel_parents` text,"
-                        "`orig_cc` text,`resp_cc` string ,FOREIGN KEY(`uid`) REFERENCES main (`uid`))")
+            # con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
+            #             ", `id_resp_p` INT,`proto` text,`service` text,"
+            #             "`duration` time,`orig_bytes` int,`resp_bytes` int,"
+            #             "`conn_state` text,`local_orig` bool ,`missed_bytes` int ,"
+            #             "`history` text ,`orig_pkts` int ,`orig_ip_bytes` int,"
+            #             "`resp_ip_bytes` int,`tunnel_parents` text,"
+            #             "`orig_cc` text,`resp_cc` string ,FOREIGN KEY(`uid`) REFERENCES main (`uid`))")
         except:
             print("error dropping main ?")
 
