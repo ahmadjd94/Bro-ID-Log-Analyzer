@@ -16,7 +16,7 @@ from PyQt5.QtGui import QIcon
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import hashlib, codecs, operator, sqlite3, os,time
-
+#hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -43,7 +43,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         _translate = QtCore.QCoreApplication.translate
         #self.__message2__.setText("error connecting to database")
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
         self.pushButton.setText(_translate("MainWindow", "Load"))
@@ -225,11 +224,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def uMan(self):
         self.label_2.setVisible(False)
 
-        # creating db tables will be moved here
-
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
 
-        if fname == "ftp.log":  # DONE
+        if fname == "ftp.log":  # DONE # create FTP table
             try:
                 con.execute("""CREATE TABLE FTP(UID TEXT,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
@@ -240,7 +237,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "dhcp.log":  # DONE
+        elif fname == "dhcp.log":  # create DHCP table
             try:
                 con.execute("""CREATE TABLE DHCP(UID TEXT ,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
@@ -248,9 +245,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print("step2")
                 return True
             except:
-                return 0
+                return False
 
-        elif fname == "irc.log":  # DONE
+        elif fname == "irc.log":  # DONE  create IRC table
             try:
                 con.execute("""CREATE TABLE IRC (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
@@ -260,7 +257,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "weird.log":  # DONE
+        elif fname == "weird.log":  # DONE  create weird table
             try:
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT,"
                             " ID_RESP_H TEXT, ID_RESP_P INT,NAME TEXT,"
@@ -269,7 +266,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "ssh.log":  # DONE
+        elif fname == "ssh.log":  # DONE create SSH table
             try:
                 con.execute("""CREATE TABLE SSH( UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,STATUS TEXT,
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
@@ -278,7 +275,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "conn.log":  # DONE
+        elif fname == "conn.log":  # DONE  create CONN table
             try:
                 con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
@@ -288,7 +285,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "http.log":  # DONE
+        elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
+
             try:
                 con.execute("""CREATE TABLE  HTTP (UID TEXT,
                                         ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
@@ -318,7 +316,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print("step8")
             except:
                 return False
-        elif fname == "dns.log":  # DONE
+        elif fname == "dns.log":  # DONE # create DNS table
             try:
                 con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,PROTO TEXT,TRAN_ID INT,
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
@@ -330,7 +328,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "signature.log":  # DONE
+        elif fname == "signature.log":  # DONE # create SIGNATURES table
             try:
                 con.execute("""CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
@@ -340,7 +338,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "ssl.log":  # DONE
+        elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
             try:
                 con.execute("""CREATE TABLE SSL(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
@@ -353,7 +351,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "files.log":  # DONE
+        elif fname == "files.log":  # DONE # create files table and it's related tables
             try:
                 con.execute(
                     """CREATE TABLE FILES (TS TIME , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
@@ -361,30 +359,36 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                     MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
+
                 con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS DATETIME,SOURCE)")
+
                 con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS DATETIME,RECIEPENT TEXT)")
+
                 con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS DATETIME,CONN_UID TEXT)")
 
             except:
                 return False
 
-        elif fname == "smtp.log":  # DONE
+        elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
-                #todo : resolve blob issues
+
                 con.execute("""CREATE TABLE SMTP (UID TEXT ,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
                 ,DATE TEXT ,FROM TEXT ,TO TEXT,REPLY_TO TEXT,MSG_ID TEXT ,IN_REPLY_TO TEXT ,SUBJECT TEXT
                 ,X_ORIGINATING_IP TEXT,FIRST_RECEIVED TEXT ,
                 SECOND_RECEIVED TEXT ,LAST_REPLY TEXT ,PATH BLOB,USER_AGENT TEXT ,
                 TLS BOOL,FUIDS BLOB,IS_WEBMAIL BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+
                 con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYSIS TEXT)")
+
                 con.execute("CREATE TABLE  SMTP_RCPTO (UID TEXT , TS DATETIME ,SOURCE TEXT)")
+
                 con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS DATETIME ,RECEIVER TEXT)")
+
                 con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS DATETIME , PATH)")
+
                 con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT DATETIME TS,FUID TEXT )")
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
-
-
                 return True
             except:
                 return False
@@ -397,15 +401,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
     def traverse(self, fname):  # this function will traverse the file that is based to it
-        # todo : major changes (inserting into DB should be dynamic , the function should insert fields according to their values
         # if the field value is -1 , the field should be neglected )
         print('traversing')
         print(fname)
-        progress = 0
+        progress = 0  # indicate the level of progress bar
         try:
             #fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
             print(fname)
-            hashTemp = ""  # this variable stores the entire log file to calculate it's hash value
+            hashtemp = ""  # this variable stores the entire log file to calculate it's hash value
             print (os.getcwd())
             if fname in os.listdir():
                 print('yes')
@@ -413,7 +416,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             for i in f1:  # todo : modify function to increase the progress bar
-                hashTemp += i  # concatenate the lines being read to the string
+                hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
                     print(i)
@@ -464,10 +467,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             with open(historyLog, 'a') as csvfile:  # open log file to log the state of operation
                 wr1 = csv.writer(csvfile, delimiter=',')
-                digestive = hashlib.md5(codecs.encode(hashTemp))  # string must be converted to bytes to calculate hash
+                digestive = hashlib.md5(codecs.encode(hashtemp))  # string must be converted to bytes to calculate hash
                 # calculate the hash of the file
                 # this block is only performed when no exceptions happen , all of data inserted into DB successfully
                 try:
+                    wr1.writerow(fname, digestive.hexdigest())   # write the file name , with it's hash value incase it was loaded successfully
                     csvfile.write(fname, digestive.hexdigest())  # the digested value combined
                 except :
                     print ('exception in writing')
@@ -479,10 +483,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
 
-    def SQLcreator(self, table, line):  # should use lambda expressions
+    def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
+                                       # should use lambda expressions
                                         # should handle inserting to ids table also
         print(table)
-        exist = {}
+        exist = {}       #stores the values of existing fields that can be extracted from the log file
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
         # HANDLED IN THE CALLER FUNCTION
         # use time.time to get the current time in epoch format
@@ -501,10 +506,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (exist.values())
         print ('prepare to cast ')
         value = list(exist.values())
-        print ('fucking'+value)
-        for i1 in range(len(value)):
+        print ('fucking'+value)            #todo : check if the arrays are sorted already
+        for i1 in range(len(value)):     # the following algorithm sorts the exist dictionary , python dictionary are not sorted
+                                        # the algorithm is a modified version of bubble sort
             for i2 in range(len(value) -1):
-                if (value[i2] > value[i2 + 1]):
+                if value[i2] > value[i2 + 1]:
                     valuetemp = value[i2]
                     keytemp=keys[i2]
                     value[i2] = value[i2 + 1]
@@ -513,24 +519,21 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     keys[i2+1]=keytemp
         print ('wth',len(keys),len(value))
 
-        keys = keys[value.index(0):]
-        value = value[value.index(0):]
+        keys = keys[value.index(0):]  #slice keys based based on the values array
+        value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
         print(value,keys)
 
         for i in range(len (value)):
             print (keys[i]+':'+str(value[i]))
 
-        insert = "insert into %s (" %table
-        fields = value = ''
-        dataTypes=[]
+        insert = "insert into %s (" %table   # insert statment
+        field = value = '' # variable field stores the field name in table
+
         for i in keys:
-            fields += i + ','
-            dataTypes.append (types[i])
-        print(dataTypes)
-        fields = fields[    :len(fields) - 1]  # this line will remove the colon at the end of fileds string
+            field += i + ','
+
+        field= field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
         for i in range(len(value)):
-            print(i)
-            print (line)
 
             if types[keys[i]] == datetime: # checking for datetime type
                 a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
@@ -544,14 +547,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     value += +str(a) + ","  # concatenating the value to the values string
 
                 except :
-                    print ('error casting value%s'%line[i])
+                    print ('error casting value%s' %line[i])
                     value += str(line[i]) + ','
 
 
             else :
                 value += line[i]+','
-        values = value[:len(value) - 1]
-        insert += fields + ') values (' + values + ')'
+        values = value[:len(value) - 1] # split the colons
+        insert += field + ') values (' + values + ')' #construct the final insert statment
         print(insert)
         return insert
     #################################important segments of code ################################
@@ -563,21 +566,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     # con.execute('select * from dates where d <"2010-01-01 00:00:00"').fetchall() # selectbased on date and time and fetch from array
     # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
     #################################important segments of code ################################
-    def SQLcreator2 (self,fname,line):
 
+    def SQLcreator2 (self,fname,line):  # this function creates insert statments for the IDs table
         command = "insert into ids (uid ,ts ,ID_ORIG_H, ID_ORIG_P, ID_RESP_H , ID_RESP_P ) VALUES ("
-        values = line[validFields[fname]['uid']] +line[validFields[fname]['ts']] +line[validFields['ids']['id.orig_h']] # cast to integers required
-        +line[validFields['ids']['id.orig_p']]+line[validFields['ids']['id.resp_h']]+line[validFields['ids']['id.resp_p']]
+        values = line[validFields[fname]['uid']] +str(datetime.fromtimestamp(line[validFields[fname]['ts']])) +\
+                 line[validFields['ids']['id.orig_h']]+\
+                 int(line[validFields['ids']['id.orig_p']])+\
+                 line[validFields['ids']['id.resp_h']]+\
+                 int(line[validFields['ids']['id.resp_p']])+")"
         command = command + values
         return command
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         command = self.textEdit.toPlainText().lower()
-        s = False
+        select =insert =False  # indicates if the text area contains a select statment
         try:
             if "select" in command:
-                s = True
+                select = True
                 result = con.execute(command).fetchall()
                 for i in result:
                     for each in i:
@@ -587,7 +593,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
                 self.message.setText("are you trying to insert data into DB ? \n "
                                      "the program prohibits the user from inserting data into db")
-                self.message.show()
+                insert=True
+                raise sqlite3.OperationalError  # todo : define our own exception class
             else:
                 con.execute(command)
                 self.label_2.setStyleSheet("color: green")
@@ -596,8 +603,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         except sqlite3.OperationalError as err:
             print(str(err))
-
-            if s:
+            if select:
                 self.message.setText("error selecting rows from data base")
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
@@ -608,7 +614,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except:
             self.message.show()
 
-    def load(self):  # this function loads the content of the log files into the DB
+    def load(self):  # this function loads the content of the log files into the DB    #todo : Continue documentation
         # todo : progress bar check
         if self.loaded:
             reply = QMessageBox.question(self.message, 'Message',
