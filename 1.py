@@ -13,6 +13,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
+        MainWindow.setTabShape(QtWidgets.QTabWidget.Triangular)
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
         self.analysis = QtWidgets.QTabWidget(self.centralWidget)
@@ -21,7 +22,7 @@ class Ui_MainWindow(object):
         self.analysis.setAcceptDrops(False)
         self.analysis.setAutoFillBackground(False)
         self.analysis.setStyleSheet("color:rgb(255, 153, 0 );\n"
-"border-color: qconicalgradient(cx:0, cy:0, angle:135, stop:0 rgba(255, 255, 0, 69), stop:0.375 rgba(255, 255, 0, 69), stop:0.423533 rgba(251, 255, 0, 145), stop:0.45 rgba(247, 255, 0, 208), stop:0.477581 rgba(255, 244, 71, 130), stop:0.518717 rgba(255, 218, 71, 130), stop:0.55 rgba(255, 255, 0, 255), stop:0.57754 rgba(255, 203, 0, 130), stop:0.625 rgba(255, 255, 0, 69), stop:1 rgba(255, 255, 0, 69));")
+"")
         self.analysis.setTabShape(QtWidgets.QTabWidget.Triangular)
         self.analysis.setDocumentMode(False)
         self.analysis.setTabsClosable(False)
@@ -31,7 +32,7 @@ class Ui_MainWindow(object):
         self.tab.setMouseTracking(True)
         self.tab.setObjectName("tab")
         self.radioButton = QtWidgets.QRadioButton(self.tab)
-        self.radioButton.setGeometry(QtCore.QRect(109, 110, 198, 19))
+        self.radioButton.setGeometry(QtCore.QRect(109, 102, 198, 19))
         self.radioButton.setStyleSheet("color:rgb(255, 153, 0 );\n"
 "")
         self.radioButton.setChecked(True)
@@ -69,7 +70,7 @@ class Ui_MainWindow(object):
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
-        self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+        self.pushButton_2.setGeometry(QtCore.QRect(616, 99, 29, 27))
         self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
 "color: rgb(0, 0, 0);")
         self.pushButton_2.setObjectName("pushButton_2")
@@ -150,7 +151,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "BILA"))
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
         self.pushButton.setText(_translate("MainWindow", "Load"))
