@@ -136,11 +136,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label.setGeometry(QtCore.QRect(140, 340, 351, 17))
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
-        self.pushButton_2 = QtWidgets.QPushButton(self.tab)
-        self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+	self.pushButton_2 = QtWidgets.QPushButton(self.tab)
+        #self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+        self.pushButton_2.setGeometry(QtCore.QRect(616, 99, 29, 27))
         self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_2.setObjectName("pushButton_2")
+        #self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+        #self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
+        #                                "color: rgb(0, 0, 0);")
+        #self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_3 = QtWidgets.QPushButton(self.tab)
         self.pushButton_3.setGeometry(QtCore.QRect(621, 211, 29, 27))
         self.pushButton_3.setStyleSheet("background-color: rgb(186, 186, 186);\n"
