@@ -733,7 +733,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except FileNotFoundError:
             self.label.show()
 
-    def openDirDialog(self):
+    def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
@@ -747,14 +747,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             for each in self.validFiles:
                 file = open(each, 'r')
                 for i in file:
-                    ui.linesCount += 1
+                    ui.linesCount += 1  # stores the total lines count of the DIR
                 file.close()
             self.label.setText(
                 "the directory you have selected have %s valid files with %s lines" % (
             str(len(self.validFiles)), str(ui.linesCount)))
             self.lineEdit_2.setText(dire)
+
         except  NotADirectoryError as e:  # exception raised if the selection was not a dir
-            self.label.setText("make sure you are entering a dir")
+            self.label.setText("make sure you are selecting a dir")
+        #todo should raise an exception if the DIR has no valid logs
         except:
             self.label.setText("make sure you have selected a directory")
 
@@ -788,7 +790,9 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {# the following lines denote the types that require a set
+    types = {  # the foloowing dictionary denotes every field in log files with their data types
+
+        # the following lines denote the types that require a set
         #################sets##############
         "tags": str,"proxied": str , "analyzers": str,
         "orig_fuid": str,"resp_meme_ty": str,"orig_meme_type": str,
@@ -816,7 +820,6 @@ if __name__ == "__main__":  # main module
         , "id.orig_h": str, "id.orig_p": int, "id.resp_h": str, "id.resp_p": int, "version": str, "cipher": str,
         "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
         "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str
-             # todo :resolve vectors issues
         , "notice": bool, "peer": str
         , "src_addr": str, "src_port": int, "dst_adr": str, "dst_port": int, "note": str, "sig_id": str
         , "event_msg": str, "sub_msg": str, "sig_count": int, "host_count": int
@@ -829,20 +832,16 @@ if __name__ == "__main__":  # main module
              "rcode_name": str
         , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int,
              "rejected bool": bool
-
-             }
-    # this dictionary will declare the datatypes for each field in the database
+             }  # end of types dictionary declaration
 
     validFields = {  #this line stores the indecies of the fields at each line for every log file type
         # todo : check fields of every log file (DNS done,
-
-
         "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
                  "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
                  "info_msg": -1,
                  "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
                  "orig_fuid": -1,
-                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of lof fileds for each file
+                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of fileds for each file
 
         'ftp': {"uid": -1, "ts": -1, "id.orig_h": -1, "id.orig_p": .1, "id.resp_h": -1, "id.resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
                 "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
@@ -909,34 +908,27 @@ if __name__ == "__main__":  # main module
                 ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
                 ,'SSL_VALIDATION_STATUS','DNS_TTLS','DNS_ANSWERS'
                 ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
-                ,'ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']
+                ,'ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
-        dropped = map(droptables, tables)  # fix ?
+        dropped = map(droptables, tables)  # fix ? dropping tables
         print(list(dropped))
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` string)") #creating main table
 
-            # con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
-            #             ", `id_resp_p` INT,`proto` text,`service` text,"
-            #             "`duration` time,`orig_bytes` int,`resp_bytes` int,"
-            #             "`conn_state` text,`local_orig` bool ,`missed_bytes` int ,"
-            #             "`history` text ,`orig_pkts` int ,`orig_ip_bytes` int,"
-            #             "`resp_ip_bytes` int,`tunnel_parents` text,"
-            #             "`orig_cc` text,`resp_cc` string ,FOREIGN KEY(`uid`) REFERENCES main (`uid`))")
         except:
             print("error dropping main ?")
 
-        if "history.csv" in os.listdir():
+        if "history.csv" in os.listdir():  # creating a new history.csv if the program is executed for the first time
+                                            # todo : logging into csv should add files paths
             with open(historyLog, 'a') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
         else:
-
             print(historyLog)
             f = open(historyLog, "w")
             f.close()
