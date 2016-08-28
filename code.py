@@ -296,22 +296,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         PASSWORD TEXT,PROXIED TEXT,
                                         ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
                                         RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+
                 con.execute(
                     "CREATE TABLE HTTP_TAGS (UID TEXT , TS DATETIME , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))")
+
                 con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
                               HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
                 con.execute("""CREATE TABLE ORIG_FUIDS (UID TEXT , TS DATETIME
                           , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS DATETIME
                     ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
                 con.execute(
-                    """CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
+                    """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS DATETIME ,
                     RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS DATETIME
                             , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
 
                 print("step8")
             except:
@@ -322,6 +326,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                         RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
+
                 con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
 
                 print("step9")
@@ -345,6 +350,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+
                 con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS DATETIME,VALIDATION_STATUS TEXT)")
                 print("step11")
                 return True
@@ -614,26 +620,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except:
             self.message.show()
 
-    def load(self):  # this function loads the content of the log files into the DB    #todo : Continue documentation
+    def load(self):  # this function loads the content of the log files into the DB
         # todo : progress bar check
-        if self.loaded:
+        if self.loaded:    #check if the program is already loaded with log files
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
                                          QMessageBox.Yes,
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
-                self.reset()
-                map(droptables, tables) # dropping tables
-
+                self.reset()            # reset the GUI , clear line edit , clear database all tables
+                map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
             else:
                 return
-        if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            fPath = self.lineEdit.text().split('/')
-            fName = fPath[len(fPath) - 1]
+        if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
+            fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
+            fName = fPath[len(fPath) - 1]            # get file name
             path = '/'.join(fPath[:len(fPath) - 1])  # -1 since the right slicing operator is excluded
             print("123456",fName)
             print(fPath, path)
-            os.chdir(path)
+            os.chdir(path)             # change crwdir
 
             if not self.tableCreator(fName):
                 self.message.setText("error creating table " + str(fName))
@@ -643,8 +648,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             # print(self.linesCount)
 
 
-
-        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
 
             progress = 100 / len(
                 self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
@@ -652,22 +656,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 each = str.lower(each)
                 print(each)
                 self.tableCreator(each)
-                self.traverse(each)
+                self.traverse(each)   # load every file in the dir
                 self.progressBar.setValue(self.progressBar.value() + progress)
-            self.analysis.setTabEnabled(1, True)
-            self.analysis.setTabEnabled(2, True)
-            self.loaded = True
+            self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
+            self.analysis.setTabEnabled(2, True)  #enable query tab after loading
+            self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
             self.message.setText("please specifiy a file to load or a directory")
             self.message.show()
 
     def switch1(self):  # functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
+                        # disables the GUI components that allow user to load DIRs
         self.lineEdit_2.setDisabled(True)
         self.pushButton_3.setDisabled(True)
         self.lineEdit.setDisabled(False)
         self.pushButton_2.setDisabled(False)
 
-    def switch2(self):
+    def switch2(self):  # disables GUI components that allow loading single files
         self.lineEdit.setDisabled(True)
         self.pushButton_2.setDisabled(True)
         self.lineEdit_2.setDisabled(False)
@@ -675,12 +680,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def about(self):  # displays the about message if the user selected it from main menu
         self.message.setText(
-            "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
+            "this is a graduation project as a requirment for PSUT \n for more info visit the BitBucket link below")
         self.message.setDetailedText(
             "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer\n"
-            "https: // tree.taiga.io / project / ahmadjd94 - bila")
+            "https://tree.taiga.io/project/ahmadjd94-bila")
         self.message.show()
-
+                    #todo : continue documentation
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         single = True
@@ -759,6 +764,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
+        self.lineEdit.setText('')
+        self.lineEdit_2.setText('')
         # todo : drop tables
         # todo  reset timeline
 
@@ -897,8 +904,12 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    tables = ["main", "dhcp", "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files",
-              'ssh']
+    tables = ['main', 'dhcp', "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files"
+                ,'ssh', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
+                ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
+                ,'SSL_VALIDATION_STATUS','DNS_TTLS','DNS_ANSWERS'
+                ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
+                ,'ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
