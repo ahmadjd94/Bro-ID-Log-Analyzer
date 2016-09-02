@@ -296,22 +296,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         PASSWORD TEXT,PROXIED TEXT,
                                         ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
                                         RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+
                 con.execute(
                     "CREATE TABLE HTTP_TAGS (UID TEXT , TS DATETIME , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))")
+
                 con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
                               HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
                 con.execute("""CREATE TABLE ORIG_FUIDS (UID TEXT , TS DATETIME
                           , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS DATETIME
                     ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
                 con.execute(
-                    """CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
+                    """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS DATETIME ,
                     RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME
+                con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS DATETIME
                             , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+
 
                 print("step8")
             except:
@@ -322,6 +326,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
                                         RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
+
                 con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
 
                 print("step9")
@@ -345,6 +350,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+
                 con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS DATETIME,VALIDATION_STATUS TEXT)")
                 print("step11")
                 return True
@@ -621,26 +627,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except:
             self.message.show()
 
-    def load(self):  # this function loads the content of the log files into the DB    #todo : Continue documentation
+    def load(self):  # this function loads the content of the log files into the DB
         # todo : progress bar check
-        if self.loaded:
+        if self.loaded:    #check if the program is already loaded with log files
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
                                          QMessageBox.Yes,
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
-                self.reset()
-                map(droptables, tables) # dropping tables
-
+                self.reset()            # reset the GUI , clear line edit , clear database all tables
+                map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
             else:
                 return
-        if self.radioButton.isChecked() and self.lineEdit.text() != "":
-            fPath = self.lineEdit.text().split('/')
-            fName = fPath[len(fPath) - 1]
+        if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
+            fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
+            fName = fPath[len(fPath) - 1]            # get file name
             path = '/'.join(fPath[:len(fPath) - 1])  # -1 since the right slicing operator is excluded
             print("123456",fName)
             print(fPath, path)
-            os.chdir(path)
+            os.chdir(path)             # change crwdir
 
             if not self.tableCreator(fName):
                 self.message.setText("error creating table " + str(fName))
@@ -650,8 +655,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             # print(self.linesCount)
 
 
-
-        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":
+        elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
 
             progress = 100 / len(
                 self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
@@ -659,22 +663,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 each = str.lower(each)
                 print(each)
                 self.tableCreator(each)
-                self.traverse(each)
+                self.traverse(each)   # load every file in the dir
                 self.progressBar.setValue(self.progressBar.value() + progress)
-            self.analysis.setTabEnabled(1, True)
-            self.analysis.setTabEnabled(2, True)
-            self.loaded = True
+            self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
+            self.analysis.setTabEnabled(2, True)  #enable query tab after loading
+            self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
             self.message.setText("please specifiy a file to load or a directory")
             self.message.show()
 
     def switch1(self):  # functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
+                        # disables the GUI components that allow user to load DIRs
         self.lineEdit_2.setDisabled(True)
         self.pushButton_3.setDisabled(True)
         self.lineEdit.setDisabled(False)
         self.pushButton_2.setDisabled(False)
 
-    def switch2(self):
+    def switch2(self):  # disables GUI components that allow loading single files
         self.lineEdit.setDisabled(True)
         self.pushButton_2.setDisabled(True)
         self.lineEdit_2.setDisabled(False)
@@ -682,12 +687,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def about(self):  # displays the about message if the user selected it from main menu
         self.message.setText(
-            "this is a graduation project as a requirment for PSUT \n for more info visit the github link below")
+            "this is a graduation project as a requirment for PSUT \n for more info visit the BitBucket link below")
         self.message.setDetailedText(
             "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer\n"
-            "https: // tree.taiga.io / project / ahmadjd94 - bila")
+            "https://tree.taiga.io/project/ahmadjd94-bila")
         self.message.show()
-
+                    #todo : continue documentation
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         single = True
@@ -735,7 +740,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except FileNotFoundError:
             self.label.show()
 
-    def openDirDialog(self):
+    def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
@@ -749,14 +754,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             for each in self.validFiles:
                 file = open(each, 'r')
                 for i in file:
-                    ui.linesCount += 1
+                    ui.linesCount += 1  # stores the total lines count of the DIR
                 file.close()
             self.label.setText(
                 "the directory you have selected have %s valid files with %s lines" % (
             str(len(self.validFiles)), str(ui.linesCount)))
             self.lineEdit_2.setText(dire)
+
         except  NotADirectoryError as e:  # exception raised if the selection was not a dir
-            self.label.setText("make sure you are entering a dir")
+            self.label.setText("make sure you are selecting a dir")
+        #todo should raise an exception if the DIR has no valid logs
         except:
             self.label.setText("make sure you have selected a directory")
 
@@ -766,6 +773,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
         self.analysis.setTabEnabled(1, False)
+        self.lineEdit.setText('')
+        self.lineEdit_2.setText('')
         # todo : drop tables
         # todo  reset timeline
 
@@ -788,7 +797,9 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {# the following lines denote the types that require a set
+    types = {  # the foloowing dictionary denotes every field in log files with their data types
+
+        # the following lines denote the types that require a set
         #################sets##############
         "tags": str,"proxied": str , "analyzers": str,
         "orig_fuid": str,"resp_meme_ty": str,"orig_meme_type": str,
@@ -816,7 +827,6 @@ if __name__ == "__main__":  # main module
         , "id.orig_h": str, "id.orig_p": int, "id.resp_h": str, "id.resp_p": int, "version": str, "cipher": str,
         "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
         "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str
-             # todo :resolve vectors issues
         , "notice": bool, "peer": str
         , "src_addr": str, "src_port": int, "dst_adr": str, "dst_port": int, "note": str, "sig_id": str
         , "event_msg": str, "sub_msg": str, "sig_count": int, "host_count": int
@@ -829,20 +839,16 @@ if __name__ == "__main__":  # main module
              "rcode_name": str
         , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int,
              "rejected bool": bool
-
-             }
-    # this dictionary will declare the datatypes for each field in the database
+             }  # end of types dictionary declaration
 
     validFields = {  #this line stores the indecies of the fields at each line for every log file type
         # todo : check fields of every log file (DNS done,
-
-
         "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
                  "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
                  "info_msg": -1,
                  "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
                  "orig_fuid": -1,
-                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of lof fileds for each file
+                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of fileds for each file
 
         'ftp': {"uid": -1, "ts": -1, "id.orig_h": -1, "id.orig_p": .1, "id.resp_h": -1, "id.resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
                 "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
@@ -904,35 +910,32 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    tables = ["main", "dhcp", "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files",
-              'ssh']
+    tables = ['main', 'dhcp', "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files"
+                ,'ssh', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
+                ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
+                ,'SSL_VALIDATION_STATUS','DNS_TTLS','DNS_ANSWERS'
+                ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
+                ,'ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
-        dropped = map(droptables, tables)  # fix ?
+        dropped = map(droptables, tables)  # fix ? dropping tables
         print(list(dropped))
         print(str(list(dropped)) + "this is dropped tables ")  # fix ?
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` string)") #creating main table
 
-            # con.execute("CREATE TABLE IDs(uid INT ,`id_orig_h` TEXT, `id_orig_p` INT, `id_resp_h` TEXT"
-            #             ", `id_resp_p` INT,`proto` text,`service` text,"
-            #             "`duration` time,`orig_bytes` int,`resp_bytes` int,"
-            #             "`conn_state` text,`local_orig` bool ,`missed_bytes` int ,"
-            #             "`history` text ,`orig_pkts` int ,`orig_ip_bytes` int,"
-            #             "`resp_ip_bytes` int,`tunnel_parents` text,"
-            #             "`orig_cc` text,`resp_cc` string ,FOREIGN KEY(`uid`) REFERENCES main (`uid`))")
         except:
             print("error dropping main ?")
 
-        if "history.csv" in os.listdir():
+        if "history.csv" in os.listdir():  # creating a new history.csv if the program is executed for the first time
+                                            # todo : logging into csv should add files paths
             with open(historyLog, 'a') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
         else:
-
             print(historyLog)
             f = open(historyLog, "w")
             f.close()
