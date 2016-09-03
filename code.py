@@ -440,9 +440,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                              print ('error')
                         print(fields.index(field), field)
 
-                    print("dfdsfds", validFields[fname])
+
                     try :
-                        validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1))
+                        validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1)) #
                         print ('sorted',validFields[fname])
                     except:
                         print ('already sorted ?')
@@ -451,14 +451,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     line = i.split()
                     #sort dictionary based on key values
                     try:
-                        SQLCommand=(self.SQLcreator(fname, line))
-                        sql_command_ids=(self.SQLcreator2(line))
-                        con.execute(SQLCommand,sql_command_ids)
+                        sql_command=(self.SQLcreator(fname, line))
+                        sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
+                        con.execute(sql_command,sql_command_ids)
                     except  :
                         # print (str(a))
                         print('error creating SQL')
                     print ('end')
-                    print(SQLCommand)
+                    print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
                     # todo : the algorithm is not handling undefined fields , sprint's extended to thursday
@@ -511,8 +511,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print(keys)
         print (exist.values())
         print ('prepare to cast ')
-        value = list(exist.values())
-        print ('fucking'+value)            #todo : check if the arrays are sorted already
+        try :
+            print (type (exist))
+            value =list( exist.values())
+        except :
+            print ("error getting values of dict")
+            raise Exception
+
+        print (value)
+        #todo : check if the arrays are sorted already
         for i1 in range(len(value)):     # the following algorithm sorts the exist dictionary , python dictionary are not sorted
                                         # the algorithm is a modified version of bubble sort
             for i2 in range(len(value) -1):
@@ -523,44 +530,44 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     keys[i2]=keys[i2+1]
                     value[i2 + 1] = valuetemp
                     keys[i2+1]=keytemp
-        print ('wth',len(keys),len(value))
 
         keys = keys[value.index(0):]  #slice keys based based on the values array
         value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
         print(value,keys)
 
-        for i in range(len (value)):
-            print (keys[i]+':'+str(value[i]))
-
         insert = "insert into %s (" %table   # insert statment
-        field = value = '' # variable field stores the field name in table
-
+        field = values_string = ""   # variable field stores the field name in table
         for i in keys:
-            field += i + ','
+            if i in dict(validFields[table]):
+                field += str(i) + ","
 
-        field= field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
-        for i in range(len(value)):
+        field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
+        print (field)
+        print (len (value))
+        print ("312341231234214")
+        for i in keys:
+            if i in dict(validFields[table]):
 
-            if types[keys[i]] == datetime: # checking for datetime type
-                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[i]))) # converting epoch to datetime
-                print (a)
-                value+="\'"+str(a)+"\',"  # concatenating the value to the values string
+                if types[i] == datetime: # checking for datetime type
+                    a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
+                    print (a)
+                    values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
 
-            elif types[keys[i]] == int:
-                print(line[i], 'test1')
-                try:
-                    a = int (line[i])# converting str to int
-                    value += +str(a) + ","  # concatenating the value to the values string
+                elif types[i] == int:
+                    print(line[exist[i]], 'test1')
+                    try:
+                        a = int (line[exist[i]])# converting str to int
+                        values_string += str(a) + ","  # concatenating the value to the values string
 
-                except :
-                    print ('error casting value%s' %line[i])
-                    value += str(line[i]) + ','
-
-
-            else :
-                value += line[i]+','
-        values = value[:len(value) - 1] # split the colons
-        insert += field + ') values (' + values + ')' #construct the final insert statment
+                    except :
+                        print ('error casting value%s' %line[exist[i]])
+                        values_string += str(line[exist[i]]) + ","
+                else :
+                    values_string += str(line[exist[i]])+","
+        print (values_string)
+        values_string = values_string[:len(values_string) - 1] # split the colons
+        print (type(field))
+        insert += field + ") values (" + values_string + ")" #construct the final insert statment
         print(insert)
         return insert
     #################################important segments of code ################################
