@@ -292,7 +292,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
-                                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,USERNAME TEXT,
+                                        STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
                                         ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
                                         RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
@@ -539,15 +539,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         field = values_string = ""   # variable field stores the field name in table
         for i in keys:
             if i in dict(validFields[table]):
-                field += str(i) + ","
 
+                if i =="id.orig_h":
+                    field += "id_orig_h" + ","
+                elif i == "id.orig_p":
+                    field += "id_orig_p" + ","
+                elif i == "id.resp_h":
+                    field += "id_resp_h" + ","
+                elif i == "id.resp_p":
+                    field += "id_resp_p" + ","
+                else:
+                    field += str(i) + ","
         field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
         print (field)
         print (len (value))
         print ("312341231234214")
+        print (line)
         for i in keys:
-            if i in dict(validFields[table]):
-
+            if line[exist[i]]!='-' or line[exist[i]]!= "-":
                 if types[i] == datetime: # checking for datetime type
                     a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
                     print (a)
@@ -559,11 +568,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         a = int (line[exist[i]])# converting str to int
                         values_string += str(a) + ","  # concatenating the value to the values string
 
-                    except :
+                    except Exception as e:
+                        print (i,exist[i])
+                        print (str (e))
                         print ('error casting value%s' %line[exist[i]])
-                        values_string += str(line[exist[i]]) + ","
+
+                        values_string += (line[exist[i]]) + ","
                 else :
                     values_string += str(line[exist[i]])+","
+            else :
+                values_string += 'null' + ","
+                print (values_string)
         print (values_string)
         values_string = values_string[:len(values_string) - 1] # split the colons
         print (type(field))
@@ -842,13 +857,16 @@ if __name__ == "__main__":  # main module
              }  # end of types dictionary declaration
 
     validFields = {  #this line stores the indecies of the fields at each line for every log file type
-        # todo : check fields of every log file (DNS done,
-        "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1, "method": -1, "host": -1, "uri": -1, "referrer": -1,
-                 "user_agent": -1, "request_body_len": -1, "status_code": -1, "status_msg": -1, "info_code": -1,
-                 "info_msg": -1,
-                 "tags": -1, "username": -1, "password": -1, "proxied": -1, "orig_fuids": -1, "orig_meme_type": -1,
-                 "orig_fuid": -1,
-                 "resp_meme_ty": -1,},  # this dictionary will store the indecies of fileds for each file
+
+        "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1,
+                 "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1,
+                 "method": -1, "host": -1, "uri": -1, "referrer": -1,
+                 "user_agent": -1, "request_body_len": -1, "status_code": -1,
+                 "status_msg": -1, "info_code": -1,"info_msg": -1,
+                 "filename":-1,"tags": -1, "username": -1,
+                 "password": -1, "proxied": -1,
+                 "orig_fuids": -1, "orig_meme_type": -1,
+                 "orig_fuid": -1,"resp_meme_ty": -1},
 
         'ftp': {"uid": -1, "ts": -1, "id.orig_h": -1, "id.orig_p": .1, "id.resp_h": -1, "id.resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
                 "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
