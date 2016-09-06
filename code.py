@@ -231,7 +231,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 con.execute("""CREATE TABLE FTP(UID TEXT,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
-                DATA_CHANNEL BLOB,FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+
+                FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step3")
                 return True
             except:
@@ -386,15 +387,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 SECOND_RECEIVED TEXT ,LAST_REPLY TEXT ,PATH BLOB,USER_AGENT TEXT ,
                 TLS BOOL,FUIDS BLOB,IS_WEBMAIL BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
 
-                con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYSIS TEXT)")
+                con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYZER TEXT)")
 
-                con.execute("CREATE TABLE  SMTP_RCPTO (UID TEXT , TS DATETIME ,SOURCE TEXT)")
+                con.execute("CREATE TABLE  SMTP_RCPTO (UID TEXT , TS DATETIME ,HEADER TEXT)")
 
                 con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS DATETIME ,RECEIVER TEXT)")
 
-                con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS DATETIME , PATH)")
+                con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS DATETIME , PATH TEXT)")
 
-                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT DATETIME TS,FUID TEXT )")
+                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS datetime,FUID TEXT )")
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
                 return True
             except:
