@@ -288,14 +288,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
 
             try:
-                con.execute("""CREATE TABLE  HTTP (UID TEXT,
+                con.execute("""CREATE TABLE  HTTP (UID TEXT,trans
                                         ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
-                                        ORIG_FUIDS TEXT,ORIG_MEME_TYPES TEXT,ORIG_FUID TEXT,
-                                        RESP_MEME_TY BLOB,FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+                                        FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
 
                 con.execute(
                     "CREATE TABLE HTTP_TAGS (UID TEXT , TS DATETIME , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))")
@@ -322,9 +321,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
         elif fname == "dns.log":  # DONE # create DNS table
             try:
-                con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,PROTO TEXT,TRAN_ID INT,
-                                        QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,RCODE_NAME TEXT,QR BLOB,AA BOOL,TC BOOL,
-                                        RD BOOL,RA BOOL,Z INT,ANSWERS BLOB,TTLS BLOB,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
+                                      PROTO TEXT,TRAN_ID INT,
+                                        QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,
+                                        RCODE_NAME TEXT,QR bool,AA BOOL,TC BOOL,
+                                        RD BOOL,RA BOOL,Z INT,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
 
                 con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
@@ -348,7 +349,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 con.execute("""CREATE TABLE SSL(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
-                LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,VALIDATION_STATUS BLOB ,
+                LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
 
                 con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS DATETIME,VALIDATION_STATUS TEXT)")
