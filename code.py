@@ -278,7 +278,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "conn.log":  # DONE  create CONN table
             try:
-                con.execute("""CREATE TABLE CONN(UID TEXT,ID_ORIG_H TEXT,ID_ORIG_P INT,ID_RESP_H TEXT,ID_RESP_P INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                con.execute("""CREATE TABLE CONN(UID TEXT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
                 print("step7")
@@ -289,8 +289,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
 
             try:
-                con.execute("""CREATE TABLE  HTTP (UID TEXT,trans
-                                        ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
+                con.execute("""CREATE TABLE  HTTP (
+                                        UID TEXT
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
@@ -322,11 +322,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
         elif fname == "dns.log":  # DONE # create DNS table
             try:
-                con.execute("""CREATE TABLE DNS (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
-                                      PROTO TEXT,TRAN_ID INT,
-                                        QUERY TEXT,QCLASS INT,QCLASS_NAME TEXT,QTYPE INT,QTYPE_NAME TEXT,RCODE INT,
-                                        RCODE_NAME TEXT,QR bool,AA BOOL,TC BOOL,
-                                        RD BOOL,RA BOOL,Z INT,REJECTED BOOL,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                con.execute("""CREATE TABLE DNS (
+                                        UID TEXT,ts int,PROTO TEXT,TRAN_ID INT,
+                                        `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
+                                        `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
+                                        `RD` BOOL,`RA` BOOL,`Z`INT,`REJECTED` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
 
                 con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
@@ -337,7 +337,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "signature.log":  # DONE # create SIGNATURES table
             try:
-                con.execute("""CREATE TABLE SIGNATURE(TIMESTAMP TIME ,SRC_ADDR TEXT ,
+                con.execute("""CREATE TABLE SIGNATURE(TS int ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 print("step10")
@@ -347,7 +347,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
             try:
-                con.execute("""CREATE TABLE SSL(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,VERSION TEXT ,CIPHER TEXT ,
+                con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
@@ -380,12 +380,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
 
-                con.execute("""CREATE TABLE SMTP (UID TEXT ,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,
+                con.execute("""CREATE TABLE SMTP (UID TEXT ,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
-                ,DATE TEXT ,FROM TEXT ,TO TEXT,REPLY_TO TEXT,MSG_ID TEXT ,IN_REPLY_TO TEXT ,SUBJECT TEXT
-                ,X_ORIGINATING_IP TEXT,FIRST_RECEIVED TEXT ,
-                SECOND_RECEIVED TEXT ,LAST_REPLY TEXT ,PATH BLOB,USER_AGENT TEXT ,
-                TLS BOOL,FUIDS BLOB,IS_WEBMAIL BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+                ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
+                ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
+                `SECOND_RECEIVED` TEXT ,`LAST_REPLY` TEXT ,`PATH` BLOB,`USER_AGENT` TEXT ,
+                `TLS` BOOL,`FUIDS` BLOB,`IS_WEBMAIL` BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
 
                 con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYZER TEXT)")
 
@@ -930,8 +930,8 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    tables = ['main', 'dhcp', "smtp", "irc", "weird", "ssh", "conn", "http", "dns", "signature", "ssl", "ids", "files"
-                ,'ssh', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
+    tables = ['MAIN', 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
+                ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
                 ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
                 ,'SSL_VALIDATION_STATUS','DNS_TTLS','DNS_ANSWERS'
                 ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
