@@ -226,43 +226,49 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
 
-        if fname == "ftp.log":  # DONE # create FTP table
+        if fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                con.execute("""CREATE TABLE FTP(UID TEXT,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
+                con.execute("""CREATE TABLE FTP(UID TEXT
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
 
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step3")
+                table_created['FTP'] = True
                 return True
             except:
                 return False
 
-        elif fname == "dhcp.log":  # create DHCP table
+        elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                con.execute("""CREATE TABLE DHCP(UID TEXT ,id_orig_h text, id_orig_p int, id_resp_h text, id_resp_p int
+                con.execute("""CREATE TABLE DHCP(UID TEXT
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
-                , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID) )""")
+                , TRANS_ID INT,FOREIGN KEY(UID,TS) REFERENCES MAIN(UID,TS) )""")
                 print("step2")
+                table_created['DHCP'] = True
                 return True
             except:
                 return False
 
-        elif fname == "irc.log":  # DONE  create IRC table
+        elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                con.execute("""CREATE TABLE IRC (UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT
+                con.execute("""CREATE TABLE IRC (UID TEXT
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
-                DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
                 print("step4")
+                table_created['IRC'] = True
                 return True
             except:
                 return False
 
         elif fname == "weird.log":  # DONE  create weird table
             try:
+                if list(dropped)[tables.index("IDS")] == 0:
+                    pass
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT,"
                             " ID_RESP_H TEXT, ID_RESP_P INT,NAME TEXT,"
-                            "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))")
+                            "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))")
+                table_created['WEIRD'] = True
                 print("step5")
             except:
                 return False
@@ -270,7 +276,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "ssh.log":  # DONE create SSH table
             try:
                 con.execute("""CREATE TABLE SSH( UID TEXT,ID_ORIG_H TEXT, ID_ORIG_P INT, ID_RESP_H TEXT, ID_RESP_P INT,STATUS TEXT,
-                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
+                table_created['SSH'] = True
                 print("step6")
                 return True
             except:
@@ -280,7 +287,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             try:
                 con.execute("""CREATE TABLE CONN(UID TEXT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
-                RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID) REFERENCES MAIN(UID))""")
+                RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
+                table_created['CONN'] = True
                 print("step7")
                 return True
             except:
@@ -295,26 +303,34 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
-                                        FOREIGN KEY  (UID) REFERENCES MAIN (UID))""")
+                                        FOREIGN KEY  (UID,TS) REFERENCES MAIN (UID,TS))""")
 
                 con.execute(
-                    "CREATE TABLE HTTP_TAGS (UID TEXT , TS DATETIME , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))")
+                    "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))")
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS DATETIME ,
-                              HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
+                              HEADER TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
 
-                con.execute("""CREATE TABLE ORIG_FUIDS (UID TEXT , TS DATETIME
-                          , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                con.execute("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
+                          , ORIG_FUID TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
 
-                con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS DATETIME
-                    ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
+                    ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
 
                 con.execute(
-                    """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS DATETIME ,
-                    RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                    """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS INT ,
+                    RESP_FUIDS TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
 
-                con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS DATETIME
-                            , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID))""")
+                con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
+                            , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                table_created['HTTP'] = True
+                table_created['HTTP_RESP_MEME_TYPES'] = True
+                table_created['HTTP_RESP_FUIDS'] = True
+                table_created['HTTP_ORIG_MEME_TYPES'] = True
+                table_created['HTTP_ORIG_FUIDS'] = True
+                table_created['HTTP_PROXIED_HEADERS'] = True
+                table_created['HTTP_TAGS'] = True
+
 
 
                 print("step8")
@@ -327,9 +343,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                         `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
                                         `RD` BOOL,`RA` BOOL,`Z`INT,`REJECTED` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
-                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS DATETIME ,ANSWER TEXT)")
+                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
+                            "FOREIGN KEY (UID,TS) REFERENCES DNS(UID,TS))")
 
-                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS DATETIME ,TTL )")
+                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
+                            "FOREIGN KEY (UID,TS) REFERENCES DNS(UID,TS))")
+                table_created['DNS_ANSWERS'] = True
+                table_created['DNS_TTLS'] = True
+
+
 
                 print("step9")
             except:
@@ -337,9 +359,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "signature.log":  # DONE # create SIGNATURES table
             try:
-                con.execute("""CREATE TABLE SIGNATURE(TS int ,SRC_ADDR TEXT ,
+                con.execute("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
+                table_created['SIGNATURE'] = True
+
                 print("step10")
                 return True
             except:
@@ -352,8 +376,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+                table_created['SSL'] = True
 
-                con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS DATETIME,VALIDATION_STATUS TEXT)")
+
+                con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
+                            "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")
+                table_created['SSL_VALIDATION_STATUS'] = True
+
                 print("step11")
                 return True
             except:
@@ -362,17 +391,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "files.log":  # DONE # create files table and it's related tables
             try:
                 con.execute(
-                    """CREATE TABLE FILES (TS TIME , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
+                    """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
                     ANALYZERS TEXT,MIME_TYPE TEXT,
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
                     MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
+                table_created['FILES'] = True
 
-                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS DATETIME,SOURCE)")
 
-                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS DATETIME,RECIEPENT TEXT)")
 
-                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS DATETIME,CONN_UID TEXT)")
+                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,SOURCE"
+                             ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                table_created['FILES_TX_HOSTS'] = True
+
+                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RECIEPENT TEXT"
+                            ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                table_created['FILES_RX_HOSTS'] = True
+
+
+                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
+                            ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                table_created['FILES_CONN_UIDS'] = True
 
             except:
                 return False
@@ -380,22 +419,39 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
 
-                con.execute("""CREATE TABLE SMTP (UID TEXT ,
+                con.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
                 ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
                 ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
                 `SECOND_RECEIVED` TEXT ,`LAST_REPLY` TEXT ,`PATH` BLOB,`USER_AGENT` TEXT ,
                 `TLS` BOOL,`FUIDS` BLOB,`IS_WEBMAIL` BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+                table_created['SMTP'] = True
 
-                con.execute("CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS DATETIME ,ANALYZER TEXT)")
 
-                con.execute("CREATE TABLE  SMTP_RCPTO (UID TEXT , TS DATETIME ,HEADER TEXT)")
+                con.execute("""CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,
+                FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))""")
+                table_created['SMTP_ANALYZERS'] = True
 
-                con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS DATETIME ,RECEIVER TEXT)")
 
-                con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS DATETIME , PATH TEXT)")
+                con.execute("""CREATE TABLE  SMTP_RCPTO (UID TEXT , TS INT ,HEADER TEXT,
+                FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))""")
+                table_created['SMTP_RCPTO'] = True
 
-                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS datetime,FUID TEXT )")
+
+                con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS INT ,RECEIVER TEXT,"
+                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                table_created['SMTP_TO'] = True
+
+
+                con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS INT , PATH TEXT,"
+                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                table_created['SMTP_PATHS'] = True
+
+
+                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS INT,FUID TEXT ,"
+                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                table_created['SMTP_FUIDS'] = True
+
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
                 return True
             except:
@@ -906,7 +962,6 @@ if __name__ == "__main__":  # main module
                     #"""#TODO : THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
                     #1 DHCP ,2 DNS,3 HTTP,4 IRC,5 FTP,6 SMTP,7 SSL,8 SSH,9 WEIRD
         'ids':{"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1},
-        # still can't figure out how to integrate between ids and conn table
 
         'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
                   "service": -1,
@@ -930,6 +985,7 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+
     tables = ['MAIN', 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
                 ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
                 ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
@@ -941,11 +997,16 @@ if __name__ == "__main__":  # main module
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
-        print(list(dropped))
-        print(str(list(dropped)) + "this is dropped tables ")  # fix ?
+        table_created ={}
+        for i in tables :
+            table_created[i]=False
+        print (table_created)
+        print( "this is dropped tables ")  # fix ?
+
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` string)") #creating main table
+            con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` int PRIMARY KEY )") #creating main table
+            table_created['MAIN']=True
 
         except:
             print("error dropping main ?")
