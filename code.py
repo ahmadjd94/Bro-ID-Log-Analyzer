@@ -382,7 +382,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "signature.log":  # DONE # create SIGNATURES table
             try:
                 con.execute("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
-                            SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT
+                            SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 table_created['SIGNATURE'] = True
 
