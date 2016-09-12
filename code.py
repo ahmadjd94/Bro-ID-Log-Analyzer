@@ -321,7 +321,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE  HTTP (
-                                        UID TEXT
+                                        UID TEXT,ts int 
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
@@ -346,6 +346,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
                             , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+
                 table_created['HTTP'] = True
                 table_created['HTTP_RESP_MEME_TYPES'] = True
                 table_created['HTTP_RESP_FUIDS'] = True
@@ -615,29 +616,36 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         keys = keys[value.index(0):]  #slice keys based based on the values array
         value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
         print(value,keys)
-
-        insert = "insert into %s (" %table   # insert statment
-        field = values_string = ""   # variable field stores the field name in table
+        inserts=[]
+        ids_values=""
+        ids_insert="insert into ids("
+        normal_table_insert = "insert into %s (" %table   # insert statment
+        ids_field=field = values_string = ""   # variable field stores the field name in table
         for i in keys:
+
             if i in dict(validFields[table]):
 
                 if i =="id.orig_h":
-                    field += "id_orig_h" + ","
+                    ids_field += "orig_h" + ","
                 elif i == "id.orig_p":
-                    field += "id_orig_p" + ","
+                    ids_field += "orig_p" + ","
                 elif i == "id.resp_h":
-                    field += "id_resp_h" + ","
+                    ids_field += "id_resp_h" + ","
                 elif i == "id.resp_p":
-                    field += "id_resp_p" + ","
+                    ids_field += "resp_p" + ","
                 else:
                     field += str(i) + ","
+
         field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
         print (field)
         print (len (value))
         print ("312341231234214")
         print (line)
         for i in keys:
-            if line[exist[i]]!='-' or line[exist[i]]!= "-":
+            print (validFields['ids'])
+            if i in validFields['ids'].keys():
+                ids_values+=line[exist[i]]+','
+            elif line[exist[i]]!='-' or line[exist[i]]!= "-":
                 if types[i] == datetime: # checking for datetime type
                     a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
                     print (a)
@@ -661,11 +669,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 values_string += 'null' + ","
                 print (values_string)
         print (values_string)
+
+        ids_values = ids_values[:len(ids_values)-1]
         values_string = values_string[:len(values_string) - 1] # split the colons
         print (type(field))
-        insert += field + ") values (" + values_string + ")" #construct the final insert statment
-        print(insert)
-        return insert
+        normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
+        inserts.append(normal_table_insert)
+        try:
+            ids_insert=ids_insert+ids_field+ids_values+")"
+            inserts.append(ids_insert)
+            print (ids_insert)
+        except:
+               pass
+        print(normal_table_insert)
+        return inserts    # function will return a dictionary of insert statments
     #################################important segments of code ################################
     #a = con.execute('''insert into dates (d) values (?)''', (datetime.datetime.fromtimestamp(312312312.32112),))
     #  insert into db after normalizing epoch
@@ -903,7 +920,7 @@ if __name__ == "__main__":  # main module
         "rx_hosts": str,"path": str, "tx_hosts": str,"validation_status": str,
          "name": str,"tunnel_parents": str, "TTLs": -1, "answers": str, "fuids": str,
         #################end of sets##############
-        "uid": str, "ts": datetime, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
+        "uid": str, "ts": int, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
         "referrer": str, "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
          "info_msg": str, "username": str, "password": str, "command": str, "arg": str
         , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
