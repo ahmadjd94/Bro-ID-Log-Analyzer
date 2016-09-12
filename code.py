@@ -228,8 +228,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         if fname=='ids':
             try:
-                con.execute("""CREATE TABLE IDS (uid text,ts int ,ORIG_H TEXT,
-                                ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (UID ,TS) REFERENCES MAIN(UID,TS))""")
+                con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
+                                ORIG_P INT,RESP_H TEXT,RESP_P INT)""")#,)#FOREIGN KEY (UID ,TS) REFERENCES MAIN(UID,TS))""")
                 table_created['IDS']=True
             except :
                 table_created['IDS'] = False
@@ -317,7 +317,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
 
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                if (dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE  HTTP (
@@ -676,9 +677,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
         inserts.append(normal_table_insert)
         try:
-            ids_insert=ids_insert+ids_field+ids_values+")"
+            ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+","+line[exist['uid']]+","+ids_values+")"
+
             inserts.append(ids_insert)
             print (ids_insert)
+            con.execute(ids_insert)
         except:
                pass
         print(normal_table_insert)
@@ -693,15 +696,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
     #################################important segments of code ################################
 
-    def SQLcreator2 (self,fname,line):  # this function creates insert statments for the IDs table
-        command = "insert into ids (uid ,ts ,ID_ORIG_H, ID_ORIG_P, ID_RESP_H , ID_RESP_P ) VALUES ("
-        values = line[validFields[fname]['uid']] +str(datetime.fromtimestamp(line[validFields[fname]['ts']])) +\
-                 line[validFields['ids']['id.orig_h']]+\
-                 int(line[validFields['ids']['id.orig_p']])+\
-                 line[validFields['ids']['id.resp_h']]+\
-                 int(line[validFields['ids']['id.resp_p']])+")"
-        command = command + values
-        return command
+    # def SQLcreator2 (self,fname,line):  # this function creates insert statments for the IDs table
+    #     command = "insert into ids (uid ,ts ,ID_ORIG_H, ID_ORIG_P, ID_RESP_H , ID_RESP_P ) VALUES ("
+    #     values = line[validFields[fname]['uid']] +str(datetime.fromtimestamp(line[validFields[fname]['ts']])) +\
+    #              line[validFields['ids']['id.orig_h']]+\
+    #              int(line[validFields['ids']['id.orig_p']])+\
+    #              line[validFields['ids']['id.resp_h']]+\
+    #              int(line[validFields['ids']['id.resp_p']])+")"
+    #     command = command + values
+    #     return command
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
@@ -920,7 +923,7 @@ if __name__ == "__main__":  # main module
         "rx_hosts": str,"path": str, "tx_hosts": str,"validation_status": str,
          "name": str,"tunnel_parents": str, "TTLs": -1, "answers": str, "fuids": str,
         #################end of sets##############
-        "uid": str, "ts": int, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
+        "uid": str, "ts":float, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
         "referrer": str, "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
          "info_msg": str, "username": str, "password": str, "command": str, "arg": str
         , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
