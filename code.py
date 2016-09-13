@@ -225,14 +225,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_2.setVisible(False)
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
-
-        if fname=='ids':
+        print (dropped)
+        if fname == "ids":
             try:
                 con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
-                                ORIG_P INT,RESP_H TEXT,RESP_P INT)""")#,)#FOREIGN KEY (UID ,TS) REFERENCES MAIN(UID,TS))""")
+                                ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (UID) REFERENCES MAIN(UID),foreign key (`ts`) references  main (`ts`))""")
                 table_created['IDS']=True
+                print ("success creating ids  table ")
             except :
                 table_created['IDS'] = False
+                print ("error creating ids table ")
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
@@ -317,9 +319,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
 
             try:
-                if (dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                if dropped['IDS'] == 0:  # indicates if the IDS exists or not
 
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                    self.tableCreator("ids")  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE  HTTP (
                                         UID TEXT,ts int 
@@ -327,26 +329,35 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
                                         STATUS_CODE INT,STATUS_MSG TEXT,INFO_CODE INT,INFO_MSG TEXT,filename text,USERNAME TEXT,
                                         PASSWORD TEXT,PROXIED TEXT,
-                                        FOREIGN KEY  (UID,TS) REFERENCES MAIN (UID,TS))""")
+                                        FOREIGN KEY  (UID) REFERENCES MAIN (UID),
+                                        FOREIGN KEY  (ts) REFERENCES MAIN (ts))""")
+
 
                 con.execute(
-                    "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))")
+                    "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),"
+                    "FOREIGN KEY  (ts) REFERENCES http (ts))")
+
 
                 con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
-                              HEADER TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                              HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
+                    FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
                 con.execute("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
-                          , ORIG_FUID TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                          , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
+                    FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
                 con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
-                    ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                    ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
+                    FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
                 con.execute(
                     """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS INT ,
-                    RESP_FUIDS TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                    RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
+                    FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
                 con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
-                            , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID,TS) REFERENCES HTTP(UID,TS))""")
+                            , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
+                    FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
                 table_created['HTTP'] = True
                 table_created['HTTP_RESP_MEME_TYPES'] = True
@@ -508,7 +519,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
-                    print(i)
+                    # print(i)
                     fields = (i[7:].split())
                     print(fields)
                     fname=(fname.split('.')[0])
@@ -534,14 +545,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     line = i.split()
                     #sort dictionary based on key values
                     try:
-                        sql_command=(self.SQLcreator(fname, line))
-                        sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
-                        con.execute(sql_command,sql_command_ids)
+                        sql_commands=(self.SQLcreator(fname, line))
+                        for i in sql_commands:
+                            try :
+                                con.execute (i)
+                            except:
+                                print ('error executing',i)
+                        # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
+                        # con.execute(sql_command,sql_command_ids)
                     except  :
                         # print (str(a))
                         print('error creating SQL')
                     print ('end')
-                    print(sql_command)
+                    #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
                     # todo : the algorithm is not handling undefined fields , sprint's extended to forever
@@ -580,7 +596,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
         # HANDLED IN THE CALLER FUNCTION
         # use time.time to get the current time in epoch format
-        print('inside creator ', validFields[table])
+        # print('inside creator ', validFields[table])
 
         try:
             print (validFields[table])
@@ -631,21 +647,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i == "id.orig_p":
                     ids_field += "orig_p" + ","
                 elif i == "id.resp_h":
-                    ids_field += "id_resp_h" + ","
+                    ids_field += "resp_h" + ","
                 elif i == "id.resp_p":
                     ids_field += "resp_p" + ","
                 else:
                     field += str(i) + ","
 
         field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
-        print (field)
+        # print (field)
         print (len (value))
         print ("312341231234214")
         print (line)
         for i in keys:
             print (validFields['ids'])
             if i in validFields['ids'].keys():
-                ids_values+=line[exist[i]]+','
+                if types[i] == str:
+                    ids_values += "\'"+line[exist[i]] + '\','
+                else:
+                    ids_values += line[exist[i]] + ","
             elif line[exist[i]]!='-' or line[exist[i]]!= "-":
                 if types[i] == datetime: # checking for datetime type
                     a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
@@ -665,7 +684,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                         values_string += (line[exist[i]]) + ","
                 else :
-                    values_string += str(line[exist[i]])+","
+                    values_string += "\'"+str(line[exist[i]])+"\',"
             else :
                 values_string += 'null' + ","
                 print (values_string)
@@ -677,8 +696,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
         inserts.append(normal_table_insert)
         try:
-            ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+","+line[exist['uid']]+","+ids_values+")"
-
+            ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+",\'"+line[exist['uid']]+"\',"+ids_values+")"
             inserts.append(ids_insert)
             print (ids_insert)
             con.execute(ids_insert)
@@ -904,6 +922,9 @@ if __name__ == "__main__":  # main module
         except sqlite3.OperationalError as a:
             if "no such table" in str(a):
                 return 0
+            else :
+                return 0
+
 
 
     import sys
@@ -1029,17 +1050,26 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
 
-    tables = ['MAIN', 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
+    tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
                 ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
                 ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
-                ,'SSL_VALIDATION_STATUS','DNS_TTLS','DNS_ANSWERS'
+                ,'SSL_VALIDATION_STATUS','MAIN','DNS_TTLS','DNS_ANSWERS'
                 ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
-                ,'ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
+                ,'HTTP_ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
+        drop_result=list(dropped.__iter__())   # returns the results of the map
+
+        dropped={}
+        for i in range (len(drop_result)):
+            dropped[tables[i]]=drop_result[i]
+
+        for i in dropped :
+            print (i,dropped[i])
+
         table_created ={ }
         for i in tables :
             table_created[i]=False
@@ -1048,8 +1078,9 @@ if __name__ == "__main__":  # main module
 
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (`uid` TEXT PRIMARY KEY , `ts` int PRIMARY KEY )") #creating main table
+            con.execute("CREATE TABLE main (`uid` TEXT , `ts` int ,PRIMARY KEY(`uid`,`ts`) )") #creating main table
             table_created['MAIN']=True
+            print ("Success creating main table")
 
         except:
             print("error dropping main ?")
