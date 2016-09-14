@@ -226,10 +226,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
         print (dropped)
-        if fname == "ids":
+        if fname in ["ids","IDS"]:
             try:
                 con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
-                                ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (UID) REFERENCES MAIN(UID),foreign key (`ts`) references  main (`ts`))""")
+                                ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
                 table_created['IDS']=True
                 print ("success creating ids  table ")
             except :
@@ -319,9 +319,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
 
             try:
-                if dropped['IDS'] == 0:  # indicates if the IDS exists or not
+                # if dropped['IDS'] == 0:  # indicates if the IDS exists or not
 
-                    self.tableCreator("ids")  # call the table creator function to create the ids table
+                self.tableCreator("ids")  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE  HTTP (
                                         UID TEXT,ts int 
@@ -634,15 +634,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
         print(value,keys)
         inserts=[]
-        ids_values=""
+        http_proxied_insert=""
+        ids_values=""    #string will stores the values of insert statment for ids table
+        http_orig_fuids_insert = ""# string will store the values if insert statments into http_fuids_table
         ids_insert="insert into ids("
         normal_table_insert = "insert into %s (" %table   # insert statment
         ids_field=field = values_string = ""   # variable field stores the field name in table
+
         for i in keys:
-
             if i in dict(validFields[table]):
+                # checking for ifelds of normalized table
 
-                if i =="id.orig_h":
+                if i =="id.orig_h":                             #SPECIAL FIELDS OF IDS TABLE
                     ids_field += "orig_h" + ","
                 elif i == "id.orig_p":
                     ids_field += "orig_p" + ","
@@ -650,8 +653,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     ids_field += "resp_h" + ","
                 elif i == "id.resp_p":
                     ids_field += "resp_p" + ","
+
+                elif i=='tags':             #SPECIAL FIELDS FOR HTTP_TAGS TABLE
+                    http_tags_insert = "insert into http_tags(ts,uid,tag)values("
+
+                elif i=="proxied":   # SPECIAL FIELDS FOR HTTP_PROXIED TABLE
+                    http_proxied_insert="insert into http_proxied_headers (ts,uid,header) values ("
+
+                elif i=="orig_fuids":
+                    http_orig_fuids_insert ="insert into http_orig_fuids (ts,uid,orig_fuid) values ("
                 else:
                     field += str(i) + ","
+            else :
+                pass # neglecting the invalid fields detected
 
         field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
         # print (field)
@@ -659,16 +673,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print ("312341231234214")
         print (line)
         for i in keys:
-            print (validFields['ids'])
+            # print (validFields['ids'])
             if i in validFields['ids'].keys():
                 if types[i] == str:
                     ids_values += "\'"+line[exist[i]] + '\','
                 else:
                     ids_values += line[exist[i]] + ","
+
+            elif i =='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
+                http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
+            elif i=="proxied":   # handle insertin into procied normalized table
+                http_proxied_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
+            elif i== "orig_fuids":
+                http_orig_fuids_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
             elif line[exist[i]]!='-' or line[exist[i]]!= "-":
                 if types[i] == datetime: # checking for datetime type
                     a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
-                    print (a)
+                    #print (a)
                     values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
 
                 elif types[i] == int:
@@ -688,7 +712,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             else :
                 values_string += 'null' + ","
                 print (values_string)
-        print (values_string)
+        #print (values_string)
 
         ids_values = ids_values[:len(ids_values)-1]
         values_string = values_string[:len(values_string) - 1] # split the colons
@@ -699,7 +723,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+",\'"+line[exist['uid']]+"\',"+ids_values+")"
             inserts.append(ids_insert)
             print (ids_insert)
-            con.execute(ids_insert)
+            # con.execute(ids_insert)
+
+            if "insert into" in http_tags_insert:
+                inserts.append(http_tags_insert)
+                print (http_tags_insert)
+
+            if "insert into" in http_proxied_insert:
+                inserts.append(http_proxied_insert)
+                print (http_proxied_insert)
+
+            if "insert into " in http_orig_fuids_insert:
+                inserts.append(http_orig_fuids_insert)
+                print (http_orig_fuids_insert)
         except:
                pass
         print(normal_table_insert)
