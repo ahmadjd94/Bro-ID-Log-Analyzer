@@ -225,6 +225,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_2.setVisible(False)
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
+        print ('fname passes to function',fname)
         print (dropped)
         if fname in ["ids","IDS"]:
             try:
@@ -241,7 +242,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 con.execute("""CREATE TABLE FTP(UID TEXT
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
-
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 print("step3")
                 table_created['FTP'] = True
@@ -304,12 +304,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "conn.log":  # DONE  create CONN table
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE CONN(UID TEXT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                con.execute("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
-                RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
+                RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,
+                FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
+
+                con.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES MAIN (UID),
+                             FOREIGN KEY (TS) REFERENCES MAIN (TS))""")
                 table_created['CONN'] = True
                 print("step7")
                 return True
@@ -662,6 +666,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 elif i=="orig_fuids":
                     http_orig_fuids_insert ="insert into http_orig_fuids (ts,uid,orig_fuid) values ("
+
+                elif i=="tunnel_parents":
+                    conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts ,uid,parent) values ("
+
                 else:
                     field += str(i) + ","
             else :
@@ -686,8 +694,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             elif i=="proxied":   # handle insertin into procied normalized table
                 http_proxied_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
 
-            elif i== "orig_fuids":
+            elif i== "orig_fuids":  # handle inserting into orig_fuids normalized table
                 http_orig_fuids_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
+            elif i=="tunnel_parents":
+                conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
 
             elif line[exist[i]]!='-' or line[exist[i]]!= "-":
                 if types[i] == datetime: # checking for datetime type
@@ -697,16 +709,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 elif types[i] == int:
                     print(line[exist[i]], 'test1')
-                    try:
-                        a = int (line[exist[i]])# converting str to int
-                        values_string += str(a) + ","  # concatenating the value to the values string
+                elif types [i]==float :
+                    values_string += line[exist[i]] + ","
+                    # try:
+                    #     a = int (line[exist[i]])# converting str to int
+                    #     values_string += str(a) + ","  # concatenating the value to the values string
 
-                    except Exception as e:
-                        print (i,exist[i])
-                        print (str (e))
-                        print ('error casting value%s' %line[exist[i]])
-
-                        values_string += (line[exist[i]]) + ","
+                    # except Exception as e:
+                    #     print (i,exist[i])
+                    #     print (str (e))
+                    #     print ('error casting value%s' %line[exist[i]])
+                    #
+                    #     values_string += (line[exist[i]]) + ","
                 else :
                     values_string += "\'"+str(line[exist[i]])+"\',"
             else :
@@ -736,6 +750,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if "insert into " in http_orig_fuids_insert:
                 inserts.append(http_orig_fuids_insert)
                 print (http_orig_fuids_insert)
+
+            if "insert into" in conn_tunnel_parents_insert:
+                inserts.append (conn_tunnel_parents_insert)
         except:
                pass
         print(normal_table_insert)
@@ -1059,17 +1076,17 @@ if __name__ == "__main__":  # main module
         'signatures': {"ts": -1, 'src_addr': -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,
                        'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
                        'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
-                    #"""#TODO : THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
+                    # THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
                     #1 DHCP ,2 DNS,3 HTTP,4 IRC,5 FTP,6 SMTP,7 SSL,8 SSH,9 WEIRD
         'ids':{"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1},
 
-        'conn': {"uid": -1, "id_orig_h": -1, "id_orig_p": -1, "id_resp_h": -1, "id_resp_p": -1, "proto": -1,
+        'conn': {'ts':-1,"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1,
                   "service": -1,
                   "duration": -1, "orig_bytes": -1,
                   "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
                   "orig_pkts": -1,
                   "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
-                  "resp_cc": -1}, #todo : handling insertion into connn table ?
+                  "resp_cc": -1},
 
         'dhcp': {"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
@@ -1077,7 +1094,7 @@ if __name__ == "__main__":  # main module
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
                 "rcode_name": -1, "QR": -1,
                 "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected bool": -1}
-        # todo : check tables strucutre !!! normalize conn_ID table
+        # check tables strucutre !!! normalize conn_ID table
     }
 
     app = QtWidgets.QApplication(sys.argv)
@@ -1088,7 +1105,7 @@ if __name__ == "__main__":  # main module
 
     tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
                 ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
-                ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS'
+                ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS',"CONN_TUNNEL_PARENTS"
                 ,'SSL_VALIDATION_STATUS','MAIN','DNS_TTLS','DNS_ANSWERS'
                 ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
                 ,'HTTP_ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
