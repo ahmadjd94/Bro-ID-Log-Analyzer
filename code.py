@@ -637,7 +637,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         keys = keys[value.index(0):]  #slice keys based based on the values array
         value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
         print(value,keys)
+
+        try:
+            # print(validFields['conn'])
+            main_insert="insert into main (uid,ts) values ('%s',%s)"%(line[exist['uid']],line[exist['ts']])
+            print(main_insert)
+        except Exception as a:
+            print ("WTF")
+            print (str(a))
         inserts=[]
+        http_tags_insert=""
         http_proxied_insert=""
         ids_values=""    #string will stores the values of insert statment for ids table
         http_orig_fuids_insert = ""# string will store the values if insert statments into http_fuids_table
@@ -668,7 +677,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     http_orig_fuids_insert ="insert into http_orig_fuids (ts,uid,orig_fuid) values ("
 
                 elif i=="tunnel_parents":
-                    conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts ,uid,parent) values ("
+                    conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
 
                 else:
                     field += str(i) + ","
@@ -700,8 +709,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             elif i=="tunnel_parents":
                 conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
 
-
-            elif line[exist[i]]!='-' or line[exist[i]]!= "-":
+            elif line[exist[i]] != '-' or line[exist[i]] != "-":
                 if types[i] == datetime: # checking for datetime type
                     a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
                     #print (a)
@@ -709,7 +717,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 elif types[i] == int:
                     print(line[exist[i]], 'test1')
-                elif types [i]==float :
+                    values_string += line[exist[i]] + ","
+                elif types [i] == float :
                     values_string += line[exist[i]] + ","
                     # try:
                     #     a = int (line[exist[i]])# converting str to int
@@ -752,10 +761,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print (http_orig_fuids_insert)
 
             if "insert into" in conn_tunnel_parents_insert:
+                print ("fucking parent",conn_tunnel_parents_insert)
                 inserts.append (conn_tunnel_parents_insert)
-        except:
-               pass
+        except Exception as a1:
+            print (str(a1),'exception happend while appending')
+
+
         print(normal_table_insert)
+        print ('returned tables')
+        inserts.insert(0,main_insert)
+        print (inserts)
         return inserts    # function will return a dictionary of insert statments
     #################################important segments of code ################################
     #a = con.execute('''insert into dates (d) values (?)''', (datetime.datetime.fromtimestamp(312312312.32112),))
@@ -834,7 +849,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print(fPath, path)
             os.chdir(path)             # change crwdir
 
-            if not self.tableCreator(fName):
+            if  self.tableCreator(fName)==False:
                 self.message.setText("error creating table " + str(fName))
 
             self.traverse(fName)
