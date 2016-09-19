@@ -312,8 +312,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
 
-                con.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES MAIN (UID),
-                             FOREIGN KEY (TS) REFERENCES MAIN (TS))""")
+                con.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
+                             FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
                 print("step7")
                 return True
@@ -547,14 +547,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
                     line = i.split()
-                    #sort dictionary based on key values
+                    # sort dictionary based on key values
                     try:
                         sql_commands=(self.SQLcreator(fname, line))
-                        for i in sql_commands:
+                        print ("PRINTING RECEIVED LIST",sql_commands)
+                        for command in sql_commands:
                             try :
-                                con.execute (i)
+                                con.execute (command)
+                                print ("executed correctly :\n",command)
+                                con.commit()
                             except:
-                                print ('error executing',i)
+                                    print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
                         # con.execute(sql_command,sql_command_ids)
                     except  :
@@ -581,7 +584,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 # this block is only performed when no exceptions happen , all of data inserted into DB successfully
                 try:
                     wr1.writerow(fname, digestive.hexdigest())   # write the file name , with it's hash value incase it was loaded successfully
-                    csvfile.write(fname, digestive.hexdigest())  # the digested value combined
+                    #csvfile.write(fname, digestive.hexdigest())  # the digested value combined
                 except :
                     print ('exception in writing')
 
@@ -646,8 +649,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print ("WTF")
             print (str(a))
         inserts=[]
-        http_tags_insert=""
-        http_proxied_insert=""
+        http_tags_insert=conn_tunnel_parents_insert=http_proxied_insert=""
         ids_values=""    #string will stores the values of insert statment for ids table
         http_orig_fuids_insert = ""# string will store the values if insert statments into http_fuids_table
         ids_insert="insert into ids("
@@ -1146,7 +1148,7 @@ if __name__ == "__main__":  # main module
 
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (`uid` TEXT , `ts` int ,PRIMARY KEY(`uid`,`ts`) )") #creating main table
+            con.execute("CREATE TABLE main (uid TEXT , ts int )")#,PRIMARY KEY(`uid`,`ts`) )") #creating main table
             table_created['MAIN']=True
             print ("Success creating main table")
 
