@@ -279,8 +279,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "weird.log":  # DONE  create weird table
             try:
-                if list(dropped)[tables.index("IDS")] == 0: # indicates if the IDS exists or not
-                    self.tableCreator('ids')      # call the table creator function to create the ids table
+                #if list(dropped)[tables.index("IDS")] == 0: # indicates if the IDS exists or not
+                self.tableCreator('ids')      # call the table creator function to create the ids table
 
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))")
@@ -694,11 +694,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         for i in keys:
             # print (validFields['ids'])
             if i in validFields['ids'].keys():
-                if types[i] == str:
-                    ids_values += "\'"+line[exist[i]] + '\','
-                else:
-                    ids_values += line[exist[i]] + ","
-
+                if line[exist[i]] !='-':
+                    if types[i] == str:
+                        ids_values += "\'"+line[exist[i]] + '\','
+                    else:
+                        ids_values += line[exist[i]] + ","
+                else :
+                    ids_values += "\'" + "null" + '\','
             elif i =='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
                 http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
 
@@ -1088,7 +1090,7 @@ if __name__ == "__main__":  # main module
                 "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
                 "validation_status": -1},
 
-        'weird': {"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id_resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
+        'weird': {"uid": -1,'ts':-1 ,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
 
         'signatures': {"ts": -1, 'src_addr': -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,
                        'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
@@ -1148,7 +1150,7 @@ if __name__ == "__main__":  # main module
 
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (uid TEXT , ts int )")#,PRIMARY KEY(`uid`,`ts`) )") #creating main table
+            con.execute("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['MAIN']=True
             print ("Success creating main table")
 
