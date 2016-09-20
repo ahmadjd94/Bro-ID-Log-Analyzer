@@ -251,12 +251,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE DHCP(UID TEXT
+                con.execute("""CREATE TABLE DHCP(UID TEXT,TS int
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
-                , TRANS_ID INT,FOREIGN KEY(UID,TS) REFERENCES MAIN(UID,TS) )""")
+                , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step2")
                 table_created['DHCP'] = True
                 return True
@@ -383,12 +383,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         UID TEXT,ts int,PROTO TEXT,TRAN_ID INT,
                                         `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                         `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
-                                        `RD` BOOL,`RA` BOOL,`Z`INT,`REJECTED` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
+                                        `RD` BOOL,`RA` BOOL,`Z`INT,`REJECTED` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
+                                        FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
+
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
-                            "FOREIGN KEY (UID,TS) REFERENCES DNS(UID,TS))")
+                            "FOREIGN KEY (UID) REFERENCES DNS(UID),"
+                            "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
                 con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
-                            "FOREIGN KEY (UID,TS) REFERENCES DNS(UID,TS))")
+                            "FOREIGN KEY (UID) REFERENCES DNS(UID),"
+                            "FOREIGN KEY (ts) REFERENCES DNS(ts))")
+
                 table_created['DNS_ANSWERS'] = True
                 table_created['DNS_TTLS'] = True
 
@@ -598,6 +603,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
                                        # should use lambda expressions
                                         # should handle inserting to ids table also
+        print (line)
         print(table)
         exist = {}       #stores the values of existing fields that can be extracted from the log file
         # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
@@ -636,10 +642,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     keys[i2]=keys[i2+1]
                     value[i2 + 1] = valuetemp
                     keys[i2+1]=keytemp
-
-        keys = keys[value.index(0):]  #slice keys based based on the values array
-        value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
-        print(value,keys)
+        try:
+            keys = keys[value.index(0):]  #slice keys based based on the values array
+            value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
+            print(value,keys)
+        except Exception as E:
+            print (str (E))
 
         try:
             # print(validFields['conn'])
@@ -649,12 +657,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print ("WTF")
             print (str(a))
         inserts=[]
+
+        ################################ DNS-SPECIFIC INSERTS AND STATMENTS######################
+        dns_ttls_inserts=""
+        dns_ANSWERS_inserts = ""
+
+        ################################ http-SPECIFIC INSERTS AND STATMENTS######################
         http_tags_insert=conn_tunnel_parents_insert=http_proxied_insert=""
-        ids_values=""    #string will stores the values of insert statment for ids table
         http_orig_fuids_insert = ""# string will store the values if insert statments into http_fuids_table
+
+        ################################ ids-SPECIFIC INSERTS AND STATMENTS######################
+        ids_values = ""  # string will stores the values of insert statment for ids table
         ids_insert="insert into ids("
-        normal_table_insert = "insert into %s (" %table   # insert statment
         ids_field=field = values_string = ""   # variable field stores the field name in table
+
+
+
+
+        normal_table_insert = "insert into %s (" %table   # insert statment
 
         for i in keys:
             if i in dict(validFields[table]):
@@ -671,15 +691,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 elif i=='tags':             #SPECIAL FIELDS FOR HTTP_TAGS TABLE
                     http_tags_insert = "insert into http_tags(ts,uid,tag)values("
-
                 elif i=="proxied":   # SPECIAL FIELDS FOR HTTP_PROXIED TABLE
                     http_proxied_insert="insert into http_proxied_headers (ts,uid,header) values ("
-
                 elif i=="orig_fuids":
                     http_orig_fuids_insert ="insert into http_orig_fuids (ts,uid,orig_fuid) values ("
-
                 elif i=="tunnel_parents":
                     conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
+
+                elif i=="TTLs":                                              #SPECIAL FIELDS FOR DNS
+                    dns_ttls_inserts="insert into dns_ttl (uid,ts,ttl) values ("
+                elif i == "answers":
+                    dns_answers_inserts = "insert into dns_ttl (uid,ts,ttl) values ("
 
                 else:
                     field += str(i) + ","
@@ -692,6 +714,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print ("312341231234214")
         print (line)
         for i in keys:
+            print (i)
             # print (validFields['ids'])
             if i in validFields['ids'].keys():
                 if line[exist[i]] !='-':
@@ -712,6 +735,22 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             elif i=="tunnel_parents":
                 conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+
+            elif i=="TTLs":         #DNS TABLE
+                if line[exist[i]] != "" or line[exist[i]] != "-" or line[exist[i]] != "(empty)":
+                    ttls_inserts=[]
+                    ttls=line[exist[i]].split(',')
+                    for i in ttls:
+                        ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+i+")"
+                        ttls_inserts.append(ttl_insert)
+
+            elif i=="answers" :   #DNS TABLE
+                if line[exist[i]] != "" or line[exist[i]] != "-" or line[exist[i]]!= "(empty)":
+                    answers_inserts = []
+                    answers = line[exist[i]].split(',')
+                    for i in answers:
+                        answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + i + ")"
+                        answers_inserts.append(answer_insert)
 
             elif line[exist[i]] != '-' or line[exist[i]] != "-":
                 if types[i] == datetime: # checking for datetime type
@@ -767,6 +806,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if "insert into" in conn_tunnel_parents_insert:
                 print ("fucking parent",conn_tunnel_parents_insert)
                 inserts.append (conn_tunnel_parents_insert)
+
+            if len (dns_answers_inserts) >0:
+                    inserts.extend(dns_answers_inserts)
+
+            if len(dns_ttls_inserts) > 0:
+                    inserts.extend(dns_ttls_inserts)
+
         except Exception as a1:
             print (str(a1),'exception happend while appending')
 
