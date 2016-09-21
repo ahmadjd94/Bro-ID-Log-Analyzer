@@ -551,7 +551,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print ('already sorted ?')
 
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
-                    line = i.split()
+                    line = i.split('\t')
                     # sort dictionary based on key values
                     try:
                         sql_commands=(self.SQLcreator(fname, line))
@@ -603,6 +603,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
                                        # should use lambda expressions
                                         # should handle inserting to ids table also
+        print (len (validFields[table]),len(line))
+
+        # if len (line) < len(validFields[table]):
+        #     print ("invalid line detected")
+        #     return
         print (line)
         print(table)
         exist = {}       #stores the values of existing fields that can be extracted from the log file
@@ -780,7 +785,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 else :
                     values_string += "\'"+str(line[exist[key]])+"\',"
             else :
-                values_string += 'null' + ","
+                values_string += "null,"
                 print (values_string)
         #print (values_string)
 
