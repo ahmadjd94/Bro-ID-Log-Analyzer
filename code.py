@@ -675,6 +675,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
         normal_table_insert = "insert into %s (" %table   # insert statment
+        print (normal_table_insert)
 
         for i in keys:
             if i in dict(validFields[table]):
@@ -713,56 +714,59 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (len (value))
         print ("312341231234214")
         print (line)
-        for i in keys:
-            print (i)
+        print (keys)
+        for key in keys:
+            print (line[exist[key]])
             # print (validFields['ids'])
-            if i in validFields['ids'].keys():
-                if line[exist[i]] !='-':
-                    if types[i] == str:
-                        ids_values += "\'"+line[exist[i]] + '\','
+            if key in validFields['ids'].keys():
+                if line[exist[key]] !='-':
+                    if types[key] == str:
+                        ids_values += "\'"+line[exist[key]] + '\','
                     else:
-                        ids_values += line[exist[i]] + ","
+                        ids_values += line[exist[key]] + ","
                 else :
                     ids_values += "\'" + "null" + '\','
-            elif i =='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
-                http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
 
-            elif i=="proxied":   # handle insertin into procied normalized table
-                http_proxied_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+            elif key=='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
+                http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
 
-            elif i== "orig_fuids":  # handle inserting into orig_fuids normalized table
-                http_orig_fuids_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+            elif key=="proxied":   # handle insertin into procied normalized table
+                http_proxied_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
 
-            elif i=="tunnel_parents":
-                conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[i]]+"\')"
+            elif key== "orig_fuids":  # handle inserting into orig_fuids normalized table
+                http_orig_fuids_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
 
-            elif i=="TTLs":         #DNS TABLE
-                if line[exist[i]] != "" or line[exist[i]] != "-" or line[exist[i]] != "(empty)":
+            elif key =="tunnel_parents":
+                conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
+
+            elif key=="TTLs":         #DNS TABLE
+                print ("printing ttls",line[exist[key]])
+                if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[i]] != "(empty)":
                     ttls_inserts=[]
-                    ttls=line[exist[i]].split(',')
-                    for i in ttls:
-                        ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+i+")"
+                    ttls=line[exist[key]].split(',')
+                    for ttl in ttls:
+                        ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+ttl+")"
                         ttls_inserts.append(ttl_insert)
 
-            elif i=="answers" :   #DNS TABLE
-                if line[exist[i]] != "" or line[exist[i]] != "-" or line[exist[i]]!= "(empty)":
+            elif key=="answers" :   #DNS TABLE
+                if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[key]]!= "(empty)":
                     answers_inserts = []
                     answers = line[exist[i]].split(',')
-                    for i in answers:
-                        answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + i + ")"
+                    for answer in answers:
+                        answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + answer + ")"
                         answers_inserts.append(answer_insert)
 
-            elif line[exist[i]] != '-' or line[exist[i]] != "-":
-                if types[i] == datetime: # checking for datetime type
-                    a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[i]]))) # converting epoch to datetime
+            elif line[exist[key]] != '-' or line[exist[key]] != "-":
+                if types[key] == datetime: # checking for datetime type
+                    a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]]))) # converting epoch to datetime
                     #print (a)
                     values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
 
-                elif types[i] == int:
-                    print(line[exist[i]], 'test1')
-                    values_string += line[exist[i]] + ","
-                elif types [i] == float :
-                    values_string += line[exist[i]] + ","
+                elif types[key] == int:
+                    print(line[exist[key]], 'test1')
+                    values_string += line[exist[key]] + ","
+                elif types [key] == float :
+                    values_string += line[exist[key]] + ","
                     # try:
                     #     a = int (line[exist[i]])# converting str to int
                     #     values_string += str(a) + ","  # concatenating the value to the values string
@@ -774,7 +778,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     #
                     #     values_string += (line[exist[i]]) + ","
                 else :
-                    values_string += "\'"+str(line[exist[i]])+"\',"
+                    values_string += "\'"+str(line[exist[key]])+"\',"
             else :
                 values_string += 'null' + ","
                 print (values_string)
@@ -1158,7 +1162,7 @@ if __name__ == "__main__":  # main module
         'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
                 "rcode_name": -1, "QR": -1,
-                "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected bool": -1}
+                "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected": -1}
         # check tables strucutre !!! normalize conn_ID table
     }
 
