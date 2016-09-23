@@ -376,14 +376,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return False
         elif fname == "dns.log":  # DONE # create DNS table
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE DNS (
-                                        UID TEXT,ts int,PROTO TEXT,TRAN_ID INT,
+                                        UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
                                         `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                         `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
-                                        `RD` BOOL,`RA` BOOL,`Z`INT,`REJECTED` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
+                                        `RD` BOOL,`RA` BOOL,`Z`INT,`rejected` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
                                         FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
 
                 con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
@@ -604,6 +604,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
                                        # should use lambda expressions
                                         # should handle inserting to ids table also
+        dns_ttls_inserts = []
+        dns_answers_inserts=[]
+
         print (len (validFields[table]),len(line))
 
         # if len (line) < len(validFields[table]):
@@ -665,7 +668,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         inserts=[]
 
         ################################ DNS-SPECIFIC INSERTS AND STATMENTS######################
-        dns_ttls_inserts=""
+
         dns_ANSWERS_inserts = ""
 
         ################################ http-SPECIFIC INSERTS AND STATMENTS######################
@@ -706,9 +709,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
 
                 elif i=="TTLs":                                              #SPECIAL FIELDS FOR DNS
-                    dns_ttls_inserts="insert into dns_ttls (uid,ts,ttl) values ("
+                    dns_ttls_inserts_statment="insert into dns_ttls (uid,ts,ttl) values ("
                 elif i == "answers":
-                    dns_answers_inserts = "insert into dns_answers (uid,ts,ttl) values ("
+                    dns_answers_insert_statment = "insert into dns_answers (uid,ts,answer) values ("
 
                 else:
                     field += str(i) + ","
@@ -732,7 +735,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     else:
                         ids_values += line[exist[key]] + ","
                 else :
-                    ids_values += "\'" + "null" + '\','
+                    ids_values += "" + "null" + ','
 
             elif key=='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
                 http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
@@ -747,66 +750,83 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
 
             elif key=="TTLs":         #DNS TABLE
-                print ("printing ttls",line[exist[key]])
-                if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[i]] != "(empty)":
-                    ttls_inserts=[]
-                    ttls=line[exist[key]].split(',')
-                    if len(answers) > 1:
-                        for ttl in ttls:
-                            ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+ttl+")"
-                            ttls_inserts.append(ttl_insert)
-                    else :
-                        ttl_insert = dns_ttls_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
-                        ttls_inserts.append(ttl_insert)
+                try :
+                    print ("printing ttls",line[exist[key]])
+                    if line[exist[key]] != "" or line[exist[key]] != "-" :
+
+                        ttls=line[exist[key]].split(',')
+                        if len(ttls) > 1:
+                            for ttl in ttls:
+
+                                ttl_insert=dns_ttls_inserts_statment+"\'"+line[exist["uid"]]+"\',"+line[exist["ts"]]+","+ttl+")"
+                                dns_ttls_inserts.append(ttl_insert)
+                        else :
+                            ttl_insert = dns_ttls_inserts_statment +"\'" +line[exist["uid"]] + "\'," + line[exist["ts"]] + ",null)"
+                            dns_ttls_inserts.append(ttl_insert)
+                except Exception as exc2 :
+                    print ("faga3333 ",str (exc2))
 
             elif key=="answers" :   #DNS TAB# LE
+                try:
+                    print("answers line", line[exist['answers']])
+                    if line[exist['answers']] != "" :
+                        if line[exist['answers']] =="-":
+                            answer_insert = dns_answers_insert_statment +"\'"+ line[exist["uid"]] + "\'," + line[exist["ts"]] + ",null)"
+                            dns_answers_inserts.append(answer_insert)
+                            continue
 
-                if line[exist[key]] != "" :
-                    answers_inserts = []
-                    answers = line[exist[i]].split(',')
-                    if len (answers) >1:
-                        for answer in answers:
-                            answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + answer + ")"
+                        answers = line[exist[key]].split(',')
+                        print ("freaking",answers)
+                        if len (answers) >1:
+                            for answer in answers:
+                                answer_insert = dns_answers_insert_statment +"\'"+ line[exist["uid"]] + "\'," + line[exist["ts"]] + ",\'" + answer + "\')"
+                                dns_answers_inserts.append(answer_insert)
+
+                        else:
+                            answer_insert = dns_answers_inserts + "\'"+line[exist["uid"]] + "\'," + line[exist["ts"]] + ",(empty))"
+                            print ("answers !@$",answer_insert)
                             dns_answers_inserts.append(answer_insert)
 
-                    else:
-                        answer_insert = dns_answers_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
-                        dns_answers_inserts.append(answer_insert)
+                except Exception as exc1:
+                        print ("faga333 ",str(exc1))
 
 
 
 
             elif line[exist[key]] != '-' or line[exist[key]] != "-":
-                if types[key] == datetime: # checking for datetime type
-                    a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]]))) # converting epoch to datetime
-                    #print (a)
-                    values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
+                try :
+                    if types[key] == datetime: # checking for datetime type
+                        a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]]))) # converting epoch to datetime
+                        #print (a)
+                        values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
 
-                elif types[key] == int:
-                    print(line[exist[key]], 'test1')
-                    values_string += line[exist[key]] + ","
-                elif types [key] == float :
-                    values_string += line[exist[key]] + ","
+                    elif types[key] == int:
+                        print(line[exist[key]], 'test1')
+                        values_string += line[exist[key]] + ","
+                    elif types [key] == float :
+                        values_string += line[exist[key]] + ","
 
-                elif types[key] == bool:
-                    if line[exist[key]] =="F" or line[exist[key]] =="f":
-                        values_string +=   "false,"
-                    elif line[exist[key]] == "t" or line[exist[key]] == "T":
-                            values_string += "true,"
+                    elif types[key] == bool:
+                        if line[exist[key]] =="F" or line[exist[key]] =="f":
+                            values_string +=   "0,"
+                        elif line[exist[key]] == "t" or line[exist[key]] == "T":
+                                values_string += "1,"
+                        else :
+                            values_string += "null,"
+                        # try:
+                        #     a = int (line[exist[i]])# converting str to int
+                        #     values_string += str(a) + ","  # concatenating the value to the values string
+
+                        # except Exception as e:
+                        #     print (i,exist[i])
+                        #     print (str (e))
+                        #     print ('error casting value%s' %line[exist[i]])
+                        #
+                        #     values_string += (line[exist[i]]) + ","
                     else :
-                        values_string += "null,"
-                    # try:
-                    #     a = int (line[exist[i]])# converting str to int
-                    #     values_string += str(a) + ","  # concatenating the value to the values string
-
-                    # except Exception as e:
-                    #     print (i,exist[i])
-                    #     print (str (e))
-                    #     print ('error casting value%s' %line[exist[i]])
-                    #
-                    #     values_string += (line[exist[i]]) + ","
-                else :
-                    values_string += "\'"+str(line[exist[key]])+"\',"
+                        values_string += "\'"+str(line[exist[key]])+"\',"
+                except Exception as exc3 :
+                    print ("faga33334443",exc3)
             else :
                 values_string += "null,"
             print (dns_ttls_inserts)
@@ -1136,7 +1156,7 @@ if __name__ == "__main__":  # main module
         , "query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int,
              "rcode_name": str
         , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int,
-             "rejected bool": bool
+             "rejected": bool
              }  # end of types dictionary declaration
 
     validFields = {  #this line stores the indecies of the fields at each line for every log file type
