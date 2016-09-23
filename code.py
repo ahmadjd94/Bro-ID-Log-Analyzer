@@ -721,7 +721,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (line)
         print (keys)
         for key in keys:
-            print (line[exist[key]])
+            print (key,line[exist[key]])
             # print (validFields['ids'])
             if key in validFields['ids'].keys():
                 if line[exist[key]] !='-':
@@ -753,13 +753,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+ttl+")"
                         ttls_inserts.append(ttl_insert)
 
-            elif key=="answers" :   #DNS TABLE
+            elif key=="answers" :   #DNS TAB# LE
+
                 if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[key]]!= "(empty)":
                     answers_inserts = []
                     answers = line[exist[i]].split(',')
                     for answer in answers:
                         answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + answer + ")"
-                        answers_inserts.append(answer_insert)
+                        inserts.append(answer_insert)
+                else:
+                    answer_insert = dns_answers_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
+                    inserts.append(answer_insert)
+
+
+
 
             elif line[exist[key]] != '-' or line[exist[key]] != "-":
                 if types[key] == datetime: # checking for datetime type
@@ -813,7 +820,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print (http_orig_fuids_insert)
 
             if "insert into" in conn_tunnel_parents_insert:
-                print ("fucking parent",conn_tunnel_parents_insert)
+                # print ("fucking parent",conn_tunnel_parents_insert)
                 inserts.append (conn_tunnel_parents_insert)
 
             if len (dns_answers_inserts) >0:
@@ -1071,7 +1078,8 @@ if __name__ == "__main__":  # main module
         "rx_hosts": str,"path": str, "tx_hosts": str,"validation_status": str,
          "name": str,"tunnel_parents": str, "TTLs": -1, "answers": str, "fuids": str,
         #################end of sets##############
-        "uid": str, "ts":float, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,
+
+        "uid": str, "ts":float, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,"trans_id":int,
         "referrer": str, "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
          "info_msg": str, "username": str, "password": str, "command": str, "arg": str
         , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
@@ -1162,7 +1170,7 @@ if __name__ == "__main__":  # main module
                   "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
                   "resp_cc": -1},
 
-        'dhcp': {"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
+        'dhcp': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
 
         'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
