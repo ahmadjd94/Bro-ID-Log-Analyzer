@@ -551,7 +551,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print ('already sorted ?')
 
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
-                    line = i.split('\t')
+                    line=i.replace("\n",'')
+                    line = line.split('\t')
                     # sort dictionary based on key values
                     try:
                         sql_commands=(self.SQLcreator(fname, line))
@@ -705,9 +706,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
 
                 elif i=="TTLs":                                              #SPECIAL FIELDS FOR DNS
-                    dns_ttls_inserts="insert into dns_ttl (uid,ts,ttl) values ("
+                    dns_ttls_inserts="insert into dns_ttls (uid,ts,ttl) values ("
                 elif i == "answers":
-                    dns_answers_inserts = "insert into dns_ttl (uid,ts,ttl) values ("
+                    dns_answers_inserts = "insert into dns_answers (uid,ts,ttl) values ("
 
                 else:
                     field += str(i) + ","
@@ -727,6 +728,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if line[exist[key]] !='-':
                     if types[key] == str:
                         ids_values += "\'"+line[exist[key]] + '\','
+
                     else:
                         ids_values += line[exist[key]] + ","
                 else :
@@ -749,21 +751,27 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[i]] != "(empty)":
                     ttls_inserts=[]
                     ttls=line[exist[key]].split(',')
-                    for ttl in ttls:
-                        ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+ttl+")"
+                    if len(answers) > 1:
+                        for ttl in ttls:
+                            ttl_insert=dns_ttls_inserts+line[exist["uid"]]+","+line[exist["ts"]]+","+ttl+")"
+                            ttls_inserts.append(ttl_insert)
+                    else :
+                        ttl_insert = dns_ttls_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
                         ttls_inserts.append(ttl_insert)
 
             elif key=="answers" :   #DNS TAB# LE
 
-                if line[exist[key]] != "" or line[exist[key]] != "-" or line[exist[key]]!= "(empty)":
+                if line[exist[key]] != "" :
                     answers_inserts = []
                     answers = line[exist[i]].split(',')
-                    for answer in answers:
-                        answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + answer + ")"
-                        inserts.append(answer_insert)
-                else:
-                    answer_insert = dns_answers_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
-                    inserts.append(answer_insert)
+                    if len (answers) >1:
+                        for answer in answers:
+                            answer_insert = dns_answers_inserts+ line[exist["uid"]] + "," + line[exist["ts"]] + "," + answer + ")"
+                            dns_answers_inserts.append(answer_insert)
+
+                    else:
+                        answer_insert = dns_answers_inserts + line[exist["uid"]] + "," + line[exist["ts"]] + ",(empty))"
+                        dns_answers_inserts.append(answer_insert)
 
 
 
@@ -779,6 +787,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     values_string += line[exist[key]] + ","
                 elif types [key] == float :
                     values_string += line[exist[key]] + ","
+
+                elif types[key] == bool:
+                    if line[exist[key]] =="F" or line[exist[key]] =="f":
+                        values_string +=   "false,"
+                    elif line[exist[key]] == "t" or line[exist[key]] == "T":
+                            values_string += "true,"
+                    else :
+                        values_string += "null,"
                     # try:
                     #     a = int (line[exist[i]])# converting str to int
                     #     values_string += str(a) + ","  # concatenating the value to the values string
@@ -793,11 +809,21 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     values_string += "\'"+str(line[exist[key]])+"\',"
             else :
                 values_string += "null,"
-                print (values_string)
+            print (dns_ttls_inserts)
+            print (values_string)
         #print (values_string)
+        try:
+            ids_values = ids_values[:len(ids_values)-1]
+            print (ids_values)
+        except:
+            print("no ids values")
 
-        ids_values = ids_values[:len(ids_values)-1]
-        values_string = values_string[:len(values_string) - 1] # split the colons
+        try :
+            values_string = values_string[:len(values_string) - 1] # split the colons
+            print (values_string)
+        except Exception as a3 :
+            print (str (a3) , "error splitting values string ")
+
         print (type(field))
         normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
         inserts.append(normal_table_insert)
