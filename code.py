@@ -415,10 +415,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE SSL(UID TEXT,VERSION TEXT ,CIPHER TEXT ,
+                con.execute("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
@@ -684,6 +684,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         ids_insert="insert into ids("
         ids_field=field = values_string = ""   # variable field stores the field name in table
 
+        ################################ssl-specific insert#############################
+        ssl_validation_status_inserts=[]
+
 
 
 
@@ -728,6 +731,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     smtp_to_insert_statment = "insert into smtp_to (uid,ts,RECEIVER) values ("
                 elif i=="fuids":
                     smtp_fuid_insert_statment = "insert into smtp_fuids (uid,ts,fuid) values ("
+
+                #######################################SPECIAL FIELDS FOR SSL ################
+                elif i=='validation_status':
+                    ssl_validation_status_insert_statments="insert into ssl_validation_status (uid,ts,validation_status) values("
 
                 else:
                     field +="`" +str(i) + "`,"
@@ -867,6 +874,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                             line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + fuid + "\')"
                         smtp_fuids_inserts.append(smtp_fuids_insert)
 
+            elif key == "validation_status":
+                try:
+                    ssl_validation_status_insert = ''
+                    if line[exist['validation_status']] in ["(empty)", '-']:
+                        ssl_validation_status_insert += ssl_validation_status_insert_statments + "\'" + \
+                                             line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                        ssl_validation_status_inserts.append(ssl_validation_status_insert)
+                    else:
+                        validation_statuses = line[exist['fuids']].split(',')
+                        for validation_status in validation_statuses:
+                            ssl_validation_status_insert = ssl_validation_status_insert_statments + "\'" + \
+                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + validation_status + "\')"
+                            ssl_validation_status_inserts.append(ssl_validation_status_insert)
+                except Exception as exc7 :
+                    print ("error in ssl ",str(exc7))
+
+
 
             elif line[exist[key]] != '-' or line[exist[key]] != "-":
                 try :
@@ -957,6 +981,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     inserts.extend(smtp_rcptto_inserts)
             if len(smtp_fuids_inserts) > 0:
                     inserts.extend(smtp_fuids_inserts)
+            if len(ssl_validation_status_inserts) > 0:
+                    inserts.extend(ssl_validation_status_inserts)
+
 
         except Exception as a1:
             print (str(a1),'exception happend while appending')
@@ -1275,7 +1302,7 @@ if __name__ == "__main__":  # main module
 
         'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
 
-        'ssl': {"uid": -1, "id.orig_h": -1, "id_orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
+        'ssl': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
                 "server_name": -1, "session_id": -1, "subject": -1,
                 "issuer_subject": -1, "not_valid_before": -1,
