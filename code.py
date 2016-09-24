@@ -466,35 +466,36 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT
+                con.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
                 ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
                 ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
                 `SECOND_RECEIVED` TEXT ,`LAST_REPLY` TEXT ,`USER_AGENT` TEXT ,
-                `TLS` BOOL,`IS_WEBMAIL` BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
+                `TLS` BOOL,`IS_WEBMAIL` BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID),
+                FOREIGN KEY (ts) REFERENCES main(ts))""")
                 table_created['SMTP'] = True
 
 
-                con.execute("""CREATE TABLE  SMTP_RCPTO (UID TEXT , TS INT ,HEADER TEXT,
-                FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))""")
+                con.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,HEADER TEXT,
+                FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))""")
                 table_created['SMTP_RCPTO'] = True
 
 
                 con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS INT ,RECEIVER TEXT,"
-                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                            "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_TO'] = True
 
 
                 con.execute("CREATE TABLE SMTP_PATHS (UID TEXT ,TS INT , PATH TEXT,"
-                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                            "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_PATHS'] = True
 
 
                 con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS INT,FUID TEXT ,"
-                            "FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))")
+                            "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
 
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
@@ -605,6 +606,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         # should handle inserting to ids table also
         dns_ttls_inserts = []
         dns_answers_inserts=[]
+        smtp_paths_inserts=[]
+        smtp_to_inserts=[]
+        smtp_rcptto_inserts=[]
+        smtp_fuids_inserts=[]
 
         print (len (validFields[table]),len(line))
 
@@ -715,17 +720,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     dns_answers_insert_statment = "insert into dns_answers (uid,ts,answer) values ("
 
                 ############################SPECIAL FIELDS FOR SMTP ####################################
-                elif i=="paths":
+                elif i=="path":
                     smtp_paths_insert_statment="insert into smtp_paths (uid,ts,path) values ("
                 elif i=="rcptto":
                     smtp_rcptto_insert_statment = "insert into smtp_rcptto (uid,ts,header) values ("
                 elif i=="to":
-                    smtp_to_insert_statment = "insert into smtp_to (uid,ts,reciever) values ("
+                    smtp_to_insert_statment = "insert into smtp_to (uid,ts,RECEIVER) values ("
                 elif i=="fuids":
-                    smtp_fuid_insert_statment = "insert into smtp_to (uid,ts,fuid) values ("
+                    smtp_fuid_insert_statment = "insert into smtp_fuids (uid,ts,fuid) values ("
 
                 else:
-                    field += str(i) + ","
+                    field +="`" +str(i) + "`,"
             else :
                 pass # neglecting the invalid fields detected
 
@@ -801,7 +806,66 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 except Exception as exc1:
                         print ("faga333 ",str(exc1))
 
+            elif key=="path":
+                try :
+                    smtp_paths_insert=''
+                    if line [exist['path']]  in ["(empty)",'-']:
+                                smtp_paths_insert+=smtp_paths_insert_statment+"\'"+\
+                                                   line[exist['uid']] +"\',"+line[exist['ts']]+",null)"
+                                smtp_paths_inserts.append(smtp_paths_insert)
+                    else :
+                        paths=line[exist['path']].split(',')
+                        for path in paths :
+                            smtp_paths_insert=smtp_paths_insert_statment+"\'"+\
+                                                   line[exist['uid']] +"\',"+line[exist['ts']]+",\'"+path+"\')"
+                        smtp_paths_inserts.append(smtp_paths_insert)
+                except Exception as exc6 :
+                    print ("error in paths ",str (exc6))
 
+            elif key == "to":
+                try:
+                    smtp_to_insert = ''
+                    if line[exist['to']] in ["(empty)", '-']:
+                        smtp_to_insert += smtp_to_insert_statment + "\'" + \
+                                             line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                        smtp_to_inserts.append(smtp_to_insert)
+                    else:
+                        tos = line[exist['to']].split(',')
+                        for to in tos:
+                            smtp_to_insert = smtp_to_insert_statment + "\'" + \
+                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + to + "\')"
+                            smtp_to_inserts.append(smtp_to_insert)
+                except Exception as exc5 :
+                    print ("to fields",str(exc5))
+
+            elif key == "rcptto":
+                try:
+                    smtp_rcptto_insert = ''
+                    if line[exist['rcptto']] in ["(empty)", '-']:
+                        smtp_rcptto_insert += smtp_rcptto_insert_statment+ "\'" + \
+                                          line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                        smtp_rcptto_inserts.append(smtp_rcptto_insert)
+                    else:
+                        tos = line[exist['rcptto']].split(',')
+                        for to in tos:
+                            smtp_rcptto_insert = smtp_rcptto_insert_statment + "\'" + \
+                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + to + "\')"
+                            smtp_rcptto_inserts.append(smtp_rcptto_insert)
+                except Exception as exc4 :
+                    print ('rcptto error',str(exc4))
+
+            elif key == "fuids":
+                smtp_fuids_insert = ''
+                if line[exist['fuids']] in ["(empty)", '-']:
+                    smtp_fuids_insert += smtp_fuid_insert_statment + "\'" + \
+                                      line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                    smtp_fuids_inserts.append(smtp_fuids_insert)
+                else:
+                    fuids = line[exist['fuids']].split(',')
+                    for fuid in fuids:
+                        smtp_fuids_insert = smtp_fuid_insert_statment+ "\'" + \
+                                            line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + fuid + "\')"
+                        smtp_fuids_inserts.append(smtp_fuids_insert)
 
 
             elif line[exist[key]] != '-' or line[exist[key]] != "-":
@@ -882,9 +946,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             if len (dns_answers_inserts) >0:
                     inserts.extend(dns_answers_inserts)
-
             if len(dns_ttls_inserts) > 0:
                     inserts.extend(dns_ttls_inserts)
+
+            if len(smtp_to_inserts)>0:
+                    inserts.extend(smtp_to_inserts)
+            if len(smtp_paths_inserts) > 0:
+                inserts.extend(smtp_paths_inserts)
+            if len(smtp_rcptto_inserts) > 0:
+                    inserts.extend(smtp_rcptto_inserts)
+            if len(smtp_fuids_inserts) > 0:
+                    inserts.extend(smtp_fuids_inserts)
 
         except Exception as a1:
             print (str(a1),'exception happend while appending')
@@ -1142,7 +1214,7 @@ if __name__ == "__main__":  # main module
         , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
         , "fuid": str, "source": str, "depth": int
         , "filename": str, "duration": str, "local_orig": bool, "is_orig": bool, "seen_bytes": int,
-             "total_bytes": int
+             "total_bytes": int,'date':str
         , "missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
         , "md5": str, "sha1": str, "sha256": str, "extracted": str
         , "nick": str, "user": str, "value": str, 'addi': str
@@ -1243,7 +1315,7 @@ if __name__ == "__main__":  # main module
     MainWindow.show()
 
     tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
-                ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTO','SMTP_ANALYZERS'
+                ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTTO','SMTP_ANALYZERS'
                 ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS',"CONN_TUNNEL_PARENTS"
                 ,'SSL_VALIDATION_STATUS','MAIN','DNS_TTLS','DNS_ANSWERS'
                 ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
