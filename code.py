@@ -457,6 +457,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
                 table_created['FILES_CONN_UIDS'] = True
 
+                con.execute("""CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,
+                    FOREIGN KEY (UID,TS) REFERENCES FILES(UID,TS))""")
+                table_created['FILES_ANALYZERS'] = True
+
             except:
                 return False
 
@@ -472,11 +476,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 `SECOND_RECEIVED` TEXT ,`LAST_REPLY` TEXT ,`USER_AGENT` TEXT ,
                 `TLS` BOOL,`IS_WEBMAIL` BOOL , FOREIGN KEY (UID) REFERENCES  MAIN(UID))""")
                 table_created['SMTP'] = True
-
-
-                con.execute("""CREATE TABLE SMTP_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,
-                FOREIGN KEY (UID,TS) REFERENCES SMTP(UID,TS))""")
-                table_created['SMTP_ANALYZERS'] = True
 
 
                 con.execute("""CREATE TABLE  SMTP_RCPTO (UID TEXT , TS INT ,HEADER TEXT,
@@ -689,8 +688,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         for i in keys:
             if i in dict(validFields[table]):
                 # checking for ifelds of normalized table
-
-                if i =="id.orig_h":                             #SPECIAL FIELDS OF IDS TABLE
+                #####################SPECIAL FIELDS OF IDS TABLE#####################################
+                if i =="id.orig_h":
                     ids_field += "orig_h" + ","
                 elif i == "id.orig_p":
                     ids_field += "orig_p" + ","
@@ -699,7 +698,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i == "id.resp_p":
                     ids_field += "resp_p" + ","
 
-                elif i=='tags':             #SPECIAL FIELDS FOR HTTP_TAGS TABLE
+                ###################### SPECIAL FIELDS FOR HTTP_TAGS TABLE##############################
+                elif i=='tags':
                     http_tags_insert = "insert into http_tags(ts,uid,tag)values("
                 elif i=="proxied":   # SPECIAL FIELDS FOR HTTP_PROXIED TABLE
                     http_proxied_insert="insert into http_proxied_headers (ts,uid,header) values ("
@@ -708,10 +708,21 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i=="tunnel_parents":
                     conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
 
-                elif i=="TTLs":                                              #SPECIAL FIELDS FOR DNS
+                    ######################################SPECIAL FIELDS FOR DNS################################
+                elif i=="TTLs":
                     dns_ttls_inserts_statment="insert into dns_ttls (uid,ts,ttl) values ("
                 elif i == "answers":
                     dns_answers_insert_statment = "insert into dns_answers (uid,ts,answer) values ("
+
+                ############################SPECIAL FIELDS FOR SMTP ####################################
+                elif i=="paths":
+                    smtp_paths_insert_statment="insert into smtp_paths (uid,ts,path) values ("
+                elif i=="rcptto":
+                    smtp_rcptto_insert_statment = "insert into smtp_rcptto (uid,ts,header) values ("
+                elif i=="to":
+                    smtp_to_insert_statment = "insert into smtp_to (uid,ts,reciever) values ("
+                elif i=="fuids":
+                    smtp_fuid_insert_statment = "insert into smtp_to (uid,ts,fuid) values ("
 
                 else:
                     field += str(i) + ","
