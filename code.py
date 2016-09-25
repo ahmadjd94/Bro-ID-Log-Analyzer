@@ -604,13 +604,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
                                        # should use lambda expressions
                                         # should handle inserting to ids table also
-        dns_ttls_inserts = []
-        dns_answers_inserts=[]
-        smtp_paths_inserts=[]
-        smtp_to_inserts=[]
-        smtp_rcptto_inserts=[]
-        smtp_fuids_inserts=[]
-
+        normalized_inserts=[]
         print (len (validFields[table]),len(line))
 
         # if len (line) < len(validFields[table]):
@@ -706,36 +700,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 elif i == "id.resp_p":
                     ids_field += "resp_p" + ","
 
-                ###################### SPECIAL FIELDS FOR HTTP_TAGS TABLE##############################
-                elif i=='tags':
-                    http_tags_insert = "insert into http_tags(ts,uid,tag)values("
-                elif i=="proxied":   # SPECIAL FIELDS FOR HTTP_PROXIED TABLE
-                    http_proxied_insert="insert into http_proxied_headers (ts,uid,header) values ("
-                elif i=="orig_fuids":
-                    http_orig_fuids_insert ="insert into http_orig_fuids (ts,uid,orig_fuid) values ("
-                elif i=="tunnel_parents":
-                    conn_tunnel_parents_insert="insert into conn_tunnel_parents (ts,uid,parent) values ("
-
-                    ######################################SPECIAL FIELDS FOR DNS################################
-                elif i=="TTLs":
-                    dns_ttls_inserts_statment="insert into dns_ttls (uid,ts,ttl) values ("
-                elif i == "answers":
-                    dns_answers_insert_statment = "insert into dns_answers (uid,ts,answer) values ("
-
-                ############################SPECIAL FIELDS FOR SMTP ####################################
-                elif i=="path":
-                    smtp_paths_insert_statment="insert into smtp_paths (uid,ts,path) values ("
-                elif i=="rcptto":
-                    smtp_rcptto_insert_statment = "insert into smtp_rcptto (uid,ts,header) values ("
-                elif i=="to":
-                    smtp_to_insert_statment = "insert into smtp_to (uid,ts,RECEIVER) values ("
-                elif i=="fuids":
-                    smtp_fuid_insert_statment = "insert into smtp_fuids (uid,ts,fuid) values ("
-
-                #######################################SPECIAL FIELDS FOR SSL ################
-                elif i=='validation_status':
-                    ssl_validation_status_insert_statments="insert into ssl_validation_status (uid,ts,validation_status) values("
-
                 else:
                     field +="`" +str(i) + "`,"
             else :
@@ -760,135 +724,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 else :
                     ids_values += "" + "null" + ','
 
-            elif key=='tags' and http_tags_insert!='': # handle the inserting into tags normalized tables
-                http_tags_insert+=line[exist['ts']]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
-
-            elif key=="proxied":   # handle insertin into procied normalized table
-                http_proxied_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
-
-            elif key== "orig_fuids":  # handle inserting into orig_fuids normalized table
-                http_orig_fuids_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
-
-            elif key =="tunnel_parents":
-                conn_tunnel_parents_insert+=line[exist["ts"]]+",\'"+line[exist['uid']]+"\',\'"+line[exist[key]]+"\')"
-
-            elif key=="TTLs":         #DNS TABLE
-                try :
-                    print ("printing ttls",line[exist[key]])
-                    if line[exist[key]] != "" or line[exist[key]] != "-" :
-
-                        ttls=line[exist[key]].split(',')
-                        if len(ttls) > 1:
-                            for ttl in ttls:
-
-                                ttl_insert=dns_ttls_inserts_statment+"\'"+line[exist["uid"]]+"\',"+line[exist["ts"]]+","+ttl+")"
-                                dns_ttls_inserts.append(ttl_insert)
-                        else :
-                            ttl_insert = dns_ttls_inserts_statment +"\'" +line[exist["uid"]] + "\'," + line[exist["ts"]] + ",null)"
-                            dns_ttls_inserts.append(ttl_insert)
-                except Exception as exc2 :
-                    print ("faga3333 ",str (exc2))
-
-            elif key=="answers" :   #DNS TAB# LE
+            elif key in normalized_tables:
                 try:
-                    print("answers line", line[exist['answers']])
-                    if line[exist['answers']] != "" :
-                        if line[exist['answers']] =="-":
-                            answer_insert = dns_answers_insert_statment +"\'"+ line[exist["uid"]] + "\'," + line[exist["ts"]] + ",null)"
-                            dns_answers_inserts.append(answer_insert)
-                            continue
-
-                        answers = line[exist[key]].split(',')
-                        print ("freaking",answers)
-                        if len (answers) >1:
-                            for answer in answers:
-                                answer_insert = dns_answers_insert_statment +"\'"+ line[exist["uid"]] + "\'," + line[exist["ts"]] + ",\'" + answer + "\')"
-                                dns_answers_inserts.append(answer_insert)
-
-                        else:
-                            answer_insert = dns_answers_inserts + "\'"+line[exist["uid"]] + "\'," + line[exist["ts"]] + ",(empty))"
-                            print ("answers !@$",answer_insert)
-                            dns_answers_inserts.append(answer_insert)
-
-                except Exception as exc1:
-                        print ("faga333 ",str(exc1))
-
-            elif key=="path":
-                try :
-                    smtp_paths_insert=''
-                    if line [exist['path']]  in ["(empty)",'-']:
-                                smtp_paths_insert+=smtp_paths_insert_statment+"\'"+\
-                                                   line[exist['uid']] +"\',"+line[exist['ts']]+",null)"
-                                smtp_paths_inserts.append(smtp_paths_insert)
-                    else :
-                        paths=line[exist['path']].split(',')
-                        for path in paths :
-                            smtp_paths_insert=smtp_paths_insert_statment+"\'"+\
-                                                   line[exist['uid']] +"\',"+line[exist['ts']]+",\'"+path+"\')"
-                        smtp_paths_inserts.append(smtp_paths_insert)
-                except Exception as exc6 :
-                    print ("error in paths ",str (exc6))
-
-            elif key == "to":
-                try:
-                    smtp_to_insert = ''
-                    if line[exist['to']] in ["(empty)", '-']:
-                        smtp_to_insert += smtp_to_insert_statment + "\'" + \
-                                             line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
-                        smtp_to_inserts.append(smtp_to_insert)
+                    normalized_insert = ''
+                    if line[exist['key']] in ["(empty)", '-']:
+                        normalized_insert += "insert into %s (uid,ts,$s_%s) values (%s,%f,'null')"%(table,key,key,line[exist["uid"]],line[exist["ts"]])
+                        print(normalized_insert)
+                        normalized_inserts.append(normalized_insert)
                     else:
-                        tos = line[exist['to']].split(',')
-                        for to in tos:
-                            smtp_to_insert = smtp_to_insert_statment + "\'" + \
-                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + to + "\')"
-                            smtp_to_inserts.append(smtp_to_insert)
-                except Exception as exc5 :
-                    print ("to fields",str(exc5))
-
-            elif key == "rcptto":
-                try:
-                    smtp_rcptto_insert = ''
-                    if line[exist['rcptto']] in ["(empty)", '-']:
-                        smtp_rcptto_insert += smtp_rcptto_insert_statment+ "\'" + \
-                                          line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
-                        smtp_rcptto_inserts.append(smtp_rcptto_insert)
-                    else:
-                        tos = line[exist['rcptto']].split(',')
-                        for to in tos:
-                            smtp_rcptto_insert = smtp_rcptto_insert_statment + "\'" + \
-                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + to + "\')"
-                            smtp_rcptto_inserts.append(smtp_rcptto_insert)
+                        values = line[exist[key]].split(',')
+                        for value in values:
+                            normalized_inserts += "insert into %s (uid,ts,%s) values (%s,%f,%s)" % (
+                                                    table, key, line[exist["uid"]], line[exist["ts"]],value)
+                            normalized_inserts.append(normalized_insert)
                 except Exception as exc4 :
                     print ('rcptto error',str(exc4))
 
-            elif key == "fuids":
-                smtp_fuids_insert = ''
-                if line[exist['fuids']] in ["(empty)", '-']:
-                    smtp_fuids_insert += smtp_fuid_insert_statment + "\'" + \
-                                      line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
-                    smtp_fuids_inserts.append(smtp_fuids_insert)
-                else:
-                    fuids = line[exist['fuids']].split(',')
-                    for fuid in fuids:
-                        smtp_fuids_insert = smtp_fuid_insert_statment+ "\'" + \
-                                            line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + fuid + "\')"
-                        smtp_fuids_inserts.append(smtp_fuids_insert)
 
-            elif key == "validation_status":
-                try:
-                    ssl_validation_status_insert = ''
-                    if line[exist['validation_status']] in ["(empty)", '-']:
-                        ssl_validation_status_insert += ssl_validation_status_insert_statments + "\'" + \
-                                             line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
-                        ssl_validation_status_inserts.append(ssl_validation_status_insert)
-                    else:
-                        validation_statuses = line[exist['fuids']].split(',')
-                        for validation_status in validation_statuses:
-                            ssl_validation_status_insert = ssl_validation_status_insert_statments + "\'" + \
-                                                line[exist['uid']] + "\'," + line[exist['ts']] + ",\'" + validation_status + "\')"
-                            ssl_validation_status_inserts.append(ssl_validation_status_insert)
-                except Exception as exc7 :
-                    print ("error in ssl ",str(exc7))
 
 
 
@@ -928,7 +780,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     print ("faga33334443",exc3)
             else :
                 values_string += "null,"
-            print (dns_ttls_inserts)
             print (values_string)
         #print (values_string)
         try:
@@ -952,37 +803,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (ids_insert)
             # con.execute(ids_insert)
 
-            if "insert into" in http_tags_insert:
-                inserts.append(http_tags_insert)
-                print (http_tags_insert)
 
-            if "insert into" in http_proxied_insert:
-                inserts.append(http_proxied_insert)
-                print (http_proxied_insert)
-
-            if "insert into " in http_orig_fuids_insert:
-                inserts.append(http_orig_fuids_insert)
-                print (http_orig_fuids_insert)
-
-            if "insert into" in conn_tunnel_parents_insert:
-                # print ("fucking parent",conn_tunnel_parents_insert)
-                inserts.append (conn_tunnel_parents_insert)
-
-            if len (dns_answers_inserts) >0:
-                    inserts.extend(dns_answers_inserts)
-            if len(dns_ttls_inserts) > 0:
-                    inserts.extend(dns_ttls_inserts)
-
-            if len(smtp_to_inserts)>0:
-                    inserts.extend(smtp_to_inserts)
-            if len(smtp_paths_inserts) > 0:
-                inserts.extend(smtp_paths_inserts)
-            if len(smtp_rcptto_inserts) > 0:
-                    inserts.extend(smtp_rcptto_inserts)
-            if len(smtp_fuids_inserts) > 0:
-                    inserts.extend(smtp_fuids_inserts)
-            if len(ssl_validation_status_inserts) > 0:
-                    inserts.extend(ssl_validation_status_inserts)
+            if len(normalized_inserts) > 0:
+                    inserts.extend(normalized_inserts)
 
 
         except Exception as a1:
@@ -1341,12 +1164,15 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
 
-    tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN", "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES"
-                ,'SSH', 'SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTTO','SMTP_ANALYZERS'
-                ,'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS',"CONN_TUNNEL_PARENTS"
-                ,'SSL_VALIDATION_STATUS','MAIN','DNS_TTLS','DNS_ANSWERS'
-                ,'HTTP_RESP_MEME_TYPES','HTTP_RESP_FUIDS','HTTP_ORIG_MEME_TYPES'
-                ,'HTTP_ORIG_FUIDS','HTTP_PROXIED_HEADERS','HTTP_TAGS']  # this list declares every table in the database
+    tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN",
+               "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES",'SSH','MAIN']  # this list declares every table in the database
+
+
+    normalized_tables=['SMTP_FUIDS','SMTP_PATHS','SMTP_TO','SMTP_RCPTTO','SMTP_ANALYZERS',
+                       'FILES_CONN_UIDS','FILES_RX_HOSTS','FILES_TX_HOSTS',"CONN_TUNNEL_PARENTS",'DNS_TTLS', 'DNS_ANSWERS'
+                        , 'HTTP_RESP_MEME_TYPES', 'HTTP_RESP_FUIDS', 'HTTP_ORIG_MEME_TYPES'
+                        , 'HTTP_ORIG_FUIDS', 'HTTP_PROXIED_HEADERS', 'HTTP_TAGS'
+                        ,'SSL_VALIDATION_STATUS']
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
