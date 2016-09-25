@@ -412,7 +412,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return True
             except:
                 return False
-
         elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
