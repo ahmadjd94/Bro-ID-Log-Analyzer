@@ -611,6 +611,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         smtp_rcptto_inserts=[]
         smtp_fuids_inserts=[]
 
+        files_rx_hosts_inserts=[]
+        files_tx_hosts_inserts=[]
+        files_conn_uids_inserts=[]
+        files_analyzers_inserts=[]
+
         print (len (validFields[table]),len(line))
 
         # if len (line) < len(validFields[table]):
@@ -735,6 +740,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 #######################################SPECIAL FIELDS FOR SSL ################
                 elif i=='validation_status':
                     ssl_validation_status_insert_statments="insert into ssl_validation_status (uid,ts,validation_status) values("
+
+                #######################################SPECIAL FIELDS FOR FILES TABLES :
+                elif i=='rx_hosts':
+                    files_rx_hosts_insert_statment="insert into files_rx_hosts (uid,ts,receiver) values("
+                elif i == 'tx_hosts':
+                    files_tx_hosts_insert_statment = "insert into files_tx_hosts (uid,ts,source) values("
+                elif i == 'conn_uids':
+                    files_conn_uids_insert_statment = "insert into files_conn_uids (uid,ts,uid) values("
+                elif i == 'analyzers':
+                    files_analyzers_insert_statment = "insert into files_analyzers (uid,ts,analyzer) values("
+
 
                 else:
                     field +="`" +str(i) + "`,"
@@ -890,6 +906,39 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 except Exception as exc7 :
                     print ("error in ssl ",str(exc7))
 
+            elif key == "tx_hosts":
+                try:
+                    files_tx_hosts_insert = ''
+                    if line[exist['tx_hosts']] in ["(empty)", '-']:
+                        files_tx_hosts_insert += files_tx_hosts_insert_statment + "\'" + \
+                                                        line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                        files_tx_hosts_inserts.append(files_tx_hosts_insert)
+                    else:
+                        tx_hosts = line[exist['tx_hosts']].split(',')
+                        for tx_host in tx_hosts:
+                            files_tx_hosts_insert = files_tx_hosts_insert_statment + "\'" + \
+                                                           line[exist['uid']] + "\'," + line[
+                                                               exist['ts']] + ",\'" + tx_host + "\')"
+                            files_tx_hosts_inserts.append(files_tx_hosts_insert)
+                except Exception as exc8:
+                    print("error in tx_hosts ", str(exc8))
+
+            elif key == "rx_hosts":
+                try:
+                    files_rx_hosts_insert = ''
+                    if line[exist['rx_hosts']] in ["(empty)", '-']:
+                        files_rx_hosts_insert += files_rx_hosts_insert_statment + "\'" + \
+                                                 line[exist['uid']] + "\'," + line[exist['ts']] + ",null)"
+                        files_rx_hosts_inserts.append(files_rx_hosts_insert)
+                    else:
+                        rx_hosts = line[exist['tx_hosts']].split(',')
+                        for rx_host in rx_hosts:
+                            files_rx_hosts_insert = files_rx_hosts_insert_statment + "\'" + \
+                                                    line[exist['uid']] + "\'," + line[
+                                                        exist['ts']] + ",\'" + rx_host + "\')"
+                            files_rx_hosts_inserts.append(files_rx_hosts_insert)
+                except Exception as exc9:
+                    print("error in rx_hosts ", str(exc9))
 
 
             elif line[exist[key]] != '-' or line[exist[key]] != "-":
