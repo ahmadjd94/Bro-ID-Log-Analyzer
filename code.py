@@ -265,37 +265,40 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE IRC (UID TEXT
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
-                DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
+                DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
+                FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step4")
                 table_created['IRC'] = True
                 return True
             except:
                 return False
 
-        elif fname == "weird.log":  # DONE  create weird table
+        elif fname == "weird.log":  # create weird table WORKING FINE
             try:
                 #if list(dropped)[tables.index("IDS")] == 0: # indicates if the IDS exists or not
                 self.tableCreator('ids')      # call the table creator function to create the ids table
 
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
-                            "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))")
+                            "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
+                            "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
                 print("step5")
             except:
                 return False
 
-        elif fname == "ssh.log":  # DONE create SSH table
+        elif fname == "ssh.log":  # DONE create SSH table CHECKED
             try:
-                if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+                self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
-                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,FOREIGN KEY (UID,TS) REFERENCES MAIN(UID,TS))""")
+                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
+                FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
                 print("step6")
                 return True
@@ -386,11 +389,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         `RD` BOOL,`RA` BOOL,`Z`INT,`rejected` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
                                         FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
 
-                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWERs TEXT,"
+                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
-                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTLs INT,"
+                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
@@ -443,20 +446,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
                 table_created['FILES'] = True
 
-                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOSTS"
+                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
                              ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
                 table_created['FILES_TX_HOSTS'] = True
 
-                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOSTS TEXT"
+                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
                             ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
                 table_created['FILES_RX_HOSTS'] = True
 
 
-                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UIDS TEXT"
+                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
                             ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
                 table_created['FILES_CONN_UIDS'] = True
 
-                con.execute("""CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZERS TEXT,
+                con.execute("""CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,
                     FOREIGN KEY (UID,TS) REFERENCES FILES(UID,TS))""")
                 table_created['FILES_ANALYZERS'] = True
 
@@ -478,7 +481,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SMTP'] = True
 
 
-                con.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,RCPTTO TEXT,
+                con.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
                 FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))""")
                 table_created['SMTP_RCPTTO'] = True
 
@@ -493,7 +496,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SMTP_PATHS'] = True
 
 
-                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS INT,FUIDS TEXT ,"
+                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS INT,FUID TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
 
@@ -723,18 +726,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 else :
                     ids_values += "" + "null" + ','
 
-            elif key in normalized_tables:
+            elif key in normalized_tables.keys():
                 try:
                     normalized_insert = ''
                     if line[exist[key]] in ["(empty)", '-']:
-                        normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')"%(table,key,key,line[exist["uid"]],float(line[exist["ts"]]))
+                        normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')"%(table,key,normalized_tables[key],line[exist["uid"]],float(line[exist["ts"]]))
                         print(normalized_insert)
                         normalized_inserts.append(normalized_insert)
                     else:
                         values = line[exist[key]].split(',')
                         for value in values:
                             normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
-                                                    table, key,key, line[exist["uid"]], float(line[exist["ts"]]),value)
+                                                    table, key,normalized_tables[key], line[exist["uid"]], float(line[exist["ts"]]),value)
                             normalized_inserts.append(normalized_insert)
                 except Exception as exc4 :
                     print ('rcptto error',str(exc4),key)
@@ -1118,7 +1121,7 @@ if __name__ == "__main__":  # main module
             , "second_received": -1, "last_reply": -1, "paths": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1},
+        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1},
 
         'ssl': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
@@ -1161,12 +1164,14 @@ if __name__ == "__main__":  # main module
 
     tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN",
                "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES",'SSH','MAIN']  # this list declares every table in the database
+    # the following dictionary denotes normalized tables with the names of their normalized tables
+    normalized_tables={'fuids':'fuid','paths':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
+                       'conn_uids':'conn_uid','rx_hosts':'rx_host','tx_hosts':'tx_host',"tunnel_parents":'parent'
+                          ,"TTLs":'ttl', 'answers':'answer'
+                          ,'resp_meme_types':'resp_meme_type', 'resp_fuids':'resp_fuid', 'orig_meme_types':'orig_meme_types'
+                        , 'orig_fuids':'orig_fuid', 'proxied_headers':'header', 'tags':'tag',
+                        'validation_status':'validation_status'}
 
-    normalized_tables=['fuids','paths','to','rcptto','analyzers',
-                       'conn_uids','rx_hosts','tx_hosts',"tunnel_parents","TTLs", 'answers'
-                        , 'resp_meme_types', 'resp_fuids', 'orig_meme_types'
-                        , 'orig_fuids', 'proxied_headers', 'tags','path'
-                        ,'validation_status']
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
@@ -1174,7 +1179,8 @@ if __name__ == "__main__":  # main module
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
 
-        norm_drop=map(droptables, normalized_tables)
+        norm_drop=map(droptables, list(normalized_tables.keys()))
+        print ("dropped tables : ",norm_drop)
 
         dropped={}
         for i in range (len(drop_result)):
