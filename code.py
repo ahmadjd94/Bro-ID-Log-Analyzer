@@ -486,17 +486,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SMTP_RCPTTO'] = True
 
 
-                con.execute("CREATE TABLE  SMTP_TO (UID TEXT , TS INT ,`TO` TEXT,"
+                con.execute("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_TO'] = True
 
 
-                con.execute("CREATE TABLE SMTP_PATH (UID TEXT ,TS INT , PATH TEXT,"
+                con.execute("CREATE TABLE SMTP_PATHS (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_PATHS'] = True
 
 
-                con.execute("CREATE TABLE SMTP_FUIDS(UID TEXT ,TS INT,FUID TEXT ,"
+                con.execute("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
 
@@ -528,7 +528,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             for i in f1:  # todo : modify function to increase the progress bar
                 hashtemp += i  # concatenate the lines being read to the string
-
+                i=i.lower()
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
                     # print(i)
                     fields = (i[7:].split())
@@ -694,15 +694,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 # checking for ifelds of normalized table
                 #####################SPECIAL FIELDS OF IDS TABLE#####################################
                 if i =="id.orig_h":
-                    ids_field += "orig_h" + ","
+                    ids_field += "`orig_h`" + ","
                 elif i == "id.orig_p":
-                    ids_field += "orig_p" + ","
+                    ids_field += "`orig_p`" + ","
                 elif i == "id.resp_h":
-                    ids_field += "resp_h" + ","
+                    ids_field += "`resp_h`" + ","
                 elif i == "id.resp_p":
-                    ids_field += "resp_p" + ","
+                    ids_field += "`resp_p`" + ","
 
-                elif i not in normalized_tables :
+                elif i not in normalized_fields :
                     field +="`" +str(i) + "`,"
             else :
                 pass # neglecting the invalid fields detected
@@ -726,18 +726,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 else :
                     ids_values += "" + "null" + ','
 
-            elif key in normalized_tables.keys():
+            elif key in normalized_fields.keys():
                 try:
                     normalized_insert = ''
                     if line[exist[key]] in ["(empty)", '-']:
-                        normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')"%(table,key,normalized_tables[key],line[exist["uid"]],float(line[exist["ts"]]))
+                        normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')"%(table,key,normalized_fields[key],line[exist["uid"]],float(line[exist["ts"]]))
                         print(normalized_insert)
                         normalized_inserts.append(normalized_insert)
                     else:
                         values = line[exist[key]].split(',')
                         for value in values:
                             normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
-                                                    table, key,normalized_tables[key], line[exist["uid"]], float(line[exist["ts"]]),value)
+                                                    table, key,normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]),value)
                             normalized_inserts.append(normalized_insert)
                 except Exception as exc4 :
                     print ('rcptto error',str(exc4),key)
@@ -1029,6 +1029,7 @@ if __name__ == "__main__":  # main module
     def droptables(table):  # a map function drops tables , return 1 on success
         try:
             con.execute("drop table %s" % table)
+            con.commit()
             return 1
         except sqlite3.OperationalError as a:
             if "no such table" in str(a):
@@ -1162,16 +1163,22 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
 
-    tables = [ 'DHCP', "SMTP", "IRC", "WEIRD", "SSH", "CONN",
-               "HTTP", "DNS", "SIGNATURE", "SSL", "IDS", "FILES",'SSH','MAIN']  # this list declares every table in the database
-    # the following dictionary denotes normalized tables with the names of their normalized tables
-    normalized_tables={'fuids':'fuid','paths':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
+    tables = [ 'dhcp', "smtp", "irc", "weird", "ssh", "conn",
+               "http", "dns", "signature", "ssl", "ids", "files",'ssh','main']  # this list declares every table in the database
+
+    # the following dictionary denotes normalized FIELDS
+    normalized_fields={'fuids':'fuid','paths':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
                        'conn_uids':'conn_uid','rx_hosts':'rx_host','tx_hosts':'tx_host',"tunnel_parents":'parent'
-                          ,"TTLs":'ttl', 'answers':'answer'
+                          ,"ttls":'ttl', 'answers':'answer'
                           ,'resp_meme_types':'resp_meme_type', 'resp_fuids':'resp_fuid', 'orig_meme_types':'orig_meme_types'
                         , 'orig_fuids':'orig_fuid', 'proxied_headers':'header', 'tags':'tag',
                         'validation_status':'validation_status'}
 
+    normalized_tables=['http_proxied_headers','http_resp_meme_types','http_tags','http_orig_meme_types',
+                       'http_orig_fuids','http_resp_fuids'
+                       'files_tx_hosts','files_conn_uids','files_analyzers','files_rx_hosts','ftp_data_channel',
+                       'conn_tunnel_parents','dns_ttls','dns_answers','smtp_analyzers','smtp_rcptto','smtp_to',
+                       'smtp_fuids','smtp_paths']
     try:
 
         con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
@@ -1179,8 +1186,8 @@ if __name__ == "__main__":  # main module
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
 
-        norm_drop=map(droptables, list(normalized_tables.keys()))
-        print ("dropped tables : ",norm_drop)
+        norm_drop=map(droptables, normalized_tables)
+        print ("dropped tables : ",list(norm_drop.__iter__()))
 
         dropped={}
         for i in range (len(drop_result)):
