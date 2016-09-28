@@ -228,18 +228,22 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print ('fname passes to function',fname)
         print (dropped)
         if fname in ["ids","IDS"]:
-            try:
-                con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
-                                ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
-                table_created['IDS']=True
-                print ("success creating ids  table ")
-            except :
-                table_created['IDS'] = False
-                print ("error creating ids table ")
+            if table_created['ids'] == False:
+                try:
+
+
+                    con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
+                                    ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
+                    table_created['IDS']=True
+                    print ("success creating ids  table ")
+                except :
+                    table_created['IDS'] = False
+                    print ("error creating ids table ")
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                self.tableCreator('ids')
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')
                 con.execute("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
@@ -253,7 +257,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
                 #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE DHCP(UID TEXT,TS int
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
@@ -267,9 +272,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
                 #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE IRC (UID TEXT
+                con.execute("""CREATE TABLE IRC (UID TEXT,ts int
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                 DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
                 FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
@@ -282,7 +288,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "weird.log":  # create weird table WORKING FINE
             try:
                 #if list(dropped)[tables.index("IDS")] == 0: # indicates if the IDS exists or not
-                self.tableCreator('ids')      # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
@@ -295,7 +302,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "ssh.log":  # DONE create SSH table CHECKED
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
@@ -309,7 +317,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "conn.log":  # DONE  create CONN table
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
@@ -329,7 +338,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             try:
                 # if dropped['IDS'] == 0:  # indicates if the IDS exists or not
 
-                self.tableCreator("ids")  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE  HTTP (
                                         UID TEXT,ts int 
@@ -381,7 +391,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "dns.log":  # DONE # create DNS table
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE DNS (
                                         UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
@@ -419,7 +430,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
@@ -470,7 +482,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                self.tableCreator('ids')  # call the table creator function to create the ids table
+                if table_created['ids'] == False:
+                    self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 con.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
@@ -1200,6 +1213,7 @@ if __name__ == "__main__":  # main module
         table_created ={ }
         for i in tables :
             table_created[i]=False
+        print ("1234567890")
         print (table_created)
         print( "this is dropped tables ")  # fix ?
 
