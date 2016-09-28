@@ -239,10 +239,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE
             try:
-                con.execute("""CREATE TABLE FTP(UID TEXT
+                self.tableCreator('ids')
+                con.execute("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
-                FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
+                FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
                 table_created['FTP'] = True
                 return True
@@ -1163,7 +1164,7 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
 
-    tables = [ 'dhcp', "smtp", "irc", "weird", "ssh", "conn",
+    tables = [ 'dhcp', "smtp", "irc", "weird", "ssh", "conn",'ftp',
                "http", "dns", "signature", "ssl", "ids", "files",'ssh','main']  # this list declares every table in the database
 
     # the following dictionary denotes normalized FIELDS
