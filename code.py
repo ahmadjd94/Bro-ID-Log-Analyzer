@@ -542,8 +542,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             for i in f1:  # todo : modify function to increase the progress bar
                 hashtemp += i  # concatenate the lines being read to the string
-                i=i.lower()
+
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
+                    i = i.lower()  # ignore the case of the fields line
                     # print(i)
                     fields = (i[7:].split())
                     print(fields)
@@ -561,19 +562,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
                     try :
-                        validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1)) #
+                        validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1)) # needs review , is this important ?
                         print ('sorted',validFields[fname])
                     except:
                         print ('already sorted ?')
 
                 elif i[0] != "#":  # this line ignores the log lines that start with # , #indecates a commented line
-                    line=i.replace("\n",'')
-                    line = line.split('\t')
+                    line=i.replace("\n",'')  # remove newlines escape character
+                    line = line.split('\t')  #split file lines by tabs
                     # sort dictionary based on key values
                     try:
-                        sql_commands=(self.SQLcreator(fname, line))
+                        sql_commands=(self.SQLcreator(fname, line)) # call the SQL creator function which generates queries and return an array if queries
                         print ("PRINTING RECEIVED LIST",sql_commands)
-                        for command in sql_commands:
+                        for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
                                 con.execute (command)
                                 print ("executed correctly :\n",command)
@@ -582,14 +583,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
                         # con.execute(sql_command,sql_command_ids)
-                    except  :
+                    except Exception as exc1:
                         # print (str(a))
-                        print('error creating SQL')
+                        print('error creating SQL',str (exc1))
                     print ('end')
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
-                    # todo : the algorithm is not handling undefined fields , sprint's extended to forever
+
 
                     #con.execute
 
@@ -599,19 +600,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 #self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
             f1.close()
 
-            with open(historyLog, 'a') as csvfile:  # open log file to log the state of operation
-                wr1 = csv.writer(csvfile, delimiter=',')
-                digestive = hashlib.md5(codecs.encode(hashtemp))  # string must be converted to bytes to calculate hash
+            with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
+
+                digestive = hashlib.md5(codecs.encode(hashtemp,'ascii'))  # string must be converted to bytes to calculate hash
+                wr1 = csv.writer(csvfile1, delimiter=',')
                 # calculate the hash of the file
                 # this block is only performed when no exceptions happen , all of data inserted into DB successfully
-                try:
-                    wr1.writerow(fname, digestive.hexdigest())   # write the file name , with it's hash value incase it was loaded successfully
-                    #csvfile.write(fname, digestive.hexdigest())  # the digested value combined
-                except :
-                    print ('exception in writing')
+                try:                                #TODO :  issue resolved to be ready for test once the master sprint starts
+                    wr1.writerow((fname, digestive.hexdigest()))   # write the file name , with it's hash value incase it was loaded successfully
 
-        except Exception as e1:  # this block is executed in case of failure of instering
-            print(str(e1))
+                except Exception as exc2:
+                    print ('exception in writing the hash of the file',str(exc2))
+
+        except Exception as exc3:  # this block is executed in case of failure of instering
+            print(str(exc3))
             print ('exception occurd')
             with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
@@ -669,16 +671,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             keys = keys[value.index(0):]  #slice keys based based on the values array
             value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
             print(value,keys)
-        except Exception as E:
-            print (str (E))
+        except Exception as exc4:
+            print (str (exc4))
 
         try:
             # print(validFields['conn'])
             main_insert="insert into main (uid,ts) values ('%s',%s)"%(line[exist['uid']],line[exist['ts']])
             print(main_insert)
-        except Exception as a:
+        except Exception as exc5:
             print ("WTF")
-            print (str(a))
+            print (str(exc5))
         inserts=[]
 
         ################################ DNS-SPECIFIC INSERTS AND STATMENTS######################
@@ -753,13 +755,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
                                                     table, key,normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]),value)
                             normalized_inserts.append(normalized_insert)
-                except Exception as exc4 :
-                    print ('rcptto error',str(exc4),key)
+                except Exception as exc6 :
+                    print ('rcptto error',str(exc6),key)
 
             elif (line[exist[key]] != '-' or line[exist[key]]!= "-") and key not in normalized_tables  :
                 try :
                     if types[key] == datetime: # checking for datetime type
-                        a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]]))) # converting epoch to datetime
+                        #  NOTE converting epoch to datetime is redundent since sqlite drivers are capable of handle epoch time
+                        a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]])))
                         #print (a)
                         values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
 
@@ -788,8 +791,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         #     values_string += (line[exist[i]]) + ","
                     else :
                         values_string += "\'"+str(line[exist[key]])+"\',"
-                except Exception as exc3 :
-                    print ("faga33334443",exc3)
+                except Exception as exc7 :
+                    print ("faga33334443",exc7)
             else :
                 values_string += "null,"
             print (values_string)
@@ -803,8 +806,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try :
             values_string = values_string[:len(values_string) - 1] # split the colons
             print (values_string)
-        except Exception as a3 :
-            print (str (a3) , "error splitting values string ")
+        except Exception as exc8 :
+            print (str (exc8) , "error splitting values string ")
 
         print (type(field))
         normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
@@ -820,8 +823,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     inserts.extend(normalized_inserts)
 
 
-        except Exception as a1:
-            print (str(a1),'exception happend while appending')
+        except Exception as exc9:
+            print (str(exc9),'exception happend while appending')
 
 
         print(normal_table_insert)
