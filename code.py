@@ -229,9 +229,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (dropped)
         if fname in ["ids","IDS"]:
             if table_created['ids'] == False:
+
                 try:
-
-
                     con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
                     table_created['IDS']=True
@@ -240,7 +239,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     table_created['IDS'] = False
                     print ("error creating ids table ")
 
-        elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE
+        elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
             try:
                 if table_created['ids'] == False:
                     self.tableCreator('ids')
@@ -254,9 +253,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE
+        elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
             try:
-                #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -269,9 +268,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE
+        elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE  #check and working
             try:
-                #if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -287,7 +285,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "weird.log":  # create weird table WORKING FINE
             try:
-                #if list(dropped)[tables.index("IDS")] == 0: # indicates if the IDS exists or not
+
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -299,9 +297,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "ssh.log":  # DONE create SSH table CHECKED
+        elif fname == "ssh.log":  # DONE create SSH table CHECKED and working correctly
             try:
-                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -316,7 +314,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "conn.log":  # DONE  create CONN table
             try:
-                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -333,10 +330,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "http.log":  # DONE  create HTTP table and related normalized tables
+        elif fname == "http.log":  #  todo: needs furhter checking
 
             try:
-                # if dropped['IDS'] == 0:  # indicates if the IDS exists or not
 
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
@@ -388,7 +384,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print("step8")
             except:
                 return False
-        elif fname == "dns.log":  # DONE # create DNS table
+        elif fname == "dns.log":  # DONE # create DNS table    todo: crashes
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
                 if table_created['ids'] == False:
@@ -1153,8 +1149,8 @@ if __name__ == "__main__":  # main module
         'signatures': {"ts": -1, 'src_addr': -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,
                        'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
                        'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
-                    # THE FOLLOWING TABLES HAVE THE SUBSET OF CONN TABLE
-                    #1 DHCP ,2 DNS,3 HTTP,4 IRC,5 FTP,6 SMTP,7 SSL,8 SSH,9 WEIRD
+                    # the following tables have the subset of conn table
+                    #1 dhcp ,2 dns,3 http,4 irc,5 ftp,6 smtp,7 ssl,8 ssh,9 weird
         'ids':{"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1},
 
         'conn': {'ts':-1,"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1,
@@ -1169,8 +1165,8 @@ if __name__ == "__main__":  # main module
 
         'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
-                "rcode_name": -1, "QR": -1,
-                "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "TTLs": -1, "rejected": -1}
+                "rcode_name": -1, "qr": -1,
+                "aa": -1, "tc": -1, "rd": -1, "ra": -1, "z": -1, "answers": -1, "ttls": -1, "rejected": -1}
         # check tables strucutre !!! normalize conn_ID table
     }
 
