@@ -753,7 +753,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             normalized_insert ="insert into %s_%s ( `ts`,`%s`) values (%f,"% (table, key, normalized_fields[key], float(line[exist["ts"]]))
                             for value in values:
                                 files_normalized_insert += normalized_insert+"\'%s\')" %(value)
-                                normalized_inserts.append(normalized_insert)
+                                normalized_inserts.append(files_normalized_insert)
                         else:
                             for value in values:
                                 normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
