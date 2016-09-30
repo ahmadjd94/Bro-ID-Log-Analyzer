@@ -677,11 +677,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         try:
             # print(validFields['conn'])
-            main_insert="insert into main (uid,ts) values ('%s',%s)"%(line[exist['uid']],line[exist['ts']])
-            print(main_insert)
+            if table =="files":
+                pass
+            else :
+                main_insert="insert into main (uid,ts) values ('%s',%s)"%(line[exist['uid']],line[exist['ts']])
+                print(main_insert)
         except Exception as exc5:
             print ("WTF")
-            print (str(exc5))
+            print ('test in main' ,str(exc5))
         inserts=[]
 
 
@@ -745,10 +748,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         normalized_inserts.append(normalized_insert)
                     else:
                         values = line[exist[key]].split(',')
-                        for value in values:
-                            normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
-                                                    table, key,normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]),value)
-                            normalized_inserts.append(normalized_insert)
+                        if table == 'files':
+                            files_normalized_insert=""
+                            normalized_insert ="insert into %s_%s ( `ts`,`%s`) values (%f,"% (table, key, normalized_fields[key], float(line[exist["ts"]]))
+                            for value in values:
+                                files_normalized_insert += normalized_insert+"\'%s\')" %(value)
+                                normalized_inserts.append(normalized_insert)
+                        else:
+                            for value in values:
+                                normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
+                                                        table, key,normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]),value)
+                                normalized_inserts.append(normalized_insert)
                 except Exception as exc6 :
                     print ('rcptto error',str(exc6),key)
 
@@ -801,15 +811,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+",\'"+line[exist['uid']]+"\',"+ids_values+")"
             inserts.append(ids_insert)
             print (ids_insert)
-            if len(normalized_inserts) > 0:
-                    inserts.extend(normalized_inserts)
 
         except Exception as exc9:
             print (str(exc9),'exception happend while appending')
+        if len(normalized_inserts) > 0:
+            inserts.extend(normalized_inserts)
 
         print(normal_table_insert)
         print ('returned tables')
-        inserts.insert(0,main_insert)
+        if table !='files':
+            inserts.insert(0,main_insert)
         print (inserts)
         return inserts
 
