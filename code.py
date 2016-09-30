@@ -7,9 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
+
 from PyQt5.QtGui import QIcon
 
 # module used for changing Current working directory of the program
@@ -21,7 +22,7 @@ import hashlib, codecs, operator, sqlite3, os,time
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
-    global con  # connection to DB
+    global DBconnection  # connection to DB
     single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -231,7 +232,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if table_created['ids'] == False:
 
                 try:
-                    con.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
+                    DBconnection.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
                     table_created['IDS']=True
                     print ("success creating ids  table ")
@@ -243,7 +244,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             try:
                 if table_created['ids'] == False:
                     self.tableCreator('ids')
-                con.execute("""CREATE TABLE FTP(UID TEXT,ts int
+                DBconnection.execute("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
@@ -259,7 +260,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE DHCP(UID TEXT,TS int
+                DBconnection.execute("""CREATE TABLE DHCP(UID TEXT,TS int
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                 , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step2")
@@ -273,7 +274,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE IRC (UID TEXT,ts int
+                DBconnection.execute("""CREATE TABLE IRC (UID TEXT,ts int
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                 DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
                 FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
@@ -289,7 +290,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
+                DBconnection.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
@@ -303,7 +304,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
+                DBconnection.execute("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
@@ -317,12 +318,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                DBconnection.execute("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
 
-                con.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
+                DBconnection.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
                              FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
                 print("step7")
@@ -337,7 +338,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE  HTTP (
+                DBconnection.execute("""CREATE TABLE  HTTP (
                                         UID TEXT,ts int 
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
@@ -347,29 +348,29 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         FOREIGN KEY  (ts) REFERENCES MAIN (ts))""")
 
 
-                con.execute(
+                DBconnection.execute(
                     "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),"
                     "FOREIGN KEY  (ts) REFERENCES http (ts))")
 
 
-                con.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
+                DBconnection.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
                               HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                con.execute("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
+                DBconnection.execute("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
                           , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                con.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
+                DBconnection.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
                     ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                con.execute(
+                DBconnection.execute(
                     """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS INT ,
                     RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                con.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
+                DBconnection.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
                             , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
@@ -384,24 +385,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print("step8")
             except:
                 return False
-        elif fname == "dns.log":  # DONE # create DNS table    todo: crashes
+        elif fname == "dns.log":  # DONE # create DNS table    is working fine
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE DNS (
+                DBconnection.execute("""CREATE TABLE DNS (
                                         UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
                                         `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                         `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
                                         `RD` BOOL,`RA` BOOL,`Z`INT,`rejected` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
                                         FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
 
-                con.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
+                DBconnection.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
-                con.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
+                DBconnection.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
@@ -412,9 +413,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "signature.log":  # DONE # create SIGNATURES table
+        elif fname == "signature.log":  #  create SIGNATURES table  needs testing
             try:
-                con.execute("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
+                DBconnection.execute("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 table_created['SIGNATURE'] = True
@@ -429,14 +430,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
+                DBconnection.execute("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 table_created['SSL'] = True
 
-                con.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
+                DBconnection.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
                             "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")
                 table_created['SSL_VALIDATION_STATUS'] = True
 
@@ -445,31 +446,35 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             except:
                 return False
 
-        elif fname == "files.log":  # DONE # create files table and it's related tables
+        elif fname == "files.log":  # DONE # create files table and it's related tables #needs testing
             try:
-                con.execute(
-                    """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,CONN_UIDS,SOURCE TEXT ,DEPTH INT,
+                DBconnection.execute(
+                    """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,SOURCE TEXT ,DEPTH INT,
                     ANALYZERS TEXT,MIME_TYPE TEXT,
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
                     MISSING_BYTES INT,OVERFLOW_BYTES INT,TIMEDOUT INT,PARENT_FUID STRING,
-                    MD5A_SHA1_SHA256 TEXT,EXTRACTED BOOL)""")
+                    MD5 TEXT,SHA1 TEXT,SHA256 TEXT,EXTRACTED BOOL)""")
                 table_created['FILES'] = True
 
-                con.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
-                             ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                DBconnection.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
+                             ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
+                             ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_TX_HOSTS'] = True
 
-                con.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
-                            ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                DBconnection.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
+                            ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
+                             ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_RX_HOSTS'] = True
 
 
-                con.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
-                            ",FOREIGN KEY (UID,TS) REFERENCES FILE(UID,TS))")
+                DBconnection.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
+                            ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
+                             ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_CONN_UIDS'] = True
 
-                con.execute("""CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,
-                    FOREIGN KEY (UID,TS) REFERENCES FILES(UID,TS))""")
+                DBconnection.execute("CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,"
+                                     "FOREIGN KEY (UID) REFERENCES FILE(UID)"
+                                     ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_ANALYZERS'] = True
 
             except:
@@ -477,11 +482,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
             try:
-                # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
+
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                con.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT,
+                DBconnection.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
                 ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
                 ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
@@ -491,22 +496,22 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SMTP'] = True
 
 
-                con.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
+                DBconnection.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
                 FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))""")
                 table_created['SMTP_RCPTTO'] = True
 
 
-                con.execute("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
+                DBconnection.execute("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_TO'] = True
 
 
-                con.execute("CREATE TABLE SMTP_PATHS (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
+                DBconnection.execute("CREATE TABLE SMTP_PATH (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_PATHS'] = True
 
 
-                con.execute("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
+                DBconnection.execute("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
 
@@ -572,13 +577,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print ("PRINTING RECEIVED LIST",sql_commands)
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
-                                con.execute (command)
+                                DBconnection.execute (command)
                                 print ("executed correctly :\n",command)
-                                con.commit()
+                                DBconnection.commit()
                             except:
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
-                        # con.execute(sql_command,sql_command_ids)
+                        # DBconnection.execute(sql_command,sql_command_ids)
                     except Exception as exc1:
                         # print (str(a))
                         print('error creating SQL',str (exc1))
@@ -588,7 +593,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
 
 
-                    #con.execute
+                    #DBconnection.execute
 
 
                 #else:
@@ -679,31 +684,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (str(exc5))
         inserts=[]
 
-        ################################ DNS-SPECIFIC INSERTS AND STATMENTS######################
-
-        dns_ANSWERS_inserts = ""
-
-        ################################ http-SPECIFIC INSERTS AND STATMENTS######################
-        http_tags_insert=conn_tunnel_parents_insert=http_proxied_insert=""
-        http_orig_fuids_insert = ""# string will store the values if insert statments into http_fuids_table
 
         ################################ ids-SPECIFIC INSERTS AND STATMENTS######################
         ids_values = ""  # string will stores the values of insert statment for ids table
         ids_insert="insert into ids("
         ids_field=field = values_string = ""   # variable field stores the field name in table
-
-        ################################ssl-specific insert#############################
-        ssl_validation_status_inserts=[]
-
-
-
+        #########################################################################################
 
         normal_table_insert = "insert into %s (" %table   # insert statment
         print (normal_table_insert)
 
         for i in keys:
             if i in dict(validFields[table]):
-                # checking for ifelds of normalized table
                 #####################SPECIAL FIELDS OF IDS TABLE#####################################
                 if i =="id.orig_h":
                     ids_field += "`orig_h`" + ","
@@ -715,7 +707,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     ids_field += "`resp_p`" + ","
 
                 elif i not in normalized_fields :
-                    field +="`" +str(i) + "`,"
+                    field += "`" +str(i) + "`,"
             else :
                 pass # neglecting the invalid fields detected
 
@@ -740,9 +732,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             elif key in normalized_fields.keys():
                 try:
-                    normalized_insert = ''
+
                     if line[exist[key]] in ["(empty)", '-']:
-                        normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')"%(table,key,normalized_fields[key],line[exist["uid"]],float(line[exist["ts"]]))
+                        normalized_insert = "insert into %s_%s( "%(table,key)
+                        if table =='files':
+                            normalized_insert+="`ts`,`%s`) values (%f,'null')"%(normalized_fields[key],float(line[exist["ts"]]))
+
+                        else :
+                            normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')" % (
+                        table, key, normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]))
                         print(normalized_insert)
                         normalized_inserts.append(normalized_insert)
                     else:
@@ -775,16 +773,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 values_string += "1,"
                         else :
                             values_string += "null,"
-                        # try:
-                        #     a = int (line[exist[i]])# converting str to int
-                        #     values_string += str(a) + ","  # concatenating the value to the values string
 
-                        # except Exception as e:
-                        #     print (i,exist[i])
-                        #     print (str (e))
-                        #     print ('error casting value%s' %line[exist[i]])
-                        #
-                        #     values_string += (line[exist[i]]) + ","
                     else :
                         values_string += "\'"+str(line[exist[key]])+"\',"
                 except Exception as exc7 :
@@ -812,41 +801,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+",\'"+line[exist['uid']]+"\',"+ids_values+")"
             inserts.append(ids_insert)
             print (ids_insert)
-            # con.execute(ids_insert)
-
-
             if len(normalized_inserts) > 0:
                     inserts.extend(normalized_inserts)
 
-
         except Exception as exc9:
             print (str(exc9),'exception happend while appending')
-
 
         print(normal_table_insert)
         print ('returned tables')
         inserts.insert(0,main_insert)
         print (inserts)
-        return inserts    # function will return a dictionary of insert statments
-    #################################important segments of code ################################
-    #a = con.execute('''insert into dates (d) values (?)''', (datetime.datetime.fromtimestamp(312312312.32112),))
-    #  insert into db after normalizing epoch
-    # SCREW QUOTATION MARKS RIGHT ?
-    #con.execute("insert into time values('" + str(datetime.datetime.fromtimestamp(312312312.312312)) + "')")
-
-    # con.execute('select * from dates where d <"2010-01-01 00:00:00"').fetchall() # selectbased on date and time and fetch from array
-    # a=con.execute('select* from dates where d>"2000/00/00"' ) #select based on date only
-    #################################important segments of code ################################
-
-    # def SQLcreator2 (self,fname,line):  # this function creates insert statments for the IDs table
-    #     command = "insert into ids (uid ,ts ,ID_ORIG_H, ID_ORIG_P, ID_RESP_H , ID_RESP_P ) VALUES ("
-    #     values = line[validFields[fname]['uid']] +str(datetime.fromtimestamp(line[validFields[fname]['ts']])) +\
-    #              line[validFields['ids']['id.orig_h']]+\
-    #              int(line[validFields['ids']['id.orig_p']])+\
-    #              line[validFields['ids']['id.resp_h']]+\
-    #              int(line[validFields['ids']['id.resp_p']])+")"
-    #     command = command + values
-    #     return command
+        return inserts
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
@@ -855,7 +820,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try:
             if "select" in command:
                 select = True
-                result = con.execute(command).fetchall()
+                result = DBconnection.execute(command).fetchall()
                 for i in result:
                     for each in i:
                         pass
@@ -867,7 +832,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 insert=True
                 raise sqlite3.OperationalError  # todo : define our own exception class
             else:
-                con.execute(command)
+                DBconnection.execute(command)
                 self.label_2.setStyleSheet("color: green")
                 self.label_2.setText("operation succeded")
                 self.label_2.show()
@@ -950,7 +915,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             "https://bitbucket.org/Psut/bro-ids-log-files-visualizer-and-analyzer\n"
             "https://tree.taiga.io/project/ahmadjd94-bila")
         self.message.show()
-                    #todo : continue documentation
+
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
         single = True
@@ -1041,8 +1006,8 @@ if __name__ == "__main__":  # main module
 
     def droptables(table):  # a map function drops tables , return 1 on success
         try:
-            con.execute("drop table %s" % table)
-            con.commit()
+            DBconnection.execute("drop table %s" % table)
+            DBconnection.commit()
             return 1
         except sqlite3.OperationalError as a:
             if "no such table" in str(a):
@@ -1132,7 +1097,7 @@ if __name__ == "__main__":  # main module
         'smtp': {'ts': -1, 'uid': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
             , "date": -1, "from": -1, "to": -1, "reply_to": -1, "msg_id": -1, "in_reply_to": -1, "subject": -1
             , "x_originating_ip": -1, "first_received": -1
-            , "second_received": -1, "last_reply": -1, "paths": -1, "user_agent": -1
+            , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
         'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1},
@@ -1180,7 +1145,7 @@ if __name__ == "__main__":  # main module
                "http", "dns", "signature", "ssl", "ids", "files",'ssh','main']  # this list declares every table in the database
 
     # the following dictionary denotes normalized FIELDS
-    normalized_fields={'fuids':'fuid','paths':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
+    normalized_fields={'fuids':'fuid','path':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
                        'conn_uids':'conn_uid','rx_hosts':'rx_host','tx_hosts':'tx_host',"tunnel_parents":'parent'
                           ,"ttls":'ttl', 'answers':'answer'
                           ,'resp_meme_types':'resp_meme_type', 'resp_fuids':'resp_fuid', 'orig_meme_types':'orig_meme_types'
@@ -1188,13 +1153,13 @@ if __name__ == "__main__":  # main module
                         'validation_status':'validation_status'}
 
     normalized_tables=['http_proxied_headers','http_resp_meme_types','http_tags','http_orig_meme_types',
-                       'http_orig_fuids','http_resp_fuids'
+                       'http_orig_fuids','http_resp_fuids',
                        'files_tx_hosts','files_conn_uids','files_analyzers','files_rx_hosts','ftp_data_channel',
                        'conn_tunnel_parents','dns_ttls','dns_answers','smtp_analyzers','smtp_rcptto','smtp_to',
-                       'smtp_fuids','smtp_paths']
+                       'smtp_fuids','smtp_path','ssl_validation_status']
     try:
 
-        con = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
+        DBconnection = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
@@ -1218,7 +1183,7 @@ if __name__ == "__main__":  # main module
 
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            con.execute("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
+            DBconnection.execute("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['MAIN']=True
             print ("Success creating main table")
 
@@ -1238,9 +1203,7 @@ if __name__ == "__main__":  # main module
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
 
-        """create a table for analysizing the log file : time , source IP ,source Port,Destination IP , Destination port , protocol in use,count of packets use"""
 
-        ##############################IMPORT DATABASE DATATYPES NEED FURTHER CHECKING ##############################################################
     except sqlite3.Error as e:
         print(e)
         print("error")
