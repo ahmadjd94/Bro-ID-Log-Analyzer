@@ -1,4 +1,6 @@
-validFields = {  #this line stores the indecies of the fields at each line for every log file type
+validFields = {
+                #this dictionary stores the initial index of every field in the program
+                # the index -1 denotes that the index is not set yet
 
         "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1,
                  "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1,

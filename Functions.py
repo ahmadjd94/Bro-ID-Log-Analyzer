@@ -3,12 +3,8 @@ from Tables import normalized_tables,normalized_fields
 from BilaTypes import BilaTypes
 import time
 from datetime import datetime
+
 def SQLcreator( table, line):  # this function creates SQL Queries based on table based to it
-
-
-    # should use lambda expressions
-    # should handle inserting to ids table also
-
     normalized_inserts = []
 
     print(len(validFields[table]), len(line))

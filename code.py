@@ -6,11 +6,13 @@
 #
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
-
+from BilaTypes import BilaTypes
+from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
-
+from Functions import SQLcreator
+import Tables
 from PyQt5.QtGui import QIcon
 
 # module used for changing Current working directory of the program
@@ -27,16 +29,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []  # this list stores the valid file found in a DIR
-
-    valid = ['conn.log', 'dhcp.log', 'dns.log', 'ftp.log', 'http.log', 'irc.log',
-             'smtp.log', 'ssl.log', 'files.log', 'signatures.log', 'weird.log',
-             'ssh.log']  # this list stores the valid log files bila can deal with
-
-    UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_loss.log', 'dnp3.log', 'intel.log',
-                        'known_certs.log', 'radius.log', 'modbus.log', 'notice.log', 'reporter.log',
-                        'notice.log', 'software.log', 'snmp.log', 'socks.log',
-                        'syslog.log', 'traceroute.log',
-                        'known_hosts.log']  # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
+    UnsupportedFiles=Tables.UnsupportedFiles
+    valid=Tables.valid
+      # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
     # END OF GLOVAL VARIABLES DEFENITION
 
@@ -220,6 +215,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.SQLcreator=SQLcreator
 
 
     def uMan(self):
@@ -620,214 +616,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
 
-    def SQLcreator(self, table, line): # this function creates SQL Queries based on table based to it
-                                       # should use lambda expressions
-                                        # should handle inserting to ids table also
-
-        normalized_inserts=[]
-
-        print (len (validFields[table]),len(line))
-
-        # if len (line) < len(validFields[table]):
-        #     print ("invalid line detected")
-        #     return
-        print (line)
-        print(table)
-        exist = {}       #stores the values of existing fields that can be extracted from the log file
-        # THIS FUNCTION WILL RAISE AN EXCEPTION INCASE OF INVALID TABLE TYPE
-        # HANDLED IN THE CALLER FUNCTION
-        # use time.time to get the current time in epoch format
-        # print('inside creator ', validFields[table])
-
-        try:
-            print (validFields[table])
-            exist = dict(validFields[table])
-        except:
-            print('error making list')
-        print(exist)
-        # missing cast
-        keys = list(exist.keys())
-        print(type(keys))
-        print(keys)
-        print (exist.values())
-        print ('prepare to cast ')
-        try :
-            print (type (exist))
-            value =list( exist.values())
-        except :
-            print ("error getting values of dict")
-            raise Exception
-
-        print (value)
-        #todo : check if the arrays are sorted already
-        for i1 in range(len(value)):     # the following algorithm sorts the exist dictionary , python dictionary are not sorted
-                                        # the algorithm is a modified version of bubble sort
-            for i2 in range(len(value) -1):
-                if value[i2] > value[i2 + 1]:
-                    valuetemp = value[i2]
-                    keytemp=keys[i2]
-                    value[i2] = value[i2 + 1]
-                    keys[i2]=keys[i2+1]
-                    value[i2 + 1] = valuetemp
-                    keys[i2+1]=keytemp
-        try:
-            keys = keys[value.index(0):]  #slice keys based based on the values array
-            value = value[value.index(0):] # slice values array accoridng to the first 0 seen in the array
-            print(value,keys)
-        except Exception as exc4:
-            print (str (exc4))
-
-        try:
-            # print(validFields['conn'])
-            if table =="files":
-                pass
-            else :
-                main_insert="insert into main (uid,ts) values ('%s',%s)"%(line[exist['uid']],line[exist['ts']])
-                print(main_insert)
-        except Exception as exc5:
-            print ("WTF")
-            print ('test in main' ,str(exc5))
-        inserts=[]
-
-
-        ################################ ids-SPECIFIC INSERTS AND STATMENTS######################
-        ids_values = ""  # string will stores the values of insert statment for ids table
-        ids_insert="insert into ids("
-        ids_field=field = values_string = ""   # variable field stores the field name in table
-        #########################################################################################
-
-        normal_table_insert = "insert into %s (" %table   # insert statment
-        print (normal_table_insert)
-
-        for i in keys:
-            if i in dict(validFields[table]):
-                #####################SPECIAL FIELDS OF IDS TABLE#####################################
-                if i =="id.orig_h":
-                    ids_field += "`orig_h`" + ","
-                elif i == "id.orig_p":
-                    ids_field += "`orig_p`" + ","
-                elif i == "id.resp_h":
-                    ids_field += "`resp_h`" + ","
-                elif i == "id.resp_p":
-                    ids_field += "`resp_p`" + ","
-
-                elif i not in normalized_fields :
-                    field += "`" +str(i) + "`,"
-
-            else :
-                pass # neglecting the invalid fields detected
-
-        field = field[:len(field) - 1]  # this line will remove the colon at the end of fileds string
-        # print (field)
-        print (len (value))
-        print ("312341231234214")
-        print (line)
-        print (keys)
-        for key in keys:
-            print (key,line[exist[key]])
-            # print (validFields['ids'])
-            if key in validFields['ids'].keys():
-                if line[exist[key]] !='-':
-                    if types[key] == str:
-                        ids_values += "\'"+line[exist[key]] + '\','
-
-                    else:
-                        ids_values += line[exist[key]] + ","
-                else :
-                    ids_values += "" + "null" + ','
-
-            elif key in normalized_fields.keys():
-                try:
-
-                    if line[exist[key]] in ["(empty)", '-']:
-                        normalized_insert = "insert into %s_%s( "%(table,key)
-                        if table =='files':
-                            normalized_insert+="`ts`,`%s`) values (%f,'null')"%(normalized_fields[key],float(line[exist["ts"]]))
-
-                        else :
-                            normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,'null')" % (
-                        table, key, normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]))
-                        print(normalized_insert)
-                        normalized_inserts.append(normalized_insert)
-                    else:
-                        values = line[exist[key]].split(',')
-                        if table == 'files':
-                            files_normalized_insert=""
-                            normalized_insert ="insert into %s_%s ( `ts`,`%s`) values (%f,"% (table, key, normalized_fields[key], float(line[exist["ts"]]))
-                            for value in values:
-                                files_normalized_insert += normalized_insert+"\'%s\')" %(value)
-                                normalized_inserts.append(files_normalized_insert)
-                        else:
-                            for value in values:
-                                normalized_insert = "insert into %s_%s (`uid`,`ts`,`%s`) values (\'%s\',%f,\'%s\')" % (
-                                                        table, key,normalized_fields[key], line[exist["uid"]], float(line[exist["ts"]]),value)
-                                normalized_inserts.append(normalized_insert)
-                except Exception as exc6 :
-                    print ('rcptto error',str(exc6),key)
-
-
-
-            elif (line[exist[key]] != '-' or line[exist[key]]!= "-") and key not in normalized_tables  :
-                try :
-                    if types[key] == datetime: # checking for datetime type
-                        #  NOTE converting epoch to datetime is redundent since sqlite drivers are capable of handle epoch time
-                        a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(float(line[exist[key]])))
-                        #print (a)
-                        values_string +="\'"+str(a)+"\',"  # concatenating the value to the values string
-
-                    elif types[key] == int:
-                        print(line[exist[key]], 'test1')
-                        values_string += line[exist[key]] + ","
-                    elif types [key] == float :
-                        values_string += line[exist[key]] + ","
-
-                    elif types[key] == bool:
-                        if line[exist[key]] =="F" or line[exist[key]] =="f":
-                            values_string +=   "0,"
-                        elif line[exist[key]] == "t" or line[exist[key]] == "T":
-                                values_string += "1,"
-                        else :
-                            values_string += "null,"
-
-                    else :
-                        values_string += "\'"+str(line[exist[key]])+"\',"
-                except Exception as exc7 :
-                    print ("faga33334443",exc7)
-            else :
-                values_string += "null,"
-            print (values_string)
-        #print (values_string)
-        try:
-            ids_values = ids_values[:len(ids_values)-1]
-            print (ids_values)
-        except:
-            print("no ids values")
-
-        try :
-            values_string = values_string[:len(values_string) - 1] # split the colons
-            print (values_string)
-        except Exception as exc8 :
-            print (str (exc8) , "error splitting values string ")
-
-        print (type(field))
-        normal_table_insert += field + ") values (" + values_string + ")" #construct the final insert statment
-        inserts.append(normal_table_insert)
-        try:
-            ids_insert=ids_insert+"ts"+",uid,"+ids_field[:len(ids_field)-1]+")values("+line[exist['ts']]+",\'"+line[exist['uid']]+"\',"+ids_values+")"
-            inserts.append(ids_insert)
-            print (ids_insert)
-
-        except Exception as exc9:
-            print (str(exc9),'exception happend while appending')
-        if len(normalized_inserts) > 0:
-            inserts.extend(normalized_inserts)
-
-        print(normal_table_insert)
-        print ('returned tables')
-        if table !='files':
-            inserts.insert(0,main_insert)
-        print (inserts)
-        return inserts
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
@@ -896,17 +684,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
 
-            progress = 100 / len(
-                self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
+            # progress = 100 / len(
+            #     self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
             for each in self.validFiles:
                 each = str.lower(each)
                 print(each)
                 self.tableCreator(each)
                 self.traverse(each)   # load every file in the dir
-                self.progressBar.setValue(self.progressBar.value() + progress)
+                # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.analysis.setTabEnabled(2, True)  #enable query tab after loading
-            self.loaded = True                      # this flag indicates the program and database are loaded with data
+            # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
             self.message.setText("please specifiy a file to load or a directory")
             self.message.show()
@@ -1030,7 +818,8 @@ if __name__ == "__main__":  # main module
                 return 0
             else :
                 return 0
-
+    tables=Tables.tables
+    normalized_tables=Tables.normalized_tables
 
 
     import sys
@@ -1040,116 +829,7 @@ if __name__ == "__main__":  # main module
     OriDir = os.getcwd()  # this variable will store the original
     historyLog = os.getcwd() + '/history.csv'
 
-    types = {  # the foloowing dictionary denotes every field in log files with their data types
 
-        # the following lines denote the types that require a set
-        #################sets##############
-        "tags": str,"proxied": str , "analyzers": str,
-        "orig_fuid": str,"resp_meme_ty": str,"orig_meme_type": str,
-        "conn_uids": str,"data_channel":str, "rcptto": str,
-        "rx_hosts": str,"path": str, "tx_hosts": str,"validation_status": str,
-         "name": str,"tunnel_parents": str, "TTLs": -1, "answers": str, "fuids": str,
-        #################end of sets##############
-
-        "uid": str, "ts":float, "id": str, "trans_depth": int, "method": str, "host": str, "uri": str,"trans_id":int,
-        "referrer": str, "user_agent": str, "request_body_len": int, "status_code": int, "status_msg": str, "info_code": int,
-         "info_msg": str, "username": str, "password": str, "command": str, "arg": str
-        , "mime_type": str, "file_size": int, "reply_code": int, "reply_msg": str
-        , "fuid": str, "source": str, "depth": int
-        , "filename": str, "duration": str, "local_orig": bool, "is_orig": bool, "seen_bytes": int,
-             "total_bytes": int,'date':str
-        , "missing_bytes": int, "overflow_bytes": int, "timedout": bool, "parent_fuid": str
-        , "md5": str, "sha1": str, "sha256": str, "extracted": str
-        , "nick": str, "user": str, "value": str, 'addi': str
-        , "dcc_file_name": str, "dcc_file_size": int, "dcc_mime_type": str
-        , 'trans_depth': int, "helo": str, "mailfrom": str
-        , "from": str, "to": str, "reply_to": str, "msg_id": str, "in_reply_to": str, "subject": str
-        , "x_originating_ip": str, "first_received": str
-        , "second_received": str, "last_reply": str
-        , "tls": bool, "is_webmail": bool
-        , "status": str, "direction": str, "client": str, "server": str, "resp_size": int
-        , "id.orig_h": str, "id.orig_p": int, "id.resp_h": str, "id.resp_p": int, "version": str, "cipher": str,
-        "server_name": str, "session_id": str, "issuer_subject": str, "not_valid_before": str,
-        "last_alert": str, "client_subject": str, "clnt_issuer_subject": str, "cert_hash": str
-        , "notice": bool, "peer": str
-        , "src_addr": str, "src_port": int, "dst_adr": str, "dst_port": int, "note": str, "sig_id": str
-        , "event_msg": str, "sub_msg": str, "sig_count": int, "host_count": int
-        , "id_resp_h": str, "id_resp_p": int, "proto": str, "service": str
-        , "orig_bytes": int, "resp_bytes": int, "conn_state": str, "missed_bytes": int, "history": str, "orig_pkts": int
-        , "orig_ip_bytes": int, "resp_pkts": int, "resp_ip_bytes": int, "orig_cc": str,
-             "resp_cc": str
-        , "mac": str, "assigned_ip": str, "lease_time ": str
-        , "query": str, "qclass": int, "qclass_name": str, "qtype": int, "qtype_name": str, "rcode": int,
-             "rcode_name": str
-        , "QR": bool, "AA": bool, "TC": bool, "RD": bool, "RA": bool, "Z": int,
-             "rejected": bool
-             }  # end of types dictionary declaration
-
-    validFields = {  #this line stores the indecies of the fields at each line for every log file type
-
-        "http": {'uid': -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1,
-                 "id.resp_h": -1, "id.resp_p": -1, "trans_depth": -1,
-                 "method": -1, "host": -1, "uri": -1, "referrer": -1,
-                 "user_agent": -1, "request_body_len": -1, "status_code": -1,
-                 "status_msg": -1, "info_code": -1,"info_msg": -1,
-                 "filename":-1,"tags": -1, "username": -1,
-                 "password": -1, "proxied": -1,
-                 "orig_fuids": -1, "orig_meme_type": -1,
-                 "orig_fuid": -1,"resp_meme_ty": -1},
-
-        'ftp': {"uid": -1, "ts": -1, "id.orig_h": -1, "id.orig_p": .1, "id.resp_h": -1, "id.resp_p": -1,  "user": -1, "password": -1, "command": -1, "arg": -1,
-                "mime_type": -1, "file_size": -1, "reply_code": -1, "reply_msg": -1,
-                "data_channel": -1, "fuid": -1},
-
-        "files": {"ts": -1, "fuid": -1, "tx_hosts": -1, "rx_hosts": -1, "conn_uids": -1, "source": -1, "depth": -1,
-                  "analyzers": -1, "mime_type": -1,
-                  "filename": -1, "duration": -1, "local_orig": -1, "is_orig": -1, "seen_bytes": -1, "total_bytes": -1,
-                  "missing_bytes": -1, "overflow_bytes": -1, "timedout": -1, "parent_fuid": -1,
-                  "md5": -1, "sha1": -1, "sha256": -1, "extracted": -1},  # check this again
-
-        'irc': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,  "nick": -1, "user": -1, "command": -1, "value": -1, "addi": -1,
-                "dcc_file_name": -1, "dcc_file_size": -1, "dcc_mime_type": -1, "fuid": 1},
-
-        'smtp': {'ts': -1, 'uid': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, 'trans_depth': -1, "helo": -1, "mailfrom": -1, "rcptto": -1
-            , "date": -1, "from": -1, "to": -1, "reply_to": -1, "msg_id": -1, "in_reply_to": -1, "subject": -1
-            , "x_originating_ip": -1, "first_received": -1
-            , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
-            , "tls": -1, "fuids": -1, "is_webmail": -1},
-
-        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1},
-
-        'ssl': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
-                "cipher": -1,
-                "server_name": -1, "session_id": -1, "subject": -1,
-                "issuer_subject": -1, "not_valid_before": -1,
-                "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
-                "validation_status": -1},
-
-        'weird': {"uid": -1,'ts':-1 ,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
-
-        'signatures': {"ts": -1, 'src_addr': -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,
-                       'src_port': -1, 'dst_adr': -1, 'dst_port': -1, 'note': -1, 'sig_id': -1,
-                       'event_msg': -1, 'sub_msg': -1, 'sig_count': -1, 'host_count': -1},
-                    # the following tables have the subset of conn table
-                    #1 dhcp ,2 dns,3 http,4 irc,5 ftp,6 smtp,7 ssl,8 ssh,9 weird
-        'ids':{"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1},
-
-        'conn': {'ts':-1,"uid": -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1,
-                  "service": -1,
-                  "duration": -1, "orig_bytes": -1,
-                  "resp_bytes": -1, "conn_state": -1, "local_orig": -1, "missed_bytes": -1, "history": -1,
-                  "orig_pkts": -1,
-                  "orig_ip_bytes": -1, "resp_pkts": -1, "resp_ip_bytes": -1, "tunnel_parents": -1, "orig_cc": -1,
-                  "resp_cc": -1},
-
-        'dhcp': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "mac": -1, "assigned_ip": -1, "lease_time ": -1, "trans_id": -1},
-
-        'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
-                "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
-                "rcode_name": -1, "qr": -1,
-                "aa": -1, "tc": -1, "rd": -1, "ra": -1, "z": -1, "answers": -1, "ttls": -1, "rejected": -1}
-        # check tables strucutre !!! normalize conn_ID table
-    }
 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
@@ -1157,22 +837,7 @@ if __name__ == "__main__":  # main module
     ui.setupUi(MainWindow)
     MainWindow.show()
 
-    tables = [ 'dhcp', "smtp", "irc", "weird", "ssh", "conn",'ftp',
-               "http", "dns", "signature", "ssl", "ids", "files",'ssh','main']  # this list declares every table in the database
 
-    # the following dictionary denotes normalized FIELDS
-    normalized_fields={'fuids':'fuid','path':'path','to':'to','rcptto':'receipent','analyzers':'analyzer',
-                       'conn_uids':'conn_uid','rx_hosts':'rx_host','tx_hosts':'tx_host',"tunnel_parents":'parent'
-                          ,"ttls":'ttl', 'answers':'answer'
-                          ,'resp_meme_types':'resp_meme_type', 'resp_fuids':'resp_fuid', 'orig_meme_types':'orig_meme_types'
-                        , 'orig_fuids':'orig_fuid', 'proxied_headers':'header', 'tags':'tag',
-                        'validation_status':'validation_status'}
-
-    normalized_tables=['http_proxied_headers','http_resp_meme_types','http_tags','http_orig_meme_types',
-                       'http_orig_fuids','http_resp_fuids',
-                       'files_tx_hosts','files_conn_uids','files_analyzers','files_rx_hosts','ftp_data_channel',
-                       'conn_tunnel_parents','dns_ttls','dns_answers','smtp_analyzers','smtp_rcptto','smtp_to',
-                       'smtp_fuids','smtp_path','ssl_validation_status']
     try:
 
         DBconnection = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
