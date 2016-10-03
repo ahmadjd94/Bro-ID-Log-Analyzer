@@ -1,8 +1,8 @@
-from BilaFieldIndecies import validFields
-from Tables import normalized_tables,normalized_fields
-from BilaTypes import BilaTypes
+from BilaFieldIndecies import validFields  # import indecies dictionary
+from Tables import normalized_tables,normalized_fields # import fields of normalized tables
+from BilaTypes import BilaTypes #import field types
 import time
-from datetime import datetime
+from datetime import datetime #needed for formating
 
 def SQLcreator( table, line):  # this function creates SQL Queries based on table based to it
     normalized_inserts = []
