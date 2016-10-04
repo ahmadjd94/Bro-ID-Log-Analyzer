@@ -74,7 +74,7 @@ def SQLcreator( table, line):  # this function creates SQL Queries based on tabl
     ids_values = ""  # string will stores the values of insert statment for ids table
     ids_insert = "insert into ids("
     ids_field = field = values_string = ""  # variable field stores the field name in table
-    #########################################################################################
+    #######################################################################################
 
     normal_table_insert = "insert into %s (" % table  # insert statment
     print(normal_table_insert)
