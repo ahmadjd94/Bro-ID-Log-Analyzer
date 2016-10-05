@@ -431,7 +431,172 @@ border-color:rgb(255, 153, 0 );
       </item>
       <item>
        <property name="text">
-        <string>New Item</string>
+        <string>SELECT RESP_H FROM IDS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string> SELECT COMMAND FROM FTP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT REPLY_CODE , REPLY_MSG FROM FTP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CONNECTION QUERIES</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT UID FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT DURATION FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT ORIG_H , ORIG_P FROM IDS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT RESP_H ,RESP_P FROM IDS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT PROTO FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT ORIG_BYTES FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT RESP_BYTES FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT CONN_STATE FROM CONN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SSL QUERIES </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT VERSION FROM SSL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT CIPHER FROM SSL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT SERVER_NAME FROM SSL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT SUBJECT FROM SSL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT ISSUER FROM SSL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SSH QUERIES</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT HOST KEY FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT DIRECTION FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT CLIENT FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT SERVER FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT CIPHER_ALG FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT VERSION FROM SSH</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>WEIRD QUERIES </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT NAME FROM WEIRD</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT ADDI FROM WEIRD</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT NOTICE FROM WEIRD</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SELECT PEER FROM WEIRD</string>
        </property>
       </item>
      </widget>
