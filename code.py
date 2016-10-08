@@ -32,6 +32,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     validFiles = []  # this list stores the valid file found in a DIR
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
+
       # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
     # END OF GLOVAL VARIABLES DEFENITION
@@ -833,7 +834,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
 if __name__ == "__main__":  # main module
-
+    DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     def droptables(table):  # a map function drops tables , return 1 on success
         try:
             DBconnection.execute("drop table %s" % table)
@@ -866,7 +867,7 @@ if __name__ == "__main__":  # main module
 
     try:
 
-        DBconnection = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
+        DBconnection = QtSql.QSqlDatabase.databaseName('analyze2.db')  # initializing connection to DB // should be in UI init ??
         print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
