@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
+from Tables import validQueries
 import Tables
 from PyQt5.QtGui import QIcon
 
@@ -35,9 +36,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     # END OF GLOVAL VARIABLES DEFENITION
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        #self.__message2__.setText("error connecting to database")
+        # self.__message2__.setText("error connecting to database")
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
@@ -50,14 +52,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
-#        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
+        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
         self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
         self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
         self.actionAbout.setText(_translate("MainWindow", "about"))
         self.label_2.setStyleSheet("color : green")
         self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
         self.label_2.setVisible(False)
+        self.comboBox.setToolTip(
+        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
+
         self.analysis.setTabEnabled(1, False)
+        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
         # self.analysis.setTabEnabled(2,False)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
@@ -66,17 +72,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
-        self.textEdit.textChanged.connect(self.uMan)
+        # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.radioButton.click()
-
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
         self.centralWidget = QtWidgets.QWidget(MainWindow)
-        self.message=QtWidgets.QMessageBox()
+        self.message = QtWidgets.QMessageBox()
         self.centralWidget.setObjectName("centralWidget")
         self.analysis = QtWidgets.QTabWidget(self.centralWidget)
         self.analysis.setGeometry(QtCore.QRect(10, 0, 721, 481))
@@ -132,15 +137,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
-        #self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
         self.pushButton_2.setGeometry(QtCore.QRect(616, 99, 29, 27))
         self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_2.setObjectName("pushButton_2")
-        #self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
-        #self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
+        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
+        # self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
         #                                "color: rgb(0, 0, 0);")
-        #self.pushButton_2.setObjectName("pushButton_2")
+        # self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_3 = QtWidgets.QPushButton(self.tab)
         self.pushButton_3.setGeometry(QtCore.QRect(621, 211, 29, 27))
         self.pushButton_3.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -180,12 +185,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_5.setObjectName("pushButton_5")
-        self.textEdit = QtWidgets.QTextEdit(self.tab_3)
-        self.textEdit.setGeometry(QtCore.QRect(60, 30, 391, 91))
-        self.textEdit.setStyleSheet("border-color:rgb(255, 153, 0 );")
-        self.textEdit.setFrameShape(QtWidgets.QFrame.Box)
-        self.textEdit.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.textEdit.setObjectName("textEdit")
+        self.label_2 = QtWidgets.QLabel(self.tab_3)
+        self.label_2.setGeometry(QtCore.QRect(480, 100, 191, 20))
+        self.label_2.setStyleSheet("color: rgb(68, 206, 0);\n"
+                                   "border-color:rgb(255, 153, 0 );\n"
+                                   "")
+        self.label_2.setObjectName("label_2")
+        self.comboBox = QtWidgets.QComboBox(self.tab_3)
+        self.comboBox.setGeometry(QtCore.QRect(60, 50, 351, 22))
+        self.comboBox.setObjectName("comboBox")
         self.label_2 = QtWidgets.QLabel(self.tab_3)
         self.label_2.setGeometry(QtCore.QRect(480, 100, 191, 20))
         self.label_2.setStyleSheet("color: rgb(68, 206, 0);\n"
@@ -215,7 +223,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.SQLcreator=SQLcreator
+        self.SQLcreator = SQLcreator
+
+    def setup_combobox(self,fname):
+
+        self.comboBox.addItems(validQueries[fname])
 
 
     def uMan(self):
@@ -231,6 +243,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     DBconnection.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
                     table_created['IDS']=True
+                    self.setup_combobox(fname)
                     print ("success creating ids  table ")
                 except :
                     table_created['IDS'] = False
@@ -246,6 +259,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
                 table_created['FTP'] = True
+                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -261,6 +275,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step2")
                 table_created['DHCP'] = True
+                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -276,6 +291,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step4")
                 table_created['IRC'] = True
+                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -290,6 +306,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
+                self.setup_combobox(fname)
                 print("step5")
             except:
                 return False
@@ -304,6 +321,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
+                self.setup_combobox(fname)
                 print("step6")
                 return True
             except:
@@ -322,6 +340,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBconnection.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
                              FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
+                self.setup_combobox(fname)
                 print("step7")
                 return True
             except:
@@ -377,8 +396,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['HTTP_ORIG_FUIDS'] = True
                 table_created['HTTP_PROXIED_HEADERS'] = True
                 table_created['HTTP_TAGS'] = True
+                self.setup_combobox(fname)
 
                 print("step8")
+
             except:
                 return False
         elif fname == "dns.log":  # DONE # create DNS table    is working fine
@@ -404,6 +425,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 table_created['DNS_ANSWERS'] = True
                 table_created['DNS_TTLS'] = True
+                self.setup_combobox(fname)
 
                 print("step9")
             except:
@@ -415,6 +437,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 table_created['SIGNATURE'] = True
+                self.setup_combobox(fname)
 
                 print("step10")
                 return True
@@ -436,6 +459,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBconnection.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
                             "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")
                 table_created['SSL_VALIDATION_STATUS'] = True
+                self.setup_combobox(fname)
 
                 print("step11")
                 return True
@@ -472,6 +496,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                      "FOREIGN KEY (UID) REFERENCES FILE(UID)"
                                      ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_ANALYZERS'] = True
+                self.setup_combobox(fname)
 
             except:
                 return False
@@ -510,6 +535,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBconnection.execute("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
+                self.setup_combobox(fname)
 
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
                 return True
