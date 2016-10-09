@@ -562,11 +562,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (os.getcwd())
             if fname in os.listdir():
                 print('yes')
-            fil = open(fname , 'r')  # open the log file Read-Only mode
+            fil = open(fname , 'r+')  # open the log file Read-Only mode
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             f1=mmap(fil.fileno(),0)
-            for i in f1:     # todo : modify function to increase the progress bar
+            readline=f1.readline
+            i =codecs.decode(readline(),'ascii')
+            while i !='' or '' not in i:     # todo : modify function to increase the progress bar
                 hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
@@ -614,6 +616,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         # print (str(a))
                         print('error creating SQL',str (exc1))
                     print ('end')
+                i = codecs.decode(readline(), 'ascii')
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
