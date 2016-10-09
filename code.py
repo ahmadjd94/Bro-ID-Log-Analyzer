@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
 from Tables import validQueries
+from mmap import mmap
 import Tables
 from PyQt5.QtGui import QIcon
 
@@ -561,14 +562,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (os.getcwd())
             if fname in os.listdir():
                 print('yes')
-            f1 = open(fname , 'r')  # open the log file Read-Only mode
+            fil = open(fname , 'r')  # open the log file Read-Only mode
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
-            for i in f1:  # todo : modify function to increase the progress bar
+            f1=mmap(fil.fileno(),0)
+            for i in f1:     # todo : modify function to increase the progress bar
                 hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
-                    i = i.lower()  # ignore the case of the fields line
+                    # i = i.lower()  # ignore the case of the fields line
                     # print(i)
                     fields = (i[7:].split())
                     print(fields)
@@ -604,7 +606,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 DBconnection.commit()
                                 print ("executed correctly :\n",command)
 
-                            except:
+                            except QtSql.QSqlError:
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
                         # DBquery.exec_(sql_command,sql_command_ids)
