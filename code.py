@@ -156,11 +156,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
-        self.graphicsView.setGeometry(QtCore.QRect(10, 10, 711, 351))
-        self.graphicsView.setStyleSheet("background-color: rgb(188, 188, 188);\n"
+        self.model = QtSql.QSqlTableModel(None,DBconnection)
+        self.modelview = QtWidgets.QTableView()
+        self.modelview.setModel(self.model)
+        self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
+        self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
                                         "border-color: rgb(0, 0, 0);")
-        self.graphicsView.setObjectName("graphicsView")
+        self.modelview.setObjectName("graphicsView")
+
+
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -230,6 +234,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def setup_combobox(self,fname):
 
         self.comboBox.addItems(validQueries[fname])
+        self.model.setTable('main')
+        self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
+        self.modelview.setModel(self.model)
 
 
     def uMan(self):
@@ -652,7 +659,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
+
         command = self.comboBox.currentText()
+
         select =insert =False  # indicates if the text area contains a select statment
         try:
             if "select" in command:
@@ -660,7 +669,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 result = DBquery.exec_(command).fetchall()
                 for i in result:
                     for each in i:
-                        pass
+                        self.SQL_tableview
                         # this lines should insert the result of select statments into the tableview
 
             if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
