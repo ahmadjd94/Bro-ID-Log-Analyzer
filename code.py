@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
-from Tables import validQueries
+from Tables import validQueries ,table_created
 from mmap import mmap
 import Tables
 from PyQt5.QtGui import QIcon
@@ -33,6 +33,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     validFiles = []  # this list stores the valid file found in a DIR
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
+    table_created=Tables.table_created
 
       # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
@@ -246,28 +247,28 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print ('fname passes to function',fname)
         print (dropped)
         if fname in ["ids","IDS"]:
-            if table_created['ids'] == False:
+            if self.table_created['ids'] == False:
 
                 try:
                     DBquery.exec_("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
-                    table_created['IDS']=True
+                    self.table_created['ids']=True
                     self.setup_combobox(fname)
                     print ("success creating ids  table ")
-                except :
-                    table_created['IDS'] = False
-                    print ("error creating ids table ")
+                except Exception as A:
+                    self.table_created['ids'] = False
+                    print ("error creating ids table ",str(A))
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
             try:
-                if table_created['ids'] == False:
+                if self.table_created['ids'] == False:
                     self.tableCreator('ids')
                 DBquery.exec_("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
-                table_created['FTP'] = True
+                self.table_created['FTP'] = True
                 self.setup_combobox(fname)
                 return True
             except:
@@ -275,7 +276,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
             try:
-
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
@@ -414,7 +414,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif fname == "dns.log":  # DONE # create DNS table    is working fine
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                if table_created['ids'] == False:
+                if self.table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
                 DBquery.exec_("""CREATE TABLE DNS (
@@ -911,7 +911,7 @@ if __name__ == "__main__":  # main module
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
-            table_created['MAIN']=True
+            table_created['main']=True
             print ("Success creating main table")
 
         except:

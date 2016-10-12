@@ -14,7 +14,21 @@ tables = ['dhcp',
           "files",
           'ssh',
           'main']
-
+table_created ={'dhcp':False,
+          "smtp":False,
+          "irc":False,
+          "weird":False,
+          "ssh":False,
+          "conn":False,
+          'ftp':False,
+          "http":False,
+          "dns":False,
+          "signature":False,
+          "ssl":False,
+          "ids":False,
+          "files":False,
+          'ssh':False,
+          'main':False}
 # the following dictionary denotes normalized FIELDS
 normalized_fields = {'fuids': 'fuid',
                      'path': 'path',
@@ -78,7 +92,7 @@ validQueries ={
 
         'dns.log':["SELECT QUERY FROM DNS",
             "SELECT ANSWER FROM DNS_ANSWERS",
-           "SELECT RESP_H FROM IDS",
+            "SELECT RESP_H FROM IDS",
             "SELECT QTYPE FROM DNS "],
 
         'conn.log':[
