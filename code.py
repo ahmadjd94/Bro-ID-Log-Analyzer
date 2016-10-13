@@ -13,7 +13,8 @@ from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
 from Tables import validQueries ,table_created
-from mmap import mmap
+from mmap import *
+import numpy
 import Tables
 from PyQt5.QtGui import QIcon
 
@@ -26,14 +27,14 @@ import hashlib, codecs, operator, sqlite3, os,time
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
-    global DBconnection  # connection to DB
+    global DBconnection,table_created  # connection to DB
     single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []  # this list stores the valid file found in a DIR
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
-    table_created=Tables.table_created
+
 
       # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
@@ -245,30 +246,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
         print ('fname passes to function',fname)
+        fname=fname.lower()
         print (dropped)
-        if fname in ["ids","IDS"]:
-            if self.table_created['ids'] == False:
-
-                try:
+        if fname =='ids':
+             if table_created['ids'] == False:
                     DBquery.exec_("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
-                    self.table_created['ids']=True
-                    self.setup_combobox(fname)
+                    table_created['ids']=True
                     print ("success creating ids  table ")
-                except Exception as A:
-                    self.table_created['ids'] = False
-                    print ("error creating ids table ",str(A))
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
             try:
-                if self.table_created['ids'] == False:
+                if table_created['ids'] == False:
                     self.tableCreator('ids')
                 DBquery.exec_("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
-                self.table_created['FTP'] = True
+                table_created['FTP'] = True
                 self.setup_combobox(fname)
                 return True
             except:
@@ -411,11 +407,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             except:
                 return False
-        elif fname == "dns.log":  # DONE # create DNS table    is working fine
+        elif fname == "dns.log":  # DONE # create DNS table    continously crashing
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                if self.table_created['ids'] == False:
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                try:
+                    if table_created['ids'] == False:
+                        self.tableCreator('ids')  # call the table creator function to create the ids table
+                except Exception as DNS_exc:
+                    print ('error creating ids of dns ',DNS_exc)
 
                 DBquery.exec_("""CREATE TABLE DNS (
                                         UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
@@ -572,9 +571,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             fil = open(fname , 'r+')  # open the log file Read-Only mode
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
-            f1=mmap(fil.fileno(),0)
-            readline=f1.readline
-            i =codecs.decode(readline(),'ascii')
+            print (fil.__sizeof__())
+            # f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
+            # readline=f1.readline
+            # i =codecs.decode(fil.readline(),'ascii')
+            i=fil.readline()
             while i !='' or '' not in i:     # todo : modify function to increase the progress bar
                 hashtemp += i  # concatenate the lines being read to the string
 
@@ -623,7 +624,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         # print (str(a))
                         print('error creating SQL',str (exc1))
                     print ('end')
-                i = codecs.decode(readline(), 'ascii')
+                # i = codecs.decode(readline(), 'ascii')
+                i=fil.readline()
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
@@ -635,8 +637,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 #else:
                  #   print(i + "neglected")
                 #self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
-            f1.close()
-
+            # f1.close()
+            fil.close()
             with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
 
                 digestive = hashlib.md5(codecs.encode(hashtemp,'ascii'))  # string must be converted to bytes to calculate hash
@@ -773,11 +775,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print(name)
                 file = open(self.lineEdit.text())
                 self.count = 0
-                for i in file:
+                for line in file:
                     self.linesCount += 1
+                file.close()
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
-                file.close()
+
             elif name in self.UnsupportedFiles:
                 print("here")
                 self.message.setText("BILA does not currently support the file you are trying to use")
@@ -850,6 +853,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 if __name__ == "__main__":  # main module
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
+    table_created = Tables.table_created
     def droptables(table):  # a map function drops tables , return 1 on success
         try:
             DBquery.exec_("drop table %s" % table)
