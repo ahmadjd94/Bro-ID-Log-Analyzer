@@ -36,6 +36,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     valid=Tables.valid
 
 
+
       # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
     # END OF GLOVAL VARIABLES DEFENITION
@@ -236,9 +237,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def setup_combobox(self,fname):
 
         self.comboBox.addItems(validQueries[fname])
-        self.model.setTable('main')
-        self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-        self.modelview.setModel(self.model)
+        # self.model.setTable('main')
+        # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
+        # self.modelview.setModel(self.model)
 
 
     def uMan(self):
@@ -265,7 +266,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
                 table_created['FTP'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -280,7 +280,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step2")
                 table_created['DHCP'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -296,7 +295,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step4")
                 table_created['IRC'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -311,7 +309,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
-                self.setup_combobox(fname)
                 print("step5")
             except:
                 return False
@@ -326,7 +323,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
-                self.setup_combobox(fname)
                 print("step6")
                 return True
             except:
@@ -345,7 +341,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBquery.exec_ ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
                              FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
-                self.setup_combobox(fname)
+
                 print("step7")
                 return True
             except:
@@ -401,7 +397,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['HTTP_ORIG_FUIDS'] = True
                 table_created['HTTP_PROXIED_HEADERS'] = True
                 table_created['HTTP_TAGS'] = True
-                self.setup_combobox(fname)
 
                 print("step8")
 
@@ -433,7 +428,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 table_created['DNS_ANSWERS'] = True
                 table_created['DNS_TTLS'] = True
-                self.setup_combobox(fname)
 
                 print("step9")
             except:
@@ -445,7 +439,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 table_created['SIGNATURE'] = True
-                self.setup_combobox(fname)
 
                 print("step10")
                 return True
@@ -467,7 +460,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBquery.exec_("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
                             "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")
                 table_created['SSL_VALIDATION_STATUS'] = True
-                self.setup_combobox(fname)
 
                 print("step11")
                 return True
@@ -504,7 +496,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                      "FOREIGN KEY (UID) REFERENCES FILE(UID)"
                                      ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_ANALYZERS'] = True
-                self.setup_combobox(fname)
 
             except:
                 return False
@@ -543,7 +534,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBquery.exec_("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
-                self.setup_combobox(fname)
 
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
                 return True
@@ -572,11 +562,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
             print (fil.__sizeof__())
-            # f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
-            # readline=f1.readline
-            # i =codecs.decode(fil.readline(),'ascii')
-            i=fil.readline()
+            f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
+            readline=f1.readline
+            i =codecs.decode(readline(),'ascii')
             while i !='' or '' not in i:     # todo : modify function to increase the progress bar
+
                 hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
@@ -623,14 +613,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     except Exception as exc1:
                         # print (str(a))
                         print('error creating SQL',str (exc1))
-                    print ('end')
-                # i = codecs.decode(readline(), 'ascii')
-                i=fil.readline()
+                print ('end')
+                i = codecs.decode(readline(), 'ascii')
+
+                # i=fil.readline()
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
-
-
+            print (fname)
+            self.setup_combobox(fname)
                     #DBquery.exec_
 
 
@@ -650,6 +641,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 except Exception as exc2:
                     print ('exception in writing the hash of the file',str(exc2))
+
 
         except Exception as exc3:  # this block is executed in case of failure of instering
             print(str(exc3))
@@ -851,19 +843,21 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # todo  reset timeline
 
 
+def droptables(table):  # a map function drops tables , return 1 on success
+    try:
+        DBquery.exec_("drop table %s" % table)
+        DBconnection.commit()
+        return 1
+    except sqlite3.OperationalError as a:
+        if "no such table" in str(a):
+            return 0
+        else:
+            return 0
 if __name__ == "__main__":  # main module
+    validQueries = Tables.validQueries
+    print (validQueries)
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     table_created = Tables.table_created
-    def droptables(table):  # a map function drops tables , return 1 on success
-        try:
-            DBquery.exec_("drop table %s" % table)
-            DBconnection.commit()
-            return 1
-        except sqlite3.OperationalError as a:
-            if "no such table" in str(a):
-                return 0
-            else :
-                return 0
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
 

@@ -83,19 +83,19 @@ UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_l
                     'known_hosts.log']
 
 validQueries ={
-        'http.log':['select * from http',
+        'http':['select * from http',
             'SELECT USER_AGENT FROM HTTP',
             'SELECT REQUEST FROM HTTP',
             'SELECT URI FROM HTTP',
             'SELECT METHOD FROM HTTP',
             'SELECT STATUS_CODE ,STATUS_MSG FROM HTTP'] ,
 
-        'dns.log':["SELECT QUERY FROM DNS",
+        'dns':["SELECT QUERY FROM DNS",
             "SELECT ANSWER FROM DNS_ANSWERS",
             "SELECT RESP_H FROM IDS",
             "SELECT QTYPE FROM DNS "],
 
-        'conn.log':[
+        'conn':[
             "SELECT DURATION FROM CONN",
             "SELECT UID FROM CONN",
             "SELECT ORIG_H , ORIG_P FROM IDS",
@@ -105,20 +105,20 @@ validQueries ={
             "SELECT RESP_BYTES FROM CONN",
             "SELECT CONN_STATE FROM CONN"],
 
-        'ssl.log':[
+        'ssl':[
             "SELECT VERSION FROM SSL",
             "SELECT CIPHER FROM SSL",
             "SELECT SERVER_NAME FROM SSL",
             "SELECT SUBJECT FROM SSL",
             "SELECT ISSUER FROM SSL"],
 
-        'ssh.log':["SELECT HOST KEY FROM SSH",
+        'ssh':["SELECT HOST KEY FROM SSH",
               "SELECT DIRECTION FROM SSH",
               "SELECT CLIENT FROM SSH",
               "SELECT SERVER FROM SSH",
               "SELECT CIPHER_ALG FROM SSH",
               "SELECT VERSION FROM SSH"],
-        'weird.log':[
+        'weird':[
               "SELECT NAME FROM WEIRD",
               "SELECT ADDI FROM WEIRD",
               "SELECT NOTICE FROM WEIRD",
