@@ -12,7 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
-from Tables import validQueries ,table_created
+from Tables import table_created
+from Queries import QueryStatment
 from mmap import *
 import numpy
 import Tables
@@ -159,7 +160,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.model = QtSql.QSqlTableModel(None,DBconnection)
+        self.model = QtSql.QSqlTableModel()
         self.modelview = QtWidgets.QTableView()
         self.modelview.setModel(self.model)
         self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
@@ -237,10 +238,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def setup_combobox(self,fname):
 
         self.comboBox.addItems(validQueries[fname])
-        # self.model.setTable('main')
-        # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-        # self.modelview.setModel(self.model)
 
+        # self.model.insertColumn(0,self.tab_3,'wtf')
+        # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
+        self.modelview.setModel(self.model)
+        # self.modelview.
+    def SetupModel (self,model,QueryID):
+        pass
 
     def uMan(self):
         self.label_2.setVisible(False)
