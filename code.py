@@ -15,6 +15,7 @@ from Functions import SQLcreator
 from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
+from PredefnedQueries import initQueries
 import numpy
 import Tables
 from PyQt5.QtGui import QIcon
@@ -234,10 +235,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
-
+        # self.dbu=DB
     def setup_combobox(self,fname):
 
-        self.comboBox.addItems(validQueries[fname])
+        self.comboBox.addItems(AllowedQueries)
 
         # self.model.insertColumn(0,self.tab_3,'wtf')
         # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
@@ -327,6 +328,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
+                AllowedQueries.append(initQueries('ssh'))
                 print("step6")
                 return True
             except:
@@ -347,6 +349,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['CONN'] = True
 
                 print("step7")
+                AllowedQueries.append(initQueries('conn'))
                 return True
             except:
                 return False
@@ -401,8 +404,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['HTTP_ORIG_FUIDS'] = True
                 table_created['HTTP_PROXIED_HEADERS'] = True
                 table_created['HTTP_TAGS'] = True
-
                 print("step8")
+                AllowedQueries.append(initQueries('http'))
 
             except:
                 return False
@@ -432,6 +435,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 table_created['DNS_ANSWERS'] = True
                 table_created['DNS_TTLS'] = True
+                AllowedQueries.append(initQueries('dns'))
 
                 print("step9")
             except:
@@ -466,6 +470,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SSL_VALIDATION_STATUS'] = True
 
                 print("step11")
+                AllowedQueries.append(initQueries('ssl'))
                 return True
             except:
                 return False
@@ -858,13 +863,13 @@ def droptables(table):  # a map function drops tables , return 1 on success
         else:
             return 0
 if __name__ == "__main__":  # main module
-    validQueries = Tables.validQueries
-    print (validQueries)
+    # validQueries = Tables.validQueries
+    # print (validQueries)
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     table_created = Tables.table_created
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
-
+    AllowedQueries = []
 
     import sys
     import csv
