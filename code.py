@@ -81,8 +81,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
+        self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
-
+    def selected_query(self):
+        for i in AllowedQueries:
+            for query in i :
+                if query.Query==self.comboBox.currentText():
+                    print (list(query.Headers))
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
@@ -237,8 +242,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         # self.dbu=DB
     def setup_combobox(self,fname):
-
-        self.comboBox.addItems(AllowedQueries)
+        try:
+            print (len (AllowedQueries))
+            for obj in AllowedQueries:
+                for query in obj:
+                    self.comboBox.addItem(query.Query)
+        except Exception as A:
+            print ('eroro adding to combo box ',A)
 
         # self.model.insertColumn(0,self.tab_3,'wtf')
         # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
