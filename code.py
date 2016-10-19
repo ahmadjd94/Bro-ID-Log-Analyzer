@@ -87,7 +87,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         for i in AllowedQueries:
             for query in i :
                 if query.Query==self.comboBox.currentText():
-                    print (list(query.Headers))
+                    print (query.Headers[0])
+                    self.model.setHorizontalHeaderLabels(query.Headers[0])
+                    self.model.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
@@ -166,13 +168,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.model = QtSql.QSqlTableModel()
-        self.modelview = QtWidgets.QTableView()
-        self.modelview.setModel(self.model)
-        self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
-        self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
-                                        "border-color: rgb(0, 0, 0);")
-        self.modelview.setObjectName("graphicsView")
+
 
 
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
@@ -184,15 +180,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.tableView = QtWidgets.QTableView(self.tab_3)
-        self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
-        self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.tableView.setAutoFillBackground(False)
-        self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
-                                     "")
-        self.tableView.setFrameShape(QtWidgets.QFrame.Box)
-        self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.tableView.setObjectName("tableView")
+        # self.tableView = QtWidgets.QTableView(self.tab_3)
+        # self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
+        # self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
+        # self.tableView.setAutoFillBackground(False)
+        # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
+        #                              "")
+        self.model = QtWidgets.QTableWidget(self.tab_3)
+        # self.modelview = QtWidgets.QTableView()
+        # # self.modelview.setModel(self.model)
+        # self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
+        # self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
+        #                                 "border-color: rgb(0, 0, 0);")
+        # self.modelview.setObjectName("graphicsView")
+        self.model.setGeometry(QtCore.QRect(60, 150, 641, 291))
+        self.model.setStyleSheet("background-color: grey;\n"
+                                 "border-color: rgb(0, 0, 0);")
+        self.model.setObjectName("graphicsView")
+        # self.tableView.setFrameShape(QtWidgets.QFrame.Box)
+        # self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
+        # self.tableView.setObjectName("tableView")
         self.label_3 = QtWidgets.QLabel(self.tab_3)
         self.label_3.setGeometry(QtCore.QRect(64, 136, 59, 14))
         self.label_3.setObjectName("label_3")
