@@ -688,13 +688,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         print (command)
 
         try:
-
             DBquery.exec_(command)
+            self.model.setRowCount(0)
+            rowcount=0
             while DBquery.next():
+
+                    self.model.insertRow(rowcount)
                     result=''
                     for count in range (len(self.currentQuery.Headers[0])):
+
+                        # tex.setText()
+                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
+                        # self.model.ite
                         result+= str(DBquery.value(count))
+
                     print (result)
+                    rowcount+=1
+
                         # this lines should insert the result of select statments into the tableview
 
             # if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
