@@ -19,7 +19,7 @@ def initQueries(Key):
         ]
         return dns
     elif Key=='conn':
-        conn=[QueryStatment("SELECT DURATION FROM CONN",11,'conn',['uid','ts','duration']),
+        conn=[QueryStatment("SELECT uid,ts,DURATION FROM CONN",11,'conn',['uid','ts','duration']),
           QueryStatment("SELECT UID FROM CONN",12,'conn',['uid','ts','uid']),
           QueryStatment("SELECT ORIG_H , ORIG_P FROM IDS",13,'conn',['uid','ts','orig_h','orig_p']),
           QueryStatment("SELECT RESP_H ,RESP_P FROM IDS",14,'conn',['uid','ts','resp_h','resp_p']),

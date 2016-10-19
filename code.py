@@ -36,6 +36,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     validFiles = []  # this list stores the valid file found in a DIR
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
+    currentQuery=None
 
 
 
@@ -83,13 +84,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
-    def selected_query(self):
-        for i in AllowedQueries:
-            for query in i :
-                if query.Query==self.comboBox.currentText():
-                    print (query.Headers[0])
-                    self.model.setHorizontalHeaderLabels(query.Headers[0])
-                    self.model.show()
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
@@ -247,7 +242,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
+        self.currentQuery
         # self.dbu=DB
+    def selected_query(self):
+        for i in AllowedQueries:
+            for query in i:
+                if query.Query == self.comboBox.currentText():
+                    self.currentQuery=query
+                    print(query.Headers[0])
+                    self.model.setColumnWidth(1, 581 / len(query.Headers[0]))
+                    self.model.setColumnCount(len(query.Headers[0]))
+                    self.model.setHorizontalHeaderLabels(query.Headers[0])
+                    self.model.show()
     def setup_combobox(self,fname):
         try:
             print (len (AllowedQueries))
@@ -259,10 +265,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         # self.model.insertColumn(0,self.tab_3,'wtf')
         # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-        self.modelview.setModel(self.model)
+        # self.modelview.setModel(self.model)
         # self.modelview.
-    def SetupModel (self,model,QueryID):
-        pass
 
     def uMan(self):
         self.label_2.setVisible(False)
@@ -681,39 +685,41 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
 
         command = self.comboBox.currentText()
+        print (command)
 
-        select =insert =False  # indicates if the text area contains a select statment
         try:
-            if "select" in command:
-                select = True
-                result = DBquery.exec_(command).fetchall()
-                for i in result:
-                    for each in i:
-                        self.SQL_tableview
+
+            DBquery.exec_(command)
+            while DBquery.next():
+                    result=''
+                    for count in range (len(self.currentQuery.Headers[0])):
+                        result+= str(DBquery.value(count))
+                    print (result)
                         # this lines should insert the result of select statments into the tableview
 
-            if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
-                self.message.setText("are you trying to insert data into DB ? \n "
-                                     "the program prohibits the user from inserting data into db")
-                insert=True
-                raise sqlite3.OperationalError  # todo : define our own exception class
-            else:
-                DBquery.exec_(command)
-                self.label_2.setStyleSheet("color: green")
-                self.label_2.setText("operation succeded")
-                self.label_2.show()
+            # if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
+            #     self.message.setText("are you trying to insert data into DB ? \n "
+            #                          "the program prohibits the user from inserting data into db")
+            #     insert=True
+            #     raise sqlite3.OperationalError  # todo : define our own exception class
+
+            # DBquery.exec_(command)
+            self.label_2.setStyleSheet("color: green")
+            self.label_2.setText("operation succeded")
+            self.label_2.show()
 
         except sqlite3.OperationalError as err:
             print(str(err))
-            if select:
-                self.message.setText("error selecting rows from data base")
+
+            self.message.setText("error selecting rows from data base")
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
             self.label_2.setStyleSheet("color : red")
             self.label_2.setVisible(True)
             self.message.show()
 
-        except:
+        except Exception as death:
+            self.message.setDetailedText(str (death))
             self.message.show()
 
     def load(self):  # this function loads the content of the log files into the DB
