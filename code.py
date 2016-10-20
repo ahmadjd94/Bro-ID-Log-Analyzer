@@ -245,7 +245,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.currentQuery
         # self.dbu=DB
     def selected_query(self):
-        self.clear_table()
 
         for i in AllowedQueries:
             for query in i:
@@ -259,7 +258,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def clear_table(self):
         print(self.model.rowCount())
         for row in range (self.model.rowCount()):
-
             self.model.removeRow(row)
     def setup_combobox(self,fname):
         try:
@@ -690,7 +688,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
-
+        self.clear_table()
         command = self.comboBox.currentText()
         try:
             DBquery.exec_(command)
