@@ -244,34 +244,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         self.currentQuery
         # self.dbu=DB
-    def selected_query(self):
-
-        for i in AllowedQueries:
-            for query in i:
-                if query.Query == self.comboBox.currentText():
-                    self.currentQuery=query
-                    print(query.Headers[0])
-                    self.model.setColumnCount(len(query.Headers[0]))
-                    self.model.setHorizontalHeaderLabels(query.Headers[0])
-                    self.model.show()
-
-    def clear_table(self):
-        print(self.model.rowCount())
-        for row in range (self.model.rowCount()):
-            self.model.removeRow(row)
-    def setup_combobox(self,fname):
-        try:
-            print (len (AllowedQueries))
-            for obj in AllowedQueries:
-                for query in obj:
-                    self.comboBox.addItem(query.Query)
-        except Exception as A:
-            print ('eroro adding to combo box ',A)
-
-        # self.model.insertColumn(0,self.tab_3,'wtf')
-        # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-        # self.modelview.setModel(self.model)
-        # self.modelview.
 
     def uMan(self):
         self.label_2.setVisible(False)
@@ -685,7 +657,34 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
 
+    def selected_query(self):
+        self.clear_table()
+        for i in AllowedQueries:
+            for query in i:
+                if query.Query == self.comboBox.currentText():
+                    self.currentQuery = query
+                    print(query.Headers[0])
+                    self.model.setColumnCount(len(query.Headers[0]))
+                    self.model.setHorizontalHeaderLabels(query.Headers[0])
+                    self.model.show()
 
+    def clear_table(self):
+        while(self.model.rowCount()>0):
+            self.model.removeRow(0)
+
+    def setup_combobox(self, fname):
+        try:
+            print(len(AllowedQueries))
+            for obj in AllowedQueries:
+                for query in obj:
+                    self.comboBox.addItem(query.Query)
+        except Exception as A:
+            print('eroro adding to combo box ', A)
+
+            # self.model.insertColumn(0,self.tab_3,'wtf')
+            # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
+            # self.modelview.setModel(self.model)
+            # self.modelview.
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         self.clear_table()
