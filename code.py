@@ -245,15 +245,22 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.currentQuery
         # self.dbu=DB
     def selected_query(self):
+        self.clear_table()
+
         for i in AllowedQueries:
             for query in i:
                 if query.Query == self.comboBox.currentText():
                     self.currentQuery=query
                     print(query.Headers[0])
-                    self.model.setColumnWidth(1, 581 / len(query.Headers[0]))
                     self.model.setColumnCount(len(query.Headers[0]))
                     self.model.setHorizontalHeaderLabels(query.Headers[0])
                     self.model.show()
+
+    def clear_table(self):
+        print(self.model.rowCount())
+        for row in range (self.model.rowCount()):
+
+            self.model.removeRow(row)
     def setup_combobox(self,fname):
         try:
             print (len (AllowedQueries))
@@ -685,8 +692,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
 
         command = self.comboBox.currentText()
-        print (command)
-
         try:
             DBquery.exec_(command)
             self.model.setRowCount(0)
@@ -696,24 +701,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     self.model.insertRow(rowcount)
                     result=''
                     for count in range (len(self.currentQuery.Headers[0])):
-
-                        # tex.setText()
                         self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
-                        # self.model.ite
                         result+= str(DBquery.value(count))
-
                     print (result)
                     rowcount+=1
 
-                        # this lines should insert the result of select statments into the tableview
-
-            # if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
-            #     self.message.setText("are you trying to insert data into DB ? \n "
-            #                          "the program prohibits the user from inserting data into db")
-            #     insert=True
-            #     raise sqlite3.OperationalError  # todo : define our own exception class
-
-            # DBquery.exec_(command)
             self.label_2.setStyleSheet("color: green")
             self.label_2.setText("operation succeded")
             self.label_2.show()
