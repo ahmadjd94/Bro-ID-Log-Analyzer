@@ -12,7 +12,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator
-from Tables import validQueries
+from Tables import table_created
+from Queries import QueryStatment
+from mmap import *
+from PredefnedQueries import initQueries
+import numpy
 import Tables
 from PyQt5.QtGui import QIcon
 
@@ -25,13 +29,17 @@ import hashlib, codecs, operator, sqlite3, os,time
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
-    global DBconnection  # connection to DB
+    global DBconnection,table_created  # connection to DB
     single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []  # this list stores the valid file found in a DIR
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
+    currentQuery=None
+
+
+
       # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
 
     # END OF GLOVAL VARIABLES DEFENITION
@@ -74,6 +82,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
+        self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
 
     def setupUi(self, MainWindow):
@@ -154,11 +163,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
-        self.graphicsView.setGeometry(QtCore.QRect(10, 10, 711, 351))
-        self.graphicsView.setStyleSheet("background-color: rgb(188, 188, 188);\n"
-                                        "border-color: rgb(0, 0, 0);")
-        self.graphicsView.setObjectName("graphicsView")
+
+
+
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -168,15 +175,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.tableView = QtWidgets.QTableView(self.tab_3)
-        self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
-        self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.tableView.setAutoFillBackground(False)
-        self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
-                                     "")
-        self.tableView.setFrameShape(QtWidgets.QFrame.Box)
-        self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.tableView.setObjectName("tableView")
+        # self.tableView = QtWidgets.QTableView(self.tab_3)
+        # self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
+        # self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
+        # self.tableView.setAutoFillBackground(False)
+        # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
+        #                              "")
+        self.model = QtWidgets.QTableWidget(self.tab_3)
+        # self.modelview = QtWidgets.QTableView()
+        # # self.modelview.setModel(self.model)
+        # self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
+        # self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
+        #                                 "border-color: rgb(0, 0, 0);")
+        # self.modelview.setObjectName("graphicsView")
+        self.model.setGeometry(QtCore.QRect(60, 150, 641, 291))
+        self.model.setStyleSheet("background-color: grey;\n"
+                                 "border-color: rgb(0, 0, 0);")
+        self.model.setObjectName("graphicsView")
+        # self.tableView.setFrameShape(QtWidgets.QFrame.Box)
+        # self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
+        # self.tableView.setObjectName("tableView")
         self.label_3 = QtWidgets.QLabel(self.tab_3)
         self.label_3.setGeometry(QtCore.QRect(64, 136, 59, 14))
         self.label_3.setObjectName("label_3")
@@ -224,58 +242,47 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
-
-    def setup_combobox(self,fname):
-
-        self.comboBox.addItems(validQueries[fname])
-
+        self.currentQuery
+        # self.dbu=DB
 
     def uMan(self):
         self.label_2.setVisible(False)
 
     def tableCreator(self, fname):  # this function creates tables based on the fname argument
         print ('fname passes to function',fname)
+        fname=fname.lower()
         print (dropped)
-        if fname in ["ids","IDS"]:
-            if table_created['ids'] == False:
-
-                try:
-                    DBconnection.execute("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
+        if fname =='ids':
+             if table_created['ids'] == False:
+                    DBquery.exec_("""CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                     ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))""")
-                    table_created['IDS']=True
-                    self.setup_combobox(fname)
+                    table_created['ids']=True
                     print ("success creating ids  table ")
-                except :
-                    table_created['IDS'] = False
-                    print ("error creating ids table ")
 
         elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
             try:
                 if table_created['ids'] == False:
                     self.tableCreator('ids')
-                DBconnection.execute("""CREATE TABLE FTP(UID TEXT,ts int
+                DBquery.exec_("""CREATE TABLE FTP(UID TEXT,ts int
                 ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
                 MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
                 FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
                 print("step3")
                 table_created['FTP'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
 
         elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
             try:
-
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE DHCP(UID TEXT,TS int
+                DBquery.exec_("""CREATE TABLE DHCP(UID TEXT,TS int
                 ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
                 , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step2")
                 table_created['DHCP'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -285,13 +292,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE IRC (UID TEXT,ts int
+                DBquery.exec_("""CREATE TABLE IRC (UID TEXT,ts int
                 , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
                 DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
                 FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 print("step4")
                 table_created['IRC'] = True
-                self.setup_combobox(fname)
                 return True
             except:
                 return False
@@ -302,11 +308,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
+                DBquery.exec_("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
-                self.setup_combobox(fname)
                 print("step5")
             except:
                 return False
@@ -317,11 +322,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
+                DBquery.exec_("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
                 DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
-                self.setup_combobox(fname)
+                AllowedQueries.append(initQueries('ssh'))
                 print("step6")
                 return True
             except:
@@ -332,16 +337,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+                DBquery.exec_("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
                 RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
                 RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")
 
-                DBconnection.execute ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
+                DBquery.exec_ ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
                              FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
-                self.setup_combobox(fname)
+
                 print("step7")
+                AllowedQueries.append(initQueries('conn'))
                 return True
             except:
                 return False
@@ -353,7 +359,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE  HTTP (
+                DBquery.exec_("""CREATE TABLE  HTTP (
                                         UID TEXT,ts int 
                                         ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                         USER_AGENT TEXT,REQUEST_BODY_LEN INT,
@@ -363,29 +369,29 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                         FOREIGN KEY  (ts) REFERENCES MAIN (ts))""")
 
 
-                DBconnection.execute(
+                DBquery.exec_(
                     "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),"
                     "FOREIGN KEY  (ts) REFERENCES http (ts))")
 
 
-                DBconnection.execute("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
+                DBquery.exec_("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
                               HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                DBconnection.execute("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
+                DBquery.exec_("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
                           , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                DBconnection.execute("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
+                DBquery.exec_("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
                     ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                DBconnection.execute(
+                DBquery.exec_(
                     """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS INT ,
                     RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-                DBconnection.execute("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
+                DBquery.exec_("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
                             , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                     FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
@@ -396,36 +402,38 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['HTTP_ORIG_FUIDS'] = True
                 table_created['HTTP_PROXIED_HEADERS'] = True
                 table_created['HTTP_TAGS'] = True
-                self.setup_combobox(fname)
-
                 print("step8")
+                AllowedQueries.append(initQueries('http'))
 
             except:
                 return False
-        elif fname == "dns.log":  # DONE # create DNS table    is working fine
+        elif fname == "dns.log":  # DONE # create DNS table    continously crashing
             try:
                 # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
-                if table_created['ids'] == False:
-                    self.tableCreator('ids')  # call the table creator function to create the ids table
+                try:
+                    if table_created['ids'] == False:
+                        self.tableCreator('ids')  # call the table creator function to create the ids table
+                except Exception as DNS_exc:
+                    print ('error creating ids of dns ',DNS_exc)
 
-                DBconnection.execute("""CREATE TABLE DNS (
+                DBquery.exec_("""CREATE TABLE DNS (
                                         UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
                                         `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                         `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
                                         `RD` BOOL,`RA` BOOL,`Z`INT,`rejected` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
                                         FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
 
-                DBconnection.execute("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
+                DBquery.exec_("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
-                DBconnection.execute("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
+                DBquery.exec_("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
                             "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                             "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
                 table_created['DNS_ANSWERS'] = True
                 table_created['DNS_TTLS'] = True
-                self.setup_combobox(fname)
+                AllowedQueries.append(initQueries('dns'))
 
                 print("step9")
             except:
@@ -433,11 +441,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif fname == "signature.log":  #  create SIGNATURES table  needs testing
             try:
-                DBconnection.execute("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
+                DBquery.exec_("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
                             SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                             EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")
                 table_created['SIGNATURE'] = True
-                self.setup_combobox(fname)
 
                 print("step10")
                 return True
@@ -449,26 +456,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
+                DBquery.exec_("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
                 SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
                 ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
                 LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
                 FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
                 table_created['SSL'] = True
 
-                DBconnection.execute("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
+                DBquery.exec_("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
                             "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")
                 table_created['SSL_VALIDATION_STATUS'] = True
-                self.setup_combobox(fname)
 
                 print("step11")
+                AllowedQueries.append(initQueries('ssl'))
                 return True
             except:
                 return False
 
         elif fname == "files.log":  # DONE # create files table and it's related tables #needs testing
             try:
-                DBconnection.execute(
+                DBquery.exec_(
                     """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,SOURCE TEXT ,DEPTH INT,
                     ANALYZERS TEXT,MIME_TYPE TEXT,
                     FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
@@ -476,27 +483,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     MD5 TEXT,SHA1 TEXT,SHA256 TEXT,EXTRACTED BOOL)""")
                 table_created['FILES'] = True
 
-                DBconnection.execute ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
+                DBquery.exec_ ("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
                              ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                              ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_TX_HOSTS'] = True
 
-                DBconnection.execute("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
+                DBquery.exec_("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
                             ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                              ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_RX_HOSTS'] = True
 
 
-                DBconnection.execute("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
+                DBquery.exec_("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
                             ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                              ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_CONN_UIDS'] = True
 
-                DBconnection.execute("CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,"
+                DBquery.exec_("CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,"
                                      "FOREIGN KEY (UID) REFERENCES FILE(UID)"
                                      ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
                 table_created['FILES_ANALYZERS'] = True
-                self.setup_combobox(fname)
 
             except:
                 return False
@@ -507,7 +513,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBconnection.execute("""CREATE TABLE SMTP (UID TEXT ,TS INT,
+                DBquery.exec_("""CREATE TABLE SMTP (UID TEXT ,TS INT,
                 TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
                 ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
                 ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
@@ -517,25 +523,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 table_created['SMTP'] = True
 
 
-                DBconnection.execute("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
+                DBquery.exec_("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
                 FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))""")
                 table_created['SMTP_RCPTTO'] = True
 
 
-                DBconnection.execute("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
+                DBquery.exec_("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_TO'] = True
 
 
-                DBconnection.execute("CREATE TABLE SMTP_PATH (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
+                DBquery.exec_("CREATE TABLE SMTP_PATH (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_PATHS'] = True
 
 
-                DBconnection.execute("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
+                DBquery.exec_("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
                             "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
                 table_created['SMTP_FUIDS'] = True
-                self.setup_combobox(fname)
 
                 #`RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
                 return True
@@ -560,14 +565,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (os.getcwd())
             if fname in os.listdir():
                 print('yes')
-            f1 = open(fname , 'r')  # open the log file Read-Only mode
+            fil = open(fname , 'r+')  # open the log file Read-Only mode
             print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
-            for i in f1:  # todo : modify function to increase the progress bar
+            print (fil.__sizeof__())
+            f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
+            readline=f1.readline
+            i =codecs.decode(readline(),'ascii')
+            while i !='' or '' not in i:     # todo : modify function to increase the progress bar
+
                 hashtemp += i  # concatenate the lines being read to the string
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
-                    i = i.lower()  # ignore the case of the fields line
+                    # i = i.lower()  # ignore the case of the fields line
                     # print(i)
                     fields = (i[7:].split())
                     print(fields)
@@ -599,30 +609,34 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         print ("PRINTING RECEIVED LIST",sql_commands)
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
-                                DBconnection.execute (command)
-                                print ("executed correctly :\n",command)
+                                DBquery.exec_ (command)
                                 DBconnection.commit()
-                            except:
+                                print ("executed correctly :\n",command)
+
+                            except QtSql.QSqlError:
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
-                        # DBconnection.execute(sql_command,sql_command_ids)
+                        # DBquery.exec_(sql_command,sql_command_ids)
                     except Exception as exc1:
                         # print (str(a))
                         print('error creating SQL',str (exc1))
-                    print ('end')
+                print ('end')
+                i = codecs.decode(readline(), 'ascii')
+
+                # i=fil.readline()
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
-
-
-                    #DBconnection.execute
+            print (fname)
+            self.setup_combobox(fname)
+                    #DBquery.exec_
 
 
                 #else:
                  #   print(i + "neglected")
                 #self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
-            f1.close()
-
+            # f1.close()
+            fil.close()
             with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
 
                 digestive = hashlib.md5(codecs.encode(hashtemp,'ascii'))  # string must be converted to bytes to calculate hash
@@ -635,6 +649,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 except Exception as exc2:
                     print ('exception in writing the hash of the file',str(exc2))
 
+
         except Exception as exc3:  # this block is executed in case of failure of instering
             print(str(exc3))
             print ('exception occurd')
@@ -642,42 +657,68 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
 
+    def selected_query(self):
+        self.clear_table()
+        for i in AllowedQueries:
+            for query in i:
+                if query.Query == self.comboBox.currentText():
+                    self.currentQuery = query
+                    print(query.Headers[0])
+                    self.model.setColumnCount(len(query.Headers[0]))
+                    self.model.setHorizontalHeaderLabels(query.Headers[0])
+                    self.model.show()
 
+    def clear_table(self):
+        while(self.model.rowCount()>0):
+            self.model.removeRow(0)
+
+    def setup_combobox(self, fname):
+        try:
+            print(len(AllowedQueries))
+            for obj in AllowedQueries:
+                for query in obj:
+                    self.comboBox.addItem(query.Query)
+        except Exception as A:
+            print('eroro adding to combo box ', A)
+
+            # self.model.insertColumn(0,self.tab_3,'wtf')
+            # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
+            # self.modelview.setModel(self.model)
+            # self.modelview.
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
-        command = self.textEdit.toPlainText().lower()
-        select =insert =False  # indicates if the text area contains a select statment
+        self.clear_table()
+        command = self.comboBox.currentText()
         try:
-            if "select" in command:
-                select = True
-                result = DBconnection.execute(command).fetchall()
-                for i in result:
-                    for each in i:
-                        pass
-                        # this lines should insert the result of select statments into the tableview
+            DBquery.exec_(command)
+            self.model.setRowCount(0)
+            rowcount=0
+            while DBquery.next():
 
-            if "insert" in command:  # THE PROGRAM SHOULD DISBLAY A WARNING IN CASE USER TRIED TO insert data into db
-                self.message.setText("are you trying to insert data into DB ? \n "
-                                     "the program prohibits the user from inserting data into db")
-                insert=True
-                raise sqlite3.OperationalError  # todo : define our own exception class
-            else:
-                DBconnection.execute(command)
-                self.label_2.setStyleSheet("color: green")
-                self.label_2.setText("operation succeded")
-                self.label_2.show()
+                    self.model.insertRow(rowcount)
+                    result=''
+                    for count in range (len(self.currentQuery.Headers[0])):
+                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
+                        result+= str(DBquery.value(count))
+                    print (result)
+                    rowcount+=1
+
+            self.label_2.setStyleSheet("color: green")
+            self.label_2.setText("operation succeded")
+            self.label_2.show()
 
         except sqlite3.OperationalError as err:
             print(str(err))
-            if select:
-                self.message.setText("error selecting rows from data base")
+
+            self.message.setText("error selecting rows from data base")
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
             self.label_2.setStyleSheet("color : red")
             self.label_2.setVisible(True)
             self.message.show()
 
-        except:
+        except Exception as death:
+            self.message.setDetailedText(str (death))
             self.message.show()
 
     def load(self):  # this function loads the content of the log files into the DB
@@ -757,11 +798,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 print(name)
                 file = open(self.lineEdit.text())
                 self.count = 0
-                for i in file:
+                for line in file:
                     self.linesCount += 1
+                file.close()
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
-                file.close()
+
             elif name in self.UnsupportedFiles:
                 print("here")
                 self.message.setText("BILA does not currently support the file you are trying to use")
@@ -832,21 +874,24 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # todo  reset timeline
 
 
+def droptables(table):  # a map function drops tables , return 1 on success
+    try:
+        DBquery.exec_("drop table %s" % table)
+        DBconnection.commit()
+        return 1
+    except sqlite3.OperationalError as a:
+        if "no such table" in str(a):
+            return 0
+        else:
+            return 0
 if __name__ == "__main__":  # main module
-
-    def droptables(table):  # a map function drops tables , return 1 on success
-        try:
-            DBconnection.execute("drop table %s" % table)
-            DBconnection.commit()
-            return 1
-        except sqlite3.OperationalError as a:
-            if "no such table" in str(a):
-                return 0
-            else :
-                return 0
+    # validQueries = Tables.validQueries
+    # print (validQueries)
+    DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
+    table_created = Tables.table_created
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
-
+    AllowedQueries = []
 
     import sys
     import csv
@@ -866,7 +911,11 @@ if __name__ == "__main__":  # main module
 
     try:
 
-        DBconnection = sqlite3.connect('analyze2.db')  # initializing connection to DB // should be in UI init ??
+        DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
+        DBconnection.setDatabaseName('analyze2.db')
+        DBconnection.open()
+        DBquery=QtSql.QSqlQuery()
+
         print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
@@ -890,8 +939,8 @@ if __name__ == "__main__":  # main module
 
         # print(tables - dropped + "non dropped tables ") #fix ?
         try:
-            DBconnection.execute("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
-            table_created['MAIN']=True
+            DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
+            table_created['main']=True
             print ("Success creating main table")
 
         except:
