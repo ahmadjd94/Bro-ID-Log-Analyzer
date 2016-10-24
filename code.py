@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#fewfew
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.2.1
@@ -75,6 +75,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
+        self.progress = 0  # indicate the level of progress bar
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.message=QtWidgets.QMessageBox()
         self.centralWidget.setObjectName("centralWidget")
@@ -111,6 +112,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                        "")
         self.progressBar.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.progressBar.setProperty("value", 0)
+        self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
+        self.progressBar.setTextVisible(True)
+        self.progressBar.setOrientation(QtCore.Qt.Horizontal)
+        self.progressBar.setTextDirection(QtWidgets.QProgressBar.BottomToTop)
         self.progressBar.setObjectName("progressBar")
         self.lineEdit = QtWidgets.QLineEdit(self.tab)
         self.lineEdit.setGeometry(QtCore.QRect(319, 100, 281, 25))
@@ -132,7 +137,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.lineEdit.setReadOnly(True)
         self.lineEdit_2.setReadOnly(True)
         self.label = QtWidgets.QLabel(self.tab)
-        self.label.setGeometry(QtCore.QRect(140, 340, 351, 17))
+        self.label.setGeometry(QtCore.QRect(140, 340, 430, 17))
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
@@ -530,7 +535,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # if the field value is -1 , the field should be neglected )
         print('traversing')
         print(fname)
-        progress = 0  # indicate the level of progress bar
+
         try:
             #fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
             print(fname)
@@ -591,14 +596,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     #print(sql_command)
                     # no hardcoded indecies of
                     # fields  / PYTHON HAS NO SWITCH SYNTAX SO we used if statments
-
-
-                    #DBconnection.execute
-
-
-                #else:
-                 #   print(i + "neglected")
-                #self.progressBar.setValue(int(self.progressBar.value() + (progress / self.count % 100 * 100)))
+                self.progress += 1
+                self.progressBar.setValue((self.progress / self.linesCount) * 100)
+                print ("progress :%d overall : %d "%(self.progress,self.linesCount))
             f1.close()
 
             with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
@@ -737,6 +737,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.count = 0
                 for i in file:
                     self.linesCount += 1
+
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
                 file.close()
