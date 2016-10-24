@@ -120,6 +120,18 @@ border-color: qconicalgradient(cx:0, cy:0, angle:135, stop:0 rgba(255, 255, 0, 6
       <property name="value">
        <number>0</number>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="textVisible">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="textDirection">
+       <enum>QProgressBar::BottomToTop</enum>
+      </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">

@@ -112,6 +112,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                        "")
         self.progressBar.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.progressBar.setProperty("value", 0)
+        self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
+        self.progressBar.setTextVisible(True)
+        self.progressBar.setOrientation(QtCore.Qt.Horizontal)
+        self.progressBar.setTextDirection(QtWidgets.QProgressBar.BottomToTop)
         self.progressBar.setObjectName("progressBar")
         self.lineEdit = QtWidgets.QLineEdit(self.tab)
         self.lineEdit.setGeometry(QtCore.QRect(319, 100, 281, 25))
@@ -591,14 +595,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.progress += 1
                 self.progressBar.setValue((self.progress / self.linesCount) * 100)
                 print ("progress :%d overall : %d "%(self.progress,self.linesCount))
-
-                    #DBconnection.execute
-
-
-                #else:
-                 #   print(i + "neglected")
-
-
             f1.close()
 
             with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
