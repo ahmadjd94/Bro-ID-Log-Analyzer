@@ -127,6 +127,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.lineEdit_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                       "border-color: rgb(0, 0, 0);")
         self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit.setEnabled(False)
+        self.lineEdit_2.setEnabled(False)
+        self.lineEdit.setReadOnly(True)
+        self.lineEdit_2.setReadOnly(True)
         self.label = QtWidgets.QLabel(self.tab)
         self.label.setGeometry(QtCore.QRect(140, 340, 351, 17))
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
