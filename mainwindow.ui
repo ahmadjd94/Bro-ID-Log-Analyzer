@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>small logo.png</normaloff>small logo.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(51, 51, 51);</string>
   </property>
@@ -375,12 +379,21 @@ border-color:rgb(255, 153, 0 );
      <height>19</height>
     </rect>
    </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
    <widget class="QMenu" name="menuBRO_visualizer">
     <property name="title">
      <string>BRO visualizer</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuHelp">
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>help</string>
     </property>
