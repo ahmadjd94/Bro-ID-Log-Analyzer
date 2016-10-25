@@ -38,6 +38,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         #self.__message2__.setText("error connecting to database")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
@@ -204,7 +207,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_3, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 759, 19))
+        # self.menuBar.setGeometry(QtCore.QRect(0, 0, 759, 19))
         self.menuBar.setObjectName("menuBar")
         self.menuBRO_visualizer = QtWidgets.QMenu(self.menuBar)
         self.menuBRO_visualizer.setObjectName("menuBRO_visualizer")
@@ -220,6 +223,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.menuHelp.addAction(self.actionAbout)
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
+        self.menuBar.setNativeMenuBar(False)
 
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
