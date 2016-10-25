@@ -5,7 +5,7 @@ def initQueries(Key):
         http=[
               QueryStatment('select * from http',1,'http',['uid','ts']),
               QueryStatment('select uid,ts,`user_agent` from http',2,'http',['uid','ts','user agent']),
-              QueryStatment('select uid,ts,`request` from http',3,'http',['uid','ts','request']),
+              QueryStatment('select uid,ts,`request_body_len` from http',3,'http',['uid','ts','request length']),
               QueryStatment('select uid,ts,`uri` from http',4,'http',['uid','ts','uri']),
               QueryStatment('select uid,ts,`method` from http',5,'http',['uid','ts','method']),
               QueryStatment('select uid,ts,`method` from http',6,'http',['uid','ts','status_code'])
@@ -36,11 +36,11 @@ def initQueries(Key):
           QueryStatment("SELECT uid,ts,ISSUER FROM SSL",23,'ssl',['uid','ts','version']),]
         return ssl
     elif Key == 'ssh':
-        ssh= [QueryStatment("SELECT uid,ts,HOST KEY FROM SSH",24,'ssh',['uid','ts','version']),
-          QueryStatment("SELECT uid,ts,DIRECTION FROM SSH",24,'ssh',['uid','ts','version']),
-          QueryStatment("SELECT uid,ts,CLIENT FROM SSH",24,'ssh',['uid','ts','version']),
-          QueryStatment("SELECT uid,ts,SERVER FROM SSH",24,'ssh',['uid','ts','version']),
-          QueryStatment("SELECT uid,ts,CIPHER_ALG FROM SSH",24,'ssh',['uid','ts','version']),
+        ssh=  [QueryStatment("SELECT uid,ts,`host_key` FROM SSH",24,'ssh',['uid','ts','host']),
+          QueryStatment("SELECT uid,ts,DIRECTION FROM SSH",24,'ssh',['uid','ts','direction']),
+          QueryStatment("SELECT uid,ts,CLIENT FROM SSH",24,'ssh',['uid','ts','client']),
+          QueryStatment("SELECT uid,ts,SERVER FROM SSH",24,'ssh',['uid','ts','server']),
+          QueryStatment("SELECT uid,ts,CIPHER_ALG FROM SSH",24,'ssh',['uid','ts','cipher']),
           QueryStatment("SELECT uid,ts,VERSION FROM SSH",24,'ssh',['uid','ts','version'])]
         return ssh
     elif Key == 'weird':

@@ -31,7 +31,7 @@ validFields = {
             , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1},
+        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1,'version':-1,'cipher_alg':-1,'host_key':-1},
 
         'ssl': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
