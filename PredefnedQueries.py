@@ -32,8 +32,8 @@ def initQueries(Key):
         ssl=[QueryStatment("SELECT uid,ts,VERSION FROM SSL",19,'ssl',['uid','ts','version']),
           QueryStatment("SELECT uid,ts,CIPHER FROM SSL",20,'ssl',['uid','ts','CIPHER']),
           QueryStatment("SELECT uid,ts,`SERVER_NAME` FROM SSL",21,'ssl',['uid','ts','SERVER_NAME']),
-          QueryStatment("SELECT uid,ts,SUBJECT FROM SSL",22,'ssl',['uid','ts','version']),
-          QueryStatment("SELECT uid,ts,ISSUER FROM SSL",23,'ssl',['uid','ts','version']),]
+          QueryStatment("SELECT uid,ts,`SUBJECT` FROM SSL",22,'ssl',['uid','ts','SUBJECT']),
+          QueryStatment("SELECT uid,ts,`ISSUER_SUBJECT` FROM SSL",23,'ssl',['uid','ts','ISSUER_SUBJECT']),]
         return ssl
     elif Key == 'ssh':
         ssh=  [QueryStatment("SELECT uid,ts,`host_key` FROM SSH",24,'ssh',['uid','ts','host key']),
