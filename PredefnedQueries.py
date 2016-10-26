@@ -45,10 +45,10 @@ def initQueries(Key):
         return ssh
     elif Key == 'weird':
         weird= [
-        QueryStatment("SELECT uid,ts,`NAME` FROM WEIRD",25,'WEIRD',['uid','ts','NAME']),
-        QueryStatment("SELECT uid,ts,`ADDI` FROM WEIRD",26,'WEIRD',['uid','ts','ADDI']),
-        QueryStatment("SELECT uid,ts,`NOTICE` FROM WEIRD",27,'WEIRD',['uid','ts','NOTICE']),
-        QueryStatment("SELECT uid,ts,`PEER` FROM WEIRD",28,'WEIRD',['uid','ts','PEER'])
+        QueryStatment("SELECT uid,ts,`NAME` FROM WEIRD",25,'weird',['uid','ts','NAME']),
+        QueryStatment("SELECT uid,ts,`ADDI` FROM WEIRD",26,'weird',['uid','ts','ADDI']),
+        QueryStatment("SELECT uid,ts,`NOTICE` FROM WEIRD",27,'weird',['uid','ts','NOTICE']),
+        QueryStatment("SELECT uid,ts,`PEER` FROM WEIRD",28,'weird',['uid','ts','PEER'])
             ]
         return weird
     else :
