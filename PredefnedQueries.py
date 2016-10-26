@@ -3,12 +3,12 @@ from Queries import *
 def initQueries(Key):
     if Key=='http':
         http=[
-              QueryStatment('select * from http',1,'http',['uid','ts']),
+              # QueryStatment('select * from http',1,'http',['uid','ts']),
               QueryStatment('select uid,ts,`user_agent` from http',2,'http',['uid','ts','user agent']),
               QueryStatment('select uid,ts,`request_body_len` from http',3,'http',['uid','ts','request length']),
               QueryStatment('select uid,ts,`uri` from http',4,'http',['uid','ts','uri']),
               QueryStatment('select uid,ts,`method` from http',5,'http',['uid','ts','method']),
-              QueryStatment('select uid,ts,`method` from http',6,'http',['uid','ts','status_code'])
+              QueryStatment('select uid,ts,`status_code` from http',6,'http',['uid','ts','status_code'])
               ]
         return http
     elif Key == 'dns':
@@ -36,7 +36,7 @@ def initQueries(Key):
           QueryStatment("SELECT uid,ts,ISSUER FROM SSL",23,'ssl',['uid','ts','version']),]
         return ssl
     elif Key == 'ssh':
-        ssh=  [QueryStatment("SELECT uid,ts,`host_key` FROM SSH",24,'ssh',['uid','ts','host']),
+        ssh=  [QueryStatment("SELECT uid,ts,`host_key` FROM SSH",24,'ssh',['uid','ts','host key']),
           QueryStatment("SELECT uid,ts,DIRECTION FROM SSH",24,'ssh',['uid','ts','direction']),
           QueryStatment("SELECT uid,ts,CLIENT FROM SSH",24,'ssh',['uid','ts','client']),
           QueryStatment("SELECT uid,ts,SERVER FROM SSH",24,'ssh',['uid','ts','server']),
