@@ -31,7 +31,7 @@ validFields = {
             , "second_received": -1, "last_reply": -1, "path": -1, "user_agent": -1
             , "tls": -1, "fuids": -1, "is_webmail": -1},
 
-        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1},
+        'ssh': {"uid": -1,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1,"status": -1, "direction": -1, "client": -1, "server": -1, "resp_size": -1,'ts':-1,'version':-1,'cipher_alg':-1,'host_key':-1},
 
         'ssl': {"uid": -1,'ts':-1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "version": -1,
                 "cipher": -1,
@@ -62,6 +62,6 @@ validFields = {
         'dns': {"uid": -1, 'ts': -1, "id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1, "proto": -1, "trans_id": -1,
                 "query": -1, "qclass": -1, "qclass_name": -1, "qtype": -1, "qtype_name": -1, "rcode": -1,
                 "rcode_name": -1, "qr": -1,
-                "aa": -1, "tc": -1, "rd": -1, "ra": -1, "z": -1, "answers": -1, "ttls": -1, "rejected": -1}
+                "AA": -1, "TC": -1, "RD": -1, "RA": -1, "Z": -1, "answers": -1, "ttls": -1, "rejected": -1}
         # check tables strucutre !!! normalize conn_ID table
     }

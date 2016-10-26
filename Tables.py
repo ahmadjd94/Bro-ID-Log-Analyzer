@@ -14,7 +14,21 @@ tables = ['dhcp',
           "files",
           'ssh',
           'main']
-
+table_created ={'dhcp':False,
+          "smtp":False,
+          "irc":False,
+          "weird":False,
+          "ssh":False,
+          "conn":False,
+          'ftp':False,
+          "http":False,
+          "dns":False,
+          "signature":False,
+          "ssl":False,
+          "ids":False,
+          "files":False,
+          'ssh':False,
+          'main':False}
 # the following dictionary denotes normalized FIELDS
 normalized_fields = {'fuids': 'fuid',
                      'path': 'path',
@@ -67,3 +81,4 @@ UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_l
                     'notice.log', 'software.log', 'snmp.log', 'socks.log',
                     'syslog.log', 'traceroute.log',
                     'known_hosts.log']
+
