@@ -312,6 +312,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
+                AllowedQueries.append(initQueries('weird'))
                 print("step5")
             except:
                 return False
@@ -322,8 +323,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 if table_created['ids'] == False:
                     self.tableCreator('ids')  # call the table creator function to create the ids table
 
-                DBquery.exec_("""CREATE TABLE SSH( UID TEXT,TS INT,STATUS TEXT,
-                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,
+                DBquery.exec_("""CREATE TABLE SSH( UID TEXT,TS INT,host_key TEXT,STATUS TEXT,
+                DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,cipher_alg text ,version text,
                 FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['SSH'] = True
                 AllowedQueries.append(initQueries('ssh'))
