@@ -459,7 +459,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if  table_creator(fName,DBquery)==False:
                 self.message.setText("error creating table " + str(fName))
             self.traverse(fName)
-            AllowedQueries.append(initQueries(fname))
+            AllowedQueries.append(initQueries(fName))
 
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
