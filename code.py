@@ -327,6 +327,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
+                AllowedQueries.append(initQueries('weird'))
+
 
                 print("step5")
             except:
@@ -647,6 +649,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.progressBar.setValue((self.progress / self.linesCount) * 100)
                 print ("progress :%d overall : %d "%(self.progress,self.linesCount))
             f1.close()
+            self.setup_combobox()
 
 
             with open(historyLog, 'a') as csvfile1:  # open log file to log the state of operation
@@ -684,11 +687,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         while(self.model.rowCount()>0):
             self.model.removeRow(0)
 
-    def setup_combobox(self, fname):
+    def setup_combobox(self):
         try:
             print(len(AllowedQueries))
             for obj in AllowedQueries:
                 for query in obj:
+                    print (query)
                     self.comboBox.addItem(query.Query)
         except Exception as A:
             print('eroro adding to combo box ', A)
