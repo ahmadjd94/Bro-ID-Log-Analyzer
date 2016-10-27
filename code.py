@@ -361,7 +361,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 DBquery.exec_ ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
                              FOREIGN KEY (TS) REFERENCES conn (TS))""")
                 table_created['CONN'] = True
-
                 print("step7")
                 AllowedQueries.append(initQueries('conn'))
                 return True
