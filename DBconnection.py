@@ -4,7 +4,4 @@ def setup_connection ():
         connection =QSqlDatabase.addDatabase('QSQLITE')
     except:
         return False
-
-
-
     return connection
