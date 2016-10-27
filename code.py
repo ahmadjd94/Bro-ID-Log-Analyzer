@@ -258,7 +258,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
         self.currentQuery
-        # self.dbu=DB
+
 
     def uMan(self):
         self.label_2.setVisible(False)
