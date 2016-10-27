@@ -327,7 +327,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                             "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")
                 table_created['WEIRD'] = True
-                AllowedQueries.append(initQueries('weird'))
+
                 print("step5")
             except:
                 return False
@@ -756,7 +756,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             if  self.tableCreator(fName)==False:
                 self.message.setText("error creating table " + str(fName))
-
+                self.message.show()
             self.traverse(fName)
 
             # print(self.linesCount)
