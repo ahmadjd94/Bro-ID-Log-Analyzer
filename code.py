@@ -29,7 +29,8 @@ import hashlib, codecs, operator, sqlite3, os,time
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
-    global DBconnection,table_created  # connection to DB
+    global DBconnection
+    global table_created  # connection to DB
     single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -456,19 +457,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print(fPath, path)
             os.chdir(path)             # change crwdir
 
-            if fName in ['weird.log','dns.log','conn.log','http.log','dhcp.log','irc.log','ssl.log'] and table_created['ids']==False:
-                ids_creation_statment = tableCreator('ids')
-                DBquery.exec_(ids_creation_statment)
-                queries =table_creation_statment =tableCreator(fName)
-                for query in queries:
-                    DBquery.exec_()
+            if table_created[fName]==False:
+                if fName in ['weird.log','dns.log','conn.log','http.log','dhcp.log','irc.log','ssl.log'] and table_created['ids']==False:
+                    ids_creation_statment = tableCreator('ids')
 
+                    DBquery.exec_(ids_creation_statment)
+                    queries =tableCreator(fName)
+                    for query in queries:
+                        DBquery.exec_(query)
 
-            table_creation_statment =tableCreator(fName)
-            if  table_creation_statment==False:
-                self.message.setText("error creating table " + str(fName))
-            else :
-                DBquery.exec_(table_creation_statment)
+                else :
+                    queries = tableCreator(fName)
+                    for query in queries:
+                        DBquery.exec_(query)
 
             self.traverse(fName)
 
@@ -477,12 +478,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
 
-            # progress = 100 / len(
-            #     self.validFiles)  # not so accurate, progress bar will be filled according to progress in file , not according to line numbers
             for each in self.validFiles:
                 each = str.lower(each)
                 print(each)
-                self.tableCreator(each)
+                if table_created[each] == False:
+                    if each in ['weird.log', 'dns.log', 'conn.log', 'http.log', 'dhcp.log', 'irc.log', 'ssl.log'] and \
+                                    table_created['ids'] == False:
+                        ids_creation_statment = tableCreator('ids')
+
+                        DBquery.exec_(ids_creation_statment)
+                        queries = tableCreator(each)
+                        for query in queries:
+                            DBquery.exec_(query)
+
+                    else:
+                        queries = tableCreator(each)
+                        for query in queries:
+                            DBquery.exec_(query)
                 self.traverse(each)   # load every file in the dir
                 # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
@@ -616,7 +628,7 @@ if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
     # print (validQueries)
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-    table_created = Tables.table_created
+    print(table_created)
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
     AllowedQueries = []
@@ -658,7 +670,6 @@ if __name__ == "__main__":  # main module
         for i in dropped :
             print (i,dropped[i])
 
-        table_created ={ }
         for i in tables :
             table_created[i]=False
         print ("1234567890")
