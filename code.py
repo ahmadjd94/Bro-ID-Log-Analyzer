@@ -476,6 +476,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         table_created[key] = True
 
             self.traverse(fName)
+            self.loaded=True
             print (table_created)
 
             # print(self.linesCount)
@@ -503,6 +504,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.traverse(each)   # load every file in the dir
                 # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
+            self.loaded=True
+
             self.analysis.setTabEnabled(2, True)  #enable query tab after loading
             # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
