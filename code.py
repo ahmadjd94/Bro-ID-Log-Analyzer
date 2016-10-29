@@ -463,15 +463,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                     DBquery.exec_(ids_creation_statment)
                     queries =tableCreator(fName)
-                    for query in queries:
-                        DBquery.exec_(query)
+                    print (queries)
+                    print (list(queries.keys()))
+                    for key in list(queries.keys()):
+                        DBquery.exec_(queries[key])
+                        table_created[key]=True
 
                 else :
                     queries = tableCreator(fName)
-                    for query in queries:
-                        DBquery.exec_(query)
+                    for key in list(queries.keys()):
+                        DBquery.exec_(queries[key])
+                        table_created[key] = True
 
             self.traverse(fName)
+            print (table_created)
 
             # print(self.linesCount)
 

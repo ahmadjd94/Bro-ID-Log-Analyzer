@@ -224,44 +224,44 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
 
 
     elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
-            return [("""CREATE TABLE FTP(UID TEXT,ts int
+            return {'ftp':("""CREATE TABLE FTP(UID TEXT,ts int
             ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
             MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
-            FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")]
+            FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")}
 
     elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
-       return[("""CREATE TABLE DHCP(UID TEXT,TS int
+       return{'dhcp':("""CREATE TABLE DHCP(UID TEXT,TS int
             ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
-            , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")]
+            , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
     elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE  #check and working
-            return[("""CREATE TABLE IRC (UID TEXT,ts int
+            return{'irc':("""CREATE TABLE IRC (UID TEXT,ts int
             , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
             DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
-            FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")]
+            FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
     elif fname == "weird.log":  # create weird table WORKING FINE
-            return[("CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
+            return{'weird':"CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                           "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
-                          "FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")]
+                          "FOREIGN KEY(ts) REFERENCES MAIN(ts) )"""}
 
     elif fname == "ssh.log":  # DONE create SSH table CHECKED and working correctly
-            return [("""CREATE TABLE SSH( UID TEXT,TS INT,host_key TEXT,STATUS TEXT,
+            return {'ssh':("""CREATE TABLE SSH( UID TEXT,TS INT,host_key TEXT,STATUS TEXT,
             DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,cipher_alg text ,version text,
-            FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")]
+            FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
     elif fname == "conn.log":  # DONE  create CONN table
 
-            return[("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
+            return{'conn':("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
             RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
             RESP_PKTS INT,RESP_IP_BYTES INT,TUNNEL_PARENTS BLOB,ORIG_CC TEXT,RESP_CC TEXT,
             FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))"""),
-            ("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
-                         FOREIGN KEY (TS) REFERENCES conn (TS))""")]
+            'conn_tunnel_parents':("""CREATE TABLE CONN_TUNNEL_PARENTS (UID TEXT , TS INT , PARENT TEXT ,FOREIGN KEY (UID) REFERENCES conn (UID),
+                         FOREIGN KEY (TS) REFERENCES conn (TS))""")}
 
 
     elif fname == "http.log":  # todo: needs furhter checking
-            return[("""CREATE TABLE  HTTP (
+            return{'http':("""CREATE TABLE  HTTP (
                                     UID TEXT,ts int
                                     ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
                                     USER_AGENT TEXT,REQUEST_BODY_LEN INT,
@@ -270,30 +270,30 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
                                     FOREIGN KEY  (UID) REFERENCES MAIN (UID),
                                     FOREIGN KEY  (ts) REFERENCES MAIN (ts))""")
 
-            ,(
+            ,'http_tags':(
                 "CREATE TABLE HTTP_TAGS (UID TEXT , TS INT , TAG TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),"
                 "FOREIGN KEY  (ts) REFERENCES http (ts))")
 
-            ,("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
+            ,'http_proxied_headers':("""CREATE TABLE HTTP_PROXIED_HEADERS (UID TEXT , TS INT ,
                           HEADER TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                 FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-            ,("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
+            ,'http_orig_fuids':("""CREATE TABLE HTTP_ORIG_FUIDS (UID TEXT , TS INT
                       , ORIG_FUID TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                 FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-            ,("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
+            ,'http_orig_meme_types':("""CREATE TABLE HTTP_ORIG_MEME_TYPES (UID TEXT , TS INT
                 ,ORIG_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                 FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-            ,(
+            ,'http_resp_fuids':(
                 """CREATE TABLE HTTP_RESP_FUIDS (UID TEXT , TS INT ,
                 RESP_FUIDS TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
                 FOREIGN KEY  (ts) REFERENCES http (ts))""")
 
-            ,("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
+            ,'http_resp_meme_types':("""CREATE TABLE HTTP_RESP_MEME_TYPES (UID TEXT , TS INT
                         , RESP_MEME_TYPES TEXT,FOREIGN KEY (UID) REFERENCES HTTP(UID),
-                FOREIGN KEY  (ts) REFERENCES http (ts))""")]
+                FOREIGN KEY  (ts) REFERENCES http (ts))""")}
 
             # table_created['HTTP'] = True
             # table_created['HTTP_RESP_MEME_TYPES'] = True
@@ -308,50 +308,50 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
             # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
 
 
-            return[("""CREATE TABLE DNS (
+            return{'dns':("""CREATE TABLE DNS (
                                     UID TEXT,ts int,PROTO TEXT,TRANS_ID INT,
                                     `QUERY` TEXT,`QCLASS` INT,`QCLASS_NAME` TEXT,`QTYPE` INT,`QTYPE_NAME` TEXT,`RCODE` INT,
                                     `RCODE_NAME` TEXT,`QR` bool,`AA` BOOL,`TC` BOOL,
                                     `RD` BOOL,`RA` BOOL,`Z`INT,`rejected` BOOL,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),
                                     FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`))""")
 
-            ,("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
+            ,'dns_answers':("CREATE TABLE DNS_ANSWERS (UID TEXT , TS INT ,ANSWER TEXT,"
                           "FOREIGN KEY (UID) REFERENCES DNS(UID),"
                           "FOREIGN KEY (ts) REFERENCES DNS(ts))")
 
-            , ("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
+            ,'dns_ttls': ("CREATE TABLE DNS_TTLS (UID TEXT , TS INT ,TTL INT,"
                           "FOREIGN KEY (UID) REFERENCES DNS(UID),"
-                          "FOREIGN KEY (ts) REFERENCES DNS(ts))")]
+                          "FOREIGN KEY (ts) REFERENCES DNS(ts))")}
 
             # table_created['DNS_ANSWERS'] = True
             # table_created['DNS_TTLS'] = True
 
     elif fname == "signature.log":  # create SIGNATURES table  needs testing
 
-            return[("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
+            return{'http_resp_meme_types':("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
                         SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
-                        EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")]
+                        EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")}
 
     elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
 
             # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
 
 
-            return[("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
+            return{'ssl':("""CREATE TABLE SSL(UID TEXT,ts int,VERSION TEXT ,CIPHER TEXT ,
             SERVER_NAME TEXT ,SESSION_ID TEXT ,SUBJECT TEXT ,
             ISSUER_SUBJECT TEXT ,NOT_VALID_BEFORE TIME ,
             LAST_ALERT TEXT ,CLIENT_SUBJECT TEXT ,CLNT_ISSUER_SUBJECT TEXT ,CERT_HASH TEXT ,
             FOREIGN KEY (UID)REFERENCES MAIN(UID))""")
 
-            ,("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
-                          "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")]
+            ,'ssl_validation_status':("CREATE TABLE SSL_VALIDATION_STATUS (UID TEXT , TS INT,"
+                          "VALIDATION_STATUS TEXT,FOREIGN KEY (UID,TS) REFERENCES SSL(UID,TS))")}
             # table_created['SSL_VALIDATION_STATUS'] = True
 
 
 
     elif fname == "files.log":  # DONE # create files table and it's related tables #needs testing
 
-            return[(
+            return{'files':(
                 """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,SOURCE TEXT ,DEPTH INT,
                 ANALYZERS TEXT,MIME_TYPE TEXT,
                 FILENAME TEXT,DURATION TIME,LOCAL_ORIG BOOL,IS_ORIG BOOL,SEEN_BYTES INT,TOTAL_BYTES INT ,
@@ -359,30 +359,30 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
                 MD5 TEXT,SHA1 TEXT,SHA256 TEXT,EXTRACTED BOOL)""")
             # table_created['FILES'] = True
 
-            ,("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
+            ,'files_tx_hosts':("CREATE TABLE FILES_TX_HOSTS(UID TEXT,TS INT,TX_HOST"
                           ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                           ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
             # table_created['FILES_TX_HOSTS'] = True
 
-            ,("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
+            ,'files_rx_hosts':("CREATE TABLE FILES_RX_HOSTS(UID TEXT,TS INT,RX_HOST TEXT"
                           ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                           ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
             # table_created['FILES_RX_HOSTS'] = True
 
-            ,("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
+            ,'files_conn_uids':("CREATE TABLE FILES_CONN_UIDS(UID TEXT,TS INT,CONN_UID TEXT"
                           ",FOREIGN KEY (UID) REFERENCES FILE(UID)"
                           ",FOREIGN KEY (TS) REFERENCES FILE(TS))")
             # table_created['FILES_CONN_UIDS'] = True
 
-            ,("CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,"
+            ,'files_analyzers':("CREATE TABLE FILES_ANALYZERS (UID TEXT , TS INT ,ANALYZER TEXT,"
                           "FOREIGN KEY (UID) REFERENCES FILE(UID)"
-                          ",FOREIGN KEY (TS) REFERENCES FILE(TS))")]
+                          ",FOREIGN KEY (TS) REFERENCES FILE(TS))")}
             # table_created['FILES_ANALYZERS'] = True
 
 
     elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
 
-            return[("""CREATE TABLE SMTP (UID TEXT ,TS INT,
+            return{'smtp':("""CREATE TABLE SMTP (UID TEXT ,TS INT,
             TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
             ,`DATE` TEXT ,`FROM` TEXT ,`TO` TEXT,`REPLY_TO` TEXT,`MSG_ID` TEXT ,`IN_REPLY_TO` TEXT ,`SUBJECT` TEXT
             ,`X_ORIGINATING_IP` TEXT,`FIRST_RECEIVED` TEXT ,
@@ -391,20 +391,20 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
             FOREIGN KEY (ts) REFERENCES main(ts))""")
             # table_created['SMTP'] = True
 
-            ,("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
+            ,'smtp_rcptto':("""CREATE TABLE  SMTP_RCPTTO (UID TEXT , TS INT ,receipent TEXT,
             FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))""")
             # table_created['SMTP_RCPTTO'] = True
 
-            ,("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
+            ,'smtp_to':("CREATE TABLE  SMTP_TO (`UID` TEXT , `TS` INT ,`TO` TEXT,"
                           "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
             # table_created['SMTP_TO'] = True
 
-            ,("CREATE TABLE SMTP_PATH (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
+            ,'smtp_path':("CREATE TABLE SMTP_PATH (`UID` TEXT ,`TS` INT , `PATH` TEXT,"
                           "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")
             # table_created['SMTP_PATHS'] = True
 
-            ,("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
-                          "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")]
+            ,'smtp_fuids':("CREATE TABLE SMTP_FUIDS(`UID` TEXT ,`TS` INT,`FUID` TEXT ,"
+                          "FOREIGN KEY (UID) REFERENCES SMTP(UID),FOREIGN KEY (ts) REFERENCES SMTP(ts))")}
             # table_created['SMTP_FUIDS'] = True
 
             # `RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
