@@ -437,8 +437,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.message.setDetailedText(str (death))
             self.message.show()
 
-    def load(self):  # this function loads the content of the log files into the DB
-        # todo : progress bar check
+    def load(self):
         if self.loaded:    #check if the program is already loaded with log files
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
@@ -447,8 +446,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if reply == QMessageBox.Yes:
                 self.reset()            # reset the GUI , clear line edit , clear database all tables
                 map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
+                self.load_files()
+
             else:
                 return
+        else :
+            self.load_files()
+    def load_files(self):  # this function loads the content of the log files into the DB
+        # todo : progress bar check
+
         if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
             fName = fPath[len(fPath) - 1]            # get file name
@@ -615,9 +621,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
+        self.progress=0
         self.analysis.setTabEnabled(1, False)
-        self.lineEdit.setText('')
-        self.lineEdit_2.setText('')
+
         # todo : drop tables
         # todo  reset timeline
 
