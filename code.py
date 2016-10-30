@@ -463,21 +463,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print(fPath, path)
             os.chdir(path)             # change crwdir
 
-            if table_created[fName]==False:
-                if fName in ['weird.log','dns.log','conn.log','http.log','dhcp.log','irc.log','ssl.log'] and table_created['ids']==False:
-                    ids_creation_statment = tableCreator('ids')
-
-                    DBquery.exec_(ids_creation_statment)
+            if table_created[fName.split('.')[0]] == False:
+                if fName.split('.')[0] in ['weird','dns','conn','http','dhcp','irc','ssl'] :
+                    if table_created['ids']==False:
+                        ids_creation_statment = tableCreator('ids')
+                        print ("ids creation statments",ids_creation_statment)
+                        try:
+                            DBquery.exec_(ids_creation_statment)
+                            table_created['ids'] == True
+                        except:
+                            table_created['ids'] == False
                     queries =tableCreator(fName)
                     print (queries)
-                    print (list(queries.keys()))
+                    print (queries.keys())
                     for key in list(queries.keys()):
                         DBquery.exec_(queries[key])
                         table_created[key]=True
 
                 else :
                     queries = tableCreator(fName)
-                    for key in list(queries.keys()):
+                    for key in queries.keys():
                         DBquery.exec_(queries[key])
                         table_created[key] = True
 
@@ -493,7 +498,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             for each in self.validFiles:
                 each = str.lower(each)
                 print(each)
-                if table_created[each] == False:
+                if table_created[each.split('.')[0]] == False:
                     if each in ['weird.log', 'dns.log', 'conn.log', 'http.log', 'dhcp.log', 'irc.log', 'ssl.log'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
@@ -590,6 +595,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label.show()
 
     def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
+        ui.linesCount=0
+        self.validFiles=[]
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
@@ -623,7 +630,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.progressBar.setValue(0)
         self.progress=0
         self.analysis.setTabEnabled(1, False)
-
+        print(table_created)
+        for key in  (table_created.keys()):
+            table_created[key]=False
+        DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
+        table_created['main'] = True
         # todo : drop tables
         # todo  reset timeline
 
