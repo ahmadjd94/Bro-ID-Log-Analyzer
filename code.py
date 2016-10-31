@@ -397,10 +397,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except Exception as A:
             print('eroro adding to combo box ', A)
 
-            # self.model.insertColumn(0,self.tab_3,'wtf')
-            # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-            # self.modelview.setModel(self.model)
-            # self.modelview.
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         self.clear_table()
@@ -491,27 +487,29 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (table_created)
 
             # print(self.linesCount)
-
-
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
-
+            print ('valid files',self.validFiles)
             for each in self.validFiles:
                 each = str.lower(each)
                 print(each)
                 if table_created[each.split('.')[0]] == False:
-                    if each in ['weird.log', 'dns.log', 'conn.log', 'http.log', 'dhcp.log', 'irc.log', 'ssl.log'] and \
+                    if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
 
                         DBquery.exec_(ids_creation_statment)
-                        queries = tableCreator(each)
-                        for query in queries:
-                            DBquery.exec_(query)
+                        print('wtf',each.split('.')[0])
+                        queries = tableCreator(each.split('.')[0])
+                        for query in queries.keys():
+                            print (queries[query])
+                            DBquery.exec_(queries[query])
+                            table_created[query] = True
 
                     else:
-                        queries = tableCreator(each)
-                        for query in queries:
-                            DBquery.exec_(query)
+                        queries = tableCreator(each.split('.')[0])
+                        for query in queries.keys():
+                            DBquery.exec_(queries[query])
+                            table_created[query] = True
                 self.traverse(each)   # load every file in the dir
                 # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
@@ -697,11 +695,9 @@ if __name__ == "__main__":  # main module
 
         for i in tables :
             table_created[i]=False
-        print ("1234567890")
-        print (table_created)
-        print( "this is dropped tables ")  # fix ?
 
-        # print(tables - dropped + "non dropped tables ") #fix ?
+        print (table_created)
+                # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['main']=True
