@@ -474,8 +474,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     for key in list(queries.keys()):
                         DBquery.exec_(queries[key])
                         table_created[key] = True
-
+            AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
+            self.setup_combobox(fName)
             print (table_created)
 
             # print(self.linesCount)
