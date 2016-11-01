@@ -215,42 +215,42 @@ def SQLcreator( table, line):  # this function creates SQL Queries based on tabl
 
 def tableCreator( fname):  # this function creates tables based on the fname argument
     print('fname passes to function', fname)
-    fname = fname.lower()
+    if '.' in fname:
+        fname = fname.lower().split('.')[0]
 
     if fname == 'ids':
-
             return """CREATE TABLE ids (uid text,ts int ,ORIG_H TEXT,
                                 ORIG_P INT,RESP_H TEXT,RESP_P INT,FOREIGN KEY (`UID`) REFERENCES MAIN(`UID`),foreign key (`ts`) references  main (`ts`))"""
 
 
-    elif fname == "ftp.log":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
+    elif fname == "ftp":  # DONE # create FTP table //THIS TABLE HAS RELATION WITH IDS TABLE #checled and works correctly
             return {'ftp':("""CREATE TABLE FTP(UID TEXT,ts int
             ,USER TEXT,PASSWORD TEXT,COMMAND TEXT,ARG TEXT,
             MIME_TYPE TEXT,FILE_SIZE INT,REPLY_CODE INT,REPLY_MSG TEXT,
             FUID TEXT,FOREIGN KEY (UID)REFERENCES MAIN(UID),FOREIGN KEY (ts)REFERENCES MAIN(ts))""")}
 
-    elif fname == "dhcp.log":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
+    elif fname == "dhcp":  # create DHCP table //THIS TABLE HAS RELATION WITH IDS TABLE # checked and working
        return{'dhcp':("""CREATE TABLE DHCP(UID TEXT,TS int
             ,MAC TEXT, ASSIGNED_IP TEXT,LEASE_TIME TEXT
             , TRANS_ID INT,FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
-    elif fname == "irc.log":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE  #check and working
+    elif fname == "irc":  # DONE  create IRC table //THIS TABLE HAS RELATION WITH IDS TABLE  #check and working
             return{'irc':("""CREATE TABLE IRC (UID TEXT,ts int
             , NICK TEXT,USER TEXT,COMMAND TEXT,VALUE TEXT,ADDI TEXT,
             DCC_FILE_NAME TEXT,DCC_FILE_SIZE INT,DCC_MIME_TYPE TEXT,FUID TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),
             FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
-    elif fname == "weird.log":  # create weird table WORKING FINE
+    elif fname == "weird":  # create weird table WORKING FINE
             return{'weird':"CREATE TABLE WEIRD(UID TEXT,ts int, NAME TEXT,"
                           "ADDI TEXT,NOTICE BOOL,PEER TEXT,FOREIGN KEY(UID) REFERENCES MAIN(UID),"
                           "FOREIGN KEY(ts) REFERENCES MAIN(ts) )"""}
 
-    elif fname == "ssh.log":  # DONE create SSH table CHECKED and working correctly
+    elif fname == "ssh":  # DONE create SSH table CHECKED and working correctly
             return {'ssh':("""CREATE TABLE SSH( UID TEXT,TS INT,host_key TEXT,STATUS TEXT,
             DIRECTION TEXT,CLIENT TEXT, SERVER TEXT,RESP_SIZE INT,cipher_alg text ,version text,
             FOREIGN KEY(UID) REFERENCES MAIN(UID),FOREIGN KEY(ts) REFERENCES MAIN(ts) )""")}
 
-    elif fname == "conn.log":  # DONE  create CONN table
+    elif fname == "conn":  # DONE  create CONN table
 
             return{'conn':("""CREATE TABLE CONN(UID TEXT,TS INT,PROTO TEXT,SERVICE TEXT,DURATION TIME,ORIG_BYTES INT,
             RESP_BYTES INT,CONN_STATE TEXT,LOCAL_ORIG BOOL,MISSED_BYTES COUNT,HISTORY TEXT,ORIG_PKTS INT,ORIG_IP_BYTES INT,
@@ -260,7 +260,7 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
                          FOREIGN KEY (TS) REFERENCES conn (TS))""")}
 
 
-    elif fname == "http.log":  # todo: needs furhter checking
+    elif fname == "http":  # todo: needs furhter checking
             return{'http':("""CREATE TABLE  HTTP (
                                     UID TEXT,ts int
                                     ,TRANS_DEPTH INT,METHOD TEXT,HOST TEXT,URI TEXT,REFERRER TEXT,
@@ -303,7 +303,7 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
             # table_created['HTTP_PROXIED_HEADERS'] = True
             # table_created['HTTP_TAGS'] = True
 
-    elif fname == "dns.log":  # DONE # create DNS table    continously crashing
+    elif fname == "dns":  # DONE # create DNS table    continously crashing
 
             # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
 
@@ -326,13 +326,13 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
             # table_created['DNS_ANSWERS'] = True
             # table_created['DNS_TTLS'] = True
 
-    elif fname == "signature.log":  # create SIGNATURES table  needs testing
+    elif fname == "signature":  # create SIGNATURES table  needs testing
 
             return{'http_resp_meme_types':("""CREATE TABLE SIGNATURE(TS INT ,SRC_ADDR TEXT ,
                         SRC_PORT INT ,DST_ADR TEXT ,DST_PORT INT ,NOTE TEXT ,SIG_ID TEXT,
                         EVENT_MSG TEXT ,SUB_MSG TEXT ,SIG_COUNT INT ,HOST_COUNT INT )""")}
 
-    elif fname == "ssl.log":  # DONE # create SSL table and it's realted tables
+    elif fname == "ssl":  # DONE # create SSL table and it's realted tables
 
             # if list(dropped)[tables.index("IDS")] == 0:  # indicates if the IDS exists or not
 
@@ -349,7 +349,7 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
 
 
 
-    elif fname == "files.log":  # DONE # create files table and it's related tables #needs testing
+    elif fname == "files":  # DONE # create files table and it's related tables #needs testing
 
             return{'files':(
                 """CREATE TABLE FILES (TS INT , FUID TEXT,TX_HOSTS TEXT,RX_HOSTS TEXT,SOURCE TEXT ,DEPTH INT,
@@ -380,7 +380,7 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
             # table_created['FILES_ANALYZERS'] = True
 
 
-    elif fname == "smtp.log":  # DONE # create SMTP table and it's related tables
+    elif fname == "smtp":  # DONE # create SMTP table and it's related tables
 
             return{'smtp':("""CREATE TABLE SMTP (UID TEXT ,TS INT,
             TRANS_DEPTH INT ,HELO TEXT,MAILFROM STRING,RCPTTO TEXT
@@ -409,3 +409,5 @@ def tableCreator( fname):  # this function creates tables based on the fname arg
 
             # `RCPTO` AND `TO` COLUMNS ARE ASSUMED TO BE SETS
 
+    else :
+        return False

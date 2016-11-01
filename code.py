@@ -397,10 +397,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except Exception as A:
             print('eroro adding to combo box ', A)
 
-            # self.model.insertColumn(0,self.tab_3,'wtf')
-            # self.model.setHorizontalHeader(0, QtCore.Qt.Horizontal, 'test')
-            # self.modelview.setModel(self.model)
-            # self.modelview.
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         self.clear_table()
@@ -437,8 +433,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.message.setDetailedText(str (death))
             self.message.show()
 
-    def load(self):  # this function loads the content of the log files into the DB
-        # todo : progress bar check
+    def load(self):
         if self.loaded:    #check if the program is already loaded with log files
             reply = QMessageBox.question(self.message, 'Message',
                                          "there is files already loaded into database ,are you sure you want to load files",
@@ -447,8 +442,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             if reply == QMessageBox.Yes:
                 self.reset()            # reset the GUI , clear line edit , clear database all tables
                 map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
+                self.load_files()
+
             else:
                 return
+        else :
+            self.load_files()
+    def load_files(self):  # this function loads the content of the log files into the DB
+        # todo : progress bar check
+
         if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
             fName = fPath[len(fPath) - 1]            # get file name
@@ -457,21 +459,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print(fPath, path)
             os.chdir(path)             # change crwdir
 
-            if table_created[fName]==False:
-                if fName in ['weird.log','dns.log','conn.log','http.log','dhcp.log','irc.log','ssl.log'] and table_created['ids']==False:
-                    ids_creation_statment = tableCreator('ids')
-
-                    DBquery.exec_(ids_creation_statment)
+            if table_created[fName.split('.')[0]] == False:
+                if fName.split('.')[0] in ['weird','dns','conn','http','dhcp','irc','ssl'] :
+                    if table_created['ids']==False:
+                        ids_creation_statment = tableCreator('ids')
+                        print ("ids creation statments",ids_creation_statment)
+                        try:
+                            DBquery.exec_(ids_creation_statment)
+                            table_created['ids'] == True
+                        except:
+                            table_created['ids'] == False
                     queries =tableCreator(fName)
                     print (queries)
-                    print (list(queries.keys()))
+                    print (queries.keys())
                     for key in list(queries.keys()):
                         DBquery.exec_(queries[key])
                         table_created[key]=True
 
                 else :
                     queries = tableCreator(fName)
-                    for key in list(queries.keys()):
+                    for key in queries.keys():
                         DBquery.exec_(queries[key])
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
@@ -480,30 +487,34 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print (table_created)
 
             # print(self.linesCount)
-
-
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
-
+            print ('valid files',self.validFiles)
             for each in self.validFiles:
                 each = str.lower(each)
                 print(each)
-                if table_created[each] == False:
-                    if each in ['weird.log', 'dns.log', 'conn.log', 'http.log', 'dhcp.log', 'irc.log', 'ssl.log'] and \
+                if table_created[each.split('.')[0]] == False:
+                    if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
 
                         DBquery.exec_(ids_creation_statment)
-                        queries = tableCreator(each)
-                        for query in queries:
-                            DBquery.exec_(query)
+                        print('wtf',each.split('.')[0])
+                        queries = tableCreator(each.split('.')[0])
+                        for query in queries.keys():
+                            print (queries[query])
+                            DBquery.exec_(queries[query])
+                            table_created[query] = True
 
                     else:
-                        queries = tableCreator(each)
-                        for query in queries:
-                            DBquery.exec_(query)
+                        queries = tableCreator(each.split('.')[0])
+                        for query in queries.keys():
+                            DBquery.exec_(queries[query])
+                            table_created[query] = True
                 self.traverse(each)   # load every file in the dir
                 # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
+            self.loaded=True
+
             self.analysis.setTabEnabled(2, True)  #enable query tab after loading
             # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
@@ -582,6 +593,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label.show()
 
     def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
+        ui.linesCount=0
+        self.validFiles=[]
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
@@ -613,9 +626,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
+        self.progress=0
         self.analysis.setTabEnabled(1, False)
-        self.lineEdit.setText('')
-        self.lineEdit_2.setText('')
+        print(table_created)
+        for key in  (table_created.keys()):
+            table_created[key]=False
+        DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
+        table_created['main'] = True
         # todo : drop tables
         # todo  reset timeline
 
@@ -678,11 +695,9 @@ if __name__ == "__main__":  # main module
 
         for i in tables :
             table_created[i]=False
-        print ("1234567890")
-        print (table_created)
-        print( "this is dropped tables ")  # fix ?
 
-        # print(tables - dropped + "non dropped tables ") #fix ?
+        print (table_created)
+                # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['main']=True
