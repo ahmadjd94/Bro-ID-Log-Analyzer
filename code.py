@@ -484,8 +484,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
             self.traverse(fName)
             self.setup_combobox(fName)
-
-
             print (table_created)
 
             # print(self.linesCount)
