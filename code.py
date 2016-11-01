@@ -16,6 +16,7 @@ from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
 from PredefnedQueries import initQueries
+from random import randint
 import numpy
 import Tables
 from PyQt5.QtGui import QIcon
@@ -31,6 +32,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     ################################  defining global variable ###################################
     global DBconnection
     global table_created  # connection to DB
+
     single = False  # indicates if user is dealing with a signle file / DIR
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -38,6 +40,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     UnsupportedFiles=Tables.UnsupportedFiles
     valid=Tables.valid
     currentQuery=None
+
 
 
 
@@ -76,7 +79,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox.setToolTip(
         _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
 
-        self.analysis.setTabEnabled(1, False)
+        self.analysis.setTabEnabled(1, True)
         self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
         # self.analysis.setTabEnabled(2,False)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
@@ -86,11 +89,33 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
+        self.pushButton_4.clicked.connect(self.pier)
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
+    def pier(self):
+        import matplotlib.pyplot as plt
 
+        # Data to plot
+        labels = list(linescount.keys())
+        sizes=[]
+        colors=[]
+        indexes=list(linescount.keys())
+        for i in linescount.keys():
+            sizes.append(linescount[i]/ui.linesCount)
+            color=indexes.index(i)
+            colors.append(Tables.defaultColors[color])
+
+         # explode = (0.1, 0, 0, 0)  # explode 1st slice
+
+        # Plot, explode=explode
+        plt.pie(sizes, labels=labels, colors=colors,
+                autopct='%1.1f%%', shadow=True, startangle=140)
+
+        plt.axis('equal')
+
+        plt.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
@@ -583,7 +608,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try:
             file = open(fname[0])
             ui.linesCount = 0
-            for i in file:
+            for line in file:
                 ui.linesCount += 1
             self.label.setText("the selected file has " + str(ui.linesCount) + " lines")
             self.label.setVisible(True)
@@ -607,13 +632,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     print(self.validFiles)
             for each in self.validFiles:
                 file = open(each, 'r')
-                for i in file:
+                linescount[each]=0
+                line_sum = 0
+                for line in file:
+                    line_sum +=1
                     ui.linesCount += 1  # stores the total lines count of the DIR
+                linescount[each]=line_sum
                 file.close()
             self.label.setText(
                 "the directory you have selected have %s valid files with %s lines" % (
             str(len(self.validFiles)), str(ui.linesCount)))
             self.lineEdit_2.setText(dire)
+            print (linescount)
 
         except  NotADirectoryError as e:  # exception raised if the selection was not a dir
             self.label.setText("make sure you are selecting a dir")
@@ -650,6 +680,7 @@ def droptables(table):  # a map function drops tables , return 1 on success
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
     # print (validQueries)
+    linescount = {}
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     print(table_created)
     tables=Tables.tables
