@@ -10,7 +10,7 @@ from BilaTypes import BilaTypes
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
-                             QAction, QFileDialog, QApplication, QMessageBox)
+                             QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from Functions import SQLcreator,tableCreator
 from Tables import table_created
 from Queries import QueryStatment
@@ -19,6 +19,10 @@ from PredefnedQueries import initQueries
 from random import randint
 import numpy
 import Tables
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import random
 from PyQt5.QtGui import QIcon
 
 # module used for changing Current working directory of the program
@@ -26,6 +30,54 @@ import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
+
+class PlotCanvas(FigureCanvas):
+    def __init__(self, parent=None, width=6, height=8, dpi=100):
+        fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='white')
+
+        ax = fig.gca()
+
+        labels = list(linescount.keys())
+        sizes = []
+        colors = []
+        indexes = list(linescount.keys())
+        for i in linescount.keys():
+            sizes.append(linescount[i] / ui.linesCount)
+            color = indexes.index(i)
+            colors.append(Tables.defaultColors[color])
+
+            # explode = (0.1, 0, 0, 0)  # explode 1st slice
+
+        # Plot, explode=explode
+
+        self.pie = plt.pie(sizes, labels=labels, colors=colors,
+                           autopct='%1.1f%%', shadow=True, startangle=140)
+        print (self.pie)
+        # self.pie.legendcolor
+        # Set aspect ratio to be equal so that pie is drawn as a circle.
+        plt.axis('equal')
+        patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=140)
+        plt.legend(patches, labels, loc=(0,0))
+        self.axes = fig.add_subplot(111)
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.tab_2)
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        # [s.set_color("#333333") for s in self.pie.gca().get_xticklabels()]
+        # self.axes.s
+        # ax.set_xticks([0, 1])
+        # ax.set_yticks([0, 1])
+
+        # ax.set_xlim((-0.5, 1.5))
+        # ax.set_ylim((-0.5, 1.5))
+
+        # Set aspect ratio to be equal so that pie is drawn as a circle.
+        # ax.set_aspect('equal')
+        # plt.draw()
+
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -43,12 +95,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
 
-
-      # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
-
-    # END OF GLOVAL VARIABLES DEFENITION
-
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
 
@@ -56,8 +102,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "BILA"))
         self.radioButton.setText(_translate("MainWindow", "load single file"))
         self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
         self.pushButton.setText(_translate("MainWindow", "Load"))
@@ -94,29 +139,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
+        self.m = None
+
+
+
 
     def pier(self):
-        import matplotlib.pyplot as plt
+
 
         # Data to plot
-        labels = list(linescount.keys())
-        sizes=[]
-        colors=[]
-        indexes=list(linescount.keys())
-        for i in linescount.keys():
-            sizes.append(linescount[i]/ui.linesCount)
-            color=indexes.index(i)
-            colors.append(Tables.defaultColors[color])
 
-         # explode = (0.1, 0, 0, 0)  # explode 1st slice
+        self.m=PlotCanvas(self, width=6, height=8)
 
-        # Plot, explode=explode
-
-        plt.pie(sizes, labels=labels, colors=colors,
-                autopct='%1.1f%%', shadow=True, startangle=140)
-
-        plt.axis('equal')
-        plt.show()
+        self.m.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
