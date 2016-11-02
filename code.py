@@ -66,7 +66,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_2.setText(_translate("MainWindow", "..."))
         self.pushButton_3.setText(_translate("MainWindow", "..."))
         self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "files statistics"))
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
@@ -94,6 +94,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
+
     def pier(self):
         import matplotlib.pyplot as plt
 
@@ -110,11 +111,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
          # explode = (0.1, 0, 0, 0)  # explode 1st slice
 
         # Plot, explode=explode
+
         plt.pie(sizes, labels=labels, colors=colors,
                 autopct='%1.1f%%', shadow=True, startangle=140)
 
         plt.axis('equal')
-
         plt.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
