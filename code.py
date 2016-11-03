@@ -85,7 +85,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     global DBconnection
     global table_created  # connection to DB
 
-    single = False  # indicates if user is dealing with a signle file / DIR
+
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []  # this list stores the valid file found in a DIR
@@ -93,68 +93,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     valid=Tables.valid
     currentQuery=None
 
-
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-
-        #self.__message2__.setText("error connecting to database")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-        MainWindow.setWindowTitle(_translate("MainWindow", "BILA"))
-        self.radioButton.setText(_translate("MainWindow", "load single file"))
-        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
-        self.pushButton.setText(_translate("MainWindow", "Load"))
-        self.label.setVisible(False)
-        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
-        self.pushButton_2.setText(_translate("MainWindow", "..."))
-        self.pushButton_3.setText(_translate("MainWindow", "..."))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "files statistics"))
-        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
-        self.menuHelp.setTitle(_translate("MainWindow", "help"))
-        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
-        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
-        self.actionAbout.setText(_translate("MainWindow", "about"))
-        self.label_2.setStyleSheet("color : green")
-        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
-        self.label_2.setVisible(False)
-        self.comboBox.setToolTip(
-        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
-
-        self.analysis.setTabEnabled(1, True)
-        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
-        # self.analysis.setTabEnabled(2,False)
-        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
-        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
-        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
-        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
-        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
-        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
-        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
-        self.pushButton_4.clicked.connect(self.pier)
-        # self.textEdit.textChanged.connect(self.uMan)
-        self.pushButton_5.clicked.connect(self.executeSQL)
-        self.comboBox.currentIndexChanged.connect(self.selected_query)
-        self.radioButton.click()
-        self.m = None
-
-
-
-
-    def pier(self):
-
-
-        # Data to plot
-
-        self.m=PlotCanvas(self, width=6, height=8)
-
-        self.m.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
+        self.single = False  # indicates if user is dealing with a signle file / DIR
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
         self.progress = 0  # indicate the level of progress bar
         self.centralWidget = QtWidgets.QWidget(MainWindow)
@@ -240,14 +182,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
 
-
-
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "border-color: rgb(0, 0, 0);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_4.setObjectName("pushButton_4")
+        self.label_4 = QtWidgets.QLabel(self.tab_2)
+        self.label_4.setGeometry(QtCore.QRect(0,0,400,20))
+        self.label_4.setStyleSheet("color:red;\n"
+                                   "border-color:rgb(255, 153, 0 );\n"
+                                   "")
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
@@ -294,6 +239,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "border-color:rgb(255, 153, 0 );\n"
                                    "")
         self.label_2.setObjectName("label_2")
+
         self.analysis.addTab(self.tab_3, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
@@ -321,6 +267,71 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         self.currentQuery
         # self.dbu=DB
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+
+        #self.__message2__.setText("error connecting to database")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setWindowTitle(_translate("MainWindow", "BILA"))
+        self.radioButton.setText(_translate("MainWindow", "load single file"))
+        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
+        self.pushButton.setText(_translate("MainWindow", "Load"))
+        self.label.setVisible(False)
+        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
+        self.pushButton_2.setText(_translate("MainWindow", "..."))
+        self.pushButton_3.setText(_translate("MainWindow", "..."))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "files statistics"))
+        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
+        self.menuHelp.setTitle(_translate("MainWindow", "help"))
+        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
+        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
+        self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.label_2.setStyleSheet("color : green")
+        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
+        self.label_2.setVisible(False)
+        self.label_4.setText("")
+        self.label_4.setVisible(True)
+        self.comboBox.setToolTip(
+        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
+
+        self.analysis.setTabEnabled(1, True)
+        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        # self.analysis.setTabEnabled(2,False)
+        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
+        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
+        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
+        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
+        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
+        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
+        self.pushButton_4.clicked.connect(self.pier)
+        # self.textEdit.textChanged.connect(self.uMan)
+        self.pushButton_5.clicked.connect(self.executeSQL)
+        self.comboBox.currentIndexChanged.connect(self.selected_query)
+        self.radioButton.click()
+        self.m = None
+
+
+
+
+    def pier(self):
+
+        if self.single==True:
+            self.label_4.setText('files statistics not available in single files mode')
+            self.label_4.show()
+
+            return
+        # Data to plot
+        else :
+            self.label_4.setVisible(False)
+            self.m=PlotCanvas(self, width=6, height=8)
+
+            self.m.show()
+
 
     def uMan(self):
         self.label_2.setVisible(False)
@@ -605,7 +616,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
-        single = True
+        self.single = True
         try:
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
@@ -637,7 +648,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
-        single = False
+        self.single = False
         fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
         print(fname)
         self.lineEdit.setText(fname[0])
@@ -656,6 +667,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
         ui.linesCount=0
         self.validFiles=[]
+        self.single=False
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
