@@ -164,15 +164,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
-        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
         self.pushButton_2.setGeometry(QtCore.QRect(616, 99, 29, 27))
         self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_2.setObjectName("pushButton_2")
-        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
-        # self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
-        #                                "color: rgb(0, 0, 0);")
-        # self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_3 = QtWidgets.QPushButton(self.tab)
         self.pushButton_3.setGeometry(QtCore.QRect(621, 211, 29, 27))
         self.pushButton_3.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -196,26 +191,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        # self.tableView = QtWidgets.QTableView(self.tab_3)
-        # self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
-        # self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-        # self.tableView.setAutoFillBackground(False)
-        # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
-        #                              "")
         self.model = QtWidgets.QTableWidget(self.tab_3)
-        # self.modelview = QtWidgets.QTableView()
-        # # self.modelview.setModel(self.model)
-        # self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
-        # self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
-        #                                 "border-color: rgb(0, 0, 0);")
-        # self.modelview.setObjectName("graphicsView")
         self.model.setGeometry(QtCore.QRect(60, 150, 641, 291))
         self.model.setStyleSheet("background-color: grey;\n"
                                  "border-color: rgb(0, 0, 0);")
         self.model.setObjectName("graphicsView")
-        # self.tableView.setFrameShape(QtWidgets.QFrame.Box)
-        # self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
-        # self.tableView.setObjectName("tableView")
         self.label_3 = QtWidgets.QLabel(self.tab_3)
         self.label_3.setGeometry(QtCore.QRect(64, 136, 59, 14))
         self.label_3.setObjectName("label_3")
@@ -243,7 +223,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_3, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        # self.menuBar.setGeometry(QtCore.QRect(0, 0, 759, 19))
         self.menuBar.setObjectName("menuBar")
         self.menuBRO_visualizer = QtWidgets.QMenu(self.menuBar)
         self.menuBRO_visualizer.setObjectName("menuBRO_visualizer")
@@ -312,6 +291,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
+        self.tab_2.setEnabled(False)
+        self.tab_3.setEnabled(False)
+
         self.radioButton.click()
         self.m = None
 
@@ -346,20 +328,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def traverse(self, fname):  # this function will traverse the file that is based to it
         # if the field value is -1 , the field should be neglected )
-        print('traversing')
-        print(fname)
+
+
 
         try:
             #fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
-            print(fname)
+
             hashtemp = ""  # this variable stores the entire log file to calculate it's hash value
-            print (os.getcwd())
+
             if fname in os.listdir():
                 print('yes')
             fil = open(fname , 'r+')  # open the log file Read-Only mode
-            print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
-            print (fil.__sizeof__())
             f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
             readline=f1.readline
             i =codecs.decode(readline(),'ascii')
@@ -369,12 +349,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
                     # i = i.lower()  # ignore the case of the fields line
-                    # print(i)
                     fields = (i[7:].split())
-                    print(fields)
                     fname=(fname.split('.')[0])
-                    print(fname)
-                    print(validFields[fname])
                     for field in fields:
                         if field in validFields[fname]:
 
@@ -387,7 +363,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                     try :
                         validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1)) # needs review , is this important ?
-                        print ('sorted',validFields[fname])
                     except:
                         print ('already sorted ?')
 
@@ -397,21 +372,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     # sort dictionary based on key values
                     try:
                         sql_commands=(self.SQLcreator(fname, line)) # call the SQL creator function which generates queries and return an array if queries
-                        print ("PRINTING RECEIVED LIST",sql_commands)
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
                                 DBquery.exec_ (command)
                                 DBconnection.commit()
-                                print ("executed correctly :\n",command)
 
                             except QtSql.QSqlError:
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
                         # DBquery.exec_(sql_command,sql_command_ids)
                     except Exception as exc1:
-                        # print (str(a))
                         print('error creating SQL',str (exc1))
-                print ('end')
                 i = codecs.decode(readline(), 'ascii')
 
                 # i=fil.readline()
@@ -421,7 +392,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 self.progress += 1
                 self.progressBar.setValue((self.progress / self.linesCount) * 100)
-                print ("progress :%d overall : %d "%(self.progress,self.linesCount))
             f1.close()
 
 
@@ -440,7 +410,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         except Exception as exc3:  # this block is executed in case of failure of instering
             print(str(exc3))
-            print ('exception occurd')
             with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
@@ -462,7 +431,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def setup_combobox(self, fname):
         try:
-            print(len(AllowedQueries))
             for obj in AllowedQueries:
                 for query in obj:
                     self.comboBox.addItem(query.Query)
@@ -484,7 +452,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     for count in range (len(self.currentQuery.Headers[0])):
                         self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
                         result+= str(DBquery.value(count))
-                    print (result)
                     rowcount+=1
 
             self.label_2.setStyleSheet("color: green")
@@ -492,8 +459,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label_2.show()
 
         except sqlite3.OperationalError as err:
-            print(str(err))
-
             self.message.setText("error selecting rows from data base")
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
@@ -527,23 +492,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
             fName = fPath[len(fPath) - 1]            # get file name
             path = '/'.join(fPath[:len(fPath) - 1])  # -1 since the right slicing operator is excluded
-            print("123456",fName)
-            print(fPath, path)
             os.chdir(path)             # change crwdir
 
             if table_created[fName.split('.')[0]] == False:
                 if fName.split('.')[0] in ['weird','dns','conn','http','dhcp','irc','ssl'] :
                     if table_created['ids']==False:
                         ids_creation_statment = tableCreator('ids')
-                        print ("ids creation statments",ids_creation_statment)
                         try:
                             DBquery.exec_(ids_creation_statment)
                             table_created['ids'] == True
                         except:
                             table_created['ids'] == False
                     queries =tableCreator(fName)
-                    print (queries)
-                    print (queries.keys())
                     for key in list(queries.keys()):
                         DBquery.exec_(queries[key])
                         table_created[key]=True
@@ -556,24 +516,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
             self.setup_combobox(fName)
-            print (table_created)
 
-            # print(self.linesCount)
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
-            print ('valid files',self.validFiles)
             for each in self.validFiles:
                 each = str.lower(each)
-                print(each)
                 if table_created[each.split('.')[0]] == False:
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
 
                         DBquery.exec_(ids_creation_statment)
-                        print('wtf',each.split('.')[0])
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            print (queries[query])
                             DBquery.exec_(queries[query])
                             table_created[query] = True
 
@@ -583,10 +537,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
-                # self.progressBar.setValue(self.progressBar.value() + progress)
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
-
+            self.tab_2.setEnabled(True)
             self.analysis.setTabEnabled(2, True)  #enable query tab after loading
             # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
@@ -620,21 +573,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try:
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
-            print(name + "this")
             if name in self.valid:
-                print(name)
                 file = open(self.lineEdit.text())
                 self.count = 0
                 for line in file:
                     self.linesCount += 1
-
                 file.close()
 
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
 
             elif name in self.UnsupportedFiles:
-                print("here")
                 self.message.setText("BILA does not currently support the file you are trying to use")
                 self.message.show()
                 self.lineEdit.clear()
@@ -644,7 +593,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.lineEdit.clear()
 
         except:  # handling incorrect file directories / paths
-            print("exception raised")
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
@@ -671,13 +619,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
-            print(dire)
             os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
                 if each in self.valid:
                     self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
-                    print(self.validFiles)
             for each in self.validFiles:
                 file = open(each, 'r')
                 linescount[each]=0
@@ -691,7 +637,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 "the directory you have selected have %s valid files with %s lines" % (
             str(len(self.validFiles)), str(ui.linesCount)))
             self.lineEdit_2.setText(dire)
-            print (linescount)
 
         except  NotADirectoryError as e:  # exception raised if the selection was not a dir
             self.label.setText("make sure you are selecting a dir")
@@ -706,7 +651,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.progressBar.setValue(0)
         self.progress=0
         self.analysis.setTabEnabled(1, False)
-        print(table_created)
         for key in  (table_created.keys()):
             table_created[key]=False
         DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
@@ -727,10 +671,8 @@ def droptables(table):  # a map function drops tables , return 1 on success
             return 0
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
-    # print (validQueries)
     linescount = {}
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-    print(table_created)
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
     AllowedQueries = []
@@ -758,29 +700,20 @@ if __name__ == "__main__":  # main module
         DBconnection.open()
         DBquery=QtSql.QSqlQuery()
 
-        print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
 
         norm_drop=map(droptables, normalized_tables)
-        print ("dropped tables : ",list(norm_drop.__iter__()))
 
         dropped={}
         for i in range (len(drop_result)):
             dropped[tables[i]]=drop_result[i]
 
-        for i in dropped :
-            print (i,dropped[i])
-
         for i in tables :
             table_created[i]=False
-
-        print (table_created)
-                # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['main']=True
-            print ("Success creating main table")
 
         except:
             print("error dropping main ?")
@@ -791,7 +724,6 @@ if __name__ == "__main__":  # main module
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
         else:
-            print(historyLog)
             f = open(historyLog, "w")
             f.close()
             with open(historyLog, 'a') as csvfile:
