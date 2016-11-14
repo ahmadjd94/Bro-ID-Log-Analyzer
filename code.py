@@ -84,7 +84,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     ################################  defining global variable ###################################
     global DBconnection
     global table_created  # connection to DB
-
+    global AllowedQueries
 
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -329,8 +329,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def traverse(self, fname):  # this function will traverse the file that is based to it
         # if the field value is -1 , the field should be neglected )
 
-
-
         try:
             #fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
 
@@ -431,11 +429,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def setup_combobox(self):
         try:
-            for obj in AllowedQueries:
-                for query in obj:
-                    self.comboBox.addItem(query.Query)
-                    print (query.Query)
-            self.comboBox.setEnabled(True)
+            print (type(AllowedQueries))
+            print (AllowedQueries)
+            try :
+                for obj in AllowedQueries:
+                    for query in obj:
+                        self.comboBox.addItem(query.Query)
+                        print (query.Query)
+                self.comboBox.setEnabled(True)
+            except Exception as s1:
+                print (s1)
+
         except Exception as A:
             print('eroro adding to combo box ', A)
 
@@ -489,7 +493,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.load_files()
     def load_files(self):  # this function loads the content of the log files into the DB
         # todo : progress bar check
-
+        self.tab_3.setEnabled(True)
         if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
             fName = fPath[len(fPath) - 1]            # get file name
@@ -522,11 +526,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
             for each in self.validFiles:
                 each = str.lower(each)
+                AllowedQueries.append(initQueries(each.split('.')[0]))
                 if table_created[each.split('.')[0]] == False:
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
-
                         DBquery.exec_(ids_creation_statment)
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
@@ -540,7 +544,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
                 print (each,"wtffffff")
-                AllowedQueries.append(initQueries(each.split('.')[0]))
+
             self.setup_combobox()
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
@@ -550,6 +554,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         else:
             self.message.setText("please specifiy a file to load or a directory")
             self.message.show()
+
 
     def switch1(self):  # functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
                         # disables the GUI components that allow user to load DIRs
