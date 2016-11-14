@@ -429,11 +429,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         while(self.model.rowCount()>0):
             self.model.removeRow(0)
 
-    def setup_combobox(self, fname):
+    def setup_combobox(self):
         try:
             for obj in AllowedQueries:
                 for query in obj:
                     self.comboBox.addItem(query.Query)
+                    print (query.Query)
+            self.comboBox.setEnabled(True)
         except Exception as A:
             print('eroro adding to combo box ', A)
 
@@ -515,7 +517,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
-            self.setup_combobox(fName)
+            self.setup_combobox()
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
             for each in self.validFiles:
@@ -537,6 +539,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
+                print (each,"wtffffff")
+                AllowedQueries.append(initQueries(each.split('.')[0]))
+            self.setup_combobox()
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
             self.tab_2.setEnabled(True)
