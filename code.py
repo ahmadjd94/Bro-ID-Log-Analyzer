@@ -248,8 +248,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # self.dbu=DB
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-
-        #self.__message2__.setText("error connecting to database")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -276,7 +274,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_4.setVisible(True)
         self.comboBox.setToolTip(
         _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
-
         self.analysis.setTabEnabled(1, True)
         self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
         # self.analysis.setTabEnabled(2,False)
@@ -291,14 +288,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
-        self.tab_2.setEnabled(False)
+        self.tab_2.setEnabled(True)
         self.tab_3.setEnabled(False)
-
         self.radioButton.click()
         self.m = None
-
-
-
 
     def pier(self):
 
@@ -317,8 +310,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def uMan(self):
         self.label_2.setVisible(False)
-
-
 
     def valuefilter(self, num):
         if num != -1:
