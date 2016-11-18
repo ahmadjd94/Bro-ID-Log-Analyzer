@@ -10,14 +10,19 @@ from BilaTypes import BilaTypes
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
-                             QAction, QFileDialog, QApplication, QMessageBox)
+                             QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from Functions import SQLcreator,tableCreator
 from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
 from PredefnedQueries import initQueries
+from random import randint
 import numpy
 import Tables
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import random
 from PyQt5.QtGui import QIcon
 
 # module used for changing Current working directory of the program
@@ -26,12 +31,61 @@ import fnmatch  # module used for matching files names
 import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
 
+class PlotCanvas(FigureCanvas):
+    def __init__(self, parent=None, width=6, height=8, dpi=100):
+        fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='white')
+
+        ax = fig.gca()
+
+        labels = list(linescount.keys())
+        sizes = []
+        colors = []
+        indexes = list(linescount.keys())
+        for i in linescount.keys():
+            sizes.append(linescount[i] / ui.linesCount)
+            color = indexes.index(i)
+            colors.append(Tables.defaultColors[color])
+
+            # explode = (0.1, 0, 0, 0)  # explode 1st slice
+
+        # Plot, explode=explode
+
+        self.pie = plt.pie(sizes, labels=labels, colors=colors,
+                           autopct='%1.1f%%', shadow=True, startangle=140)
+        print (self.pie)
+        # self.pie.legendcolor
+        # Set aspect ratio to be equal so that pie is drawn as a circle.
+        plt.axis('equal')
+        patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=140)
+        plt.legend(patches, labels, loc=(0,0))
+        self.axes = fig.add_subplot(111)
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.tab_2)
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        # [s.set_color("#333333") for s in self.pie.gca().get_xticklabels()]
+        # self.axes.s
+        # ax.set_xticks([0, 1])
+        # ax.set_yticks([0, 1])
+
+        # ax.set_xlim((-0.5, 1.5))
+        # ax.set_ylim((-0.5, 1.5))
+
+        # Set aspect ratio to be equal so that pie is drawn as a circle.
+        # ax.set_aspect('equal')
+        # plt.draw()
+
+
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
     global DBconnection
     global table_created  # connection to DB
-    single = False  # indicates if user is dealing with a signle file / DIR
+    global AllowedQueries
+
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
     validFiles = []  # this list stores the valid file found in a DIR
@@ -39,61 +93,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     valid=Tables.valid
     currentQuery=None
 
-
-
-      # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
-
-    # END OF GLOVAL VARIABLES DEFENITION
-
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-
-        #self.__message2__.setText("error connecting to database")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.radioButton.setText(_translate("MainWindow", "load single file"))
-        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
-        self.pushButton.setText(_translate("MainWindow", "Load"))
-        self.label.setVisible(False)
-        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
-        self.pushButton_2.setText(_translate("MainWindow", "..."))
-        self.pushButton_3.setText(_translate("MainWindow", "..."))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
-        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
-        self.menuHelp.setTitle(_translate("MainWindow", "help"))
-        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
-        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
-        self.actionAbout.setText(_translate("MainWindow", "about"))
-        self.label_2.setStyleSheet("color : green")
-        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
-        self.label_2.setVisible(False)
-        self.comboBox.setToolTip(
-        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
-
-        self.analysis.setTabEnabled(1, False)
-        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
-        # self.analysis.setTabEnabled(2,False)
-        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
-        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
-        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
-        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
-        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
-        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
-        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
-        # self.textEdit.textChanged.connect(self.uMan)
-        self.pushButton_5.clicked.connect(self.executeSQL)
-        self.comboBox.currentIndexChanged.connect(self.selected_query)
-        self.radioButton.click()
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
+        self.single = False  # indicates if user is dealing with a signle file / DIR
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
         self.progress = 0  # indicate the level of progress bar
         self.centralWidget = QtWidgets.QWidget(MainWindow)
@@ -161,15 +164,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label.setStyleSheet("color: rgb(255, 0, 0);")
         self.label.setObjectName("label")
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
-        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
         self.pushButton_2.setGeometry(QtCore.QRect(616, 99, 29, 27))
         self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_2.setObjectName("pushButton_2")
-        # self.pushButton_2.setGeometry(QtCore.QRect(240, 120, 29, 27))
-        # self.pushButton_2.setStyleSheet("background-color: rgb(186, 186, 186);\n"
-        #                                "color: rgb(0, 0, 0);")
-        # self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_3 = QtWidgets.QPushButton(self.tab)
         self.pushButton_3.setGeometry(QtCore.QRect(621, 211, 29, 27))
         self.pushButton_3.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -179,37 +177,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
 
-
-
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
                                         "border-color: rgb(0, 0, 0);\n"
                                         "color: rgb(0, 0, 0);")
         self.pushButton_4.setObjectName("pushButton_4")
+        self.label_4 = QtWidgets.QLabel(self.tab_2)
+        self.label_4.setGeometry(QtCore.QRect(0,0,400,20))
+        self.label_4.setStyleSheet("color:red;\n"
+                                   "border-color:rgb(255, 153, 0 );\n"
+                                   "")
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        # self.tableView = QtWidgets.QTableView(self.tab_3)
-        # self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
-        # self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
-        # self.tableView.setAutoFillBackground(False)
-        # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
-        #                              "")
         self.model = QtWidgets.QTableWidget(self.tab_3)
-        # self.modelview = QtWidgets.QTableView()
-        # # self.modelview.setModel(self.model)
-        # self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
-        # self.modelview.setStyleSheet("background-color: rgb(188, 188, 188);\n"
-        #                                 "border-color: rgb(0, 0, 0);")
-        # self.modelview.setObjectName("graphicsView")
         self.model.setGeometry(QtCore.QRect(60, 150, 641, 291))
         self.model.setStyleSheet("background-color: grey;\n"
                                  "border-color: rgb(0, 0, 0);")
         self.model.setObjectName("graphicsView")
-        # self.tableView.setFrameShape(QtWidgets.QFrame.Box)
-        # self.tableView.setFrameShadow(QtWidgets.QFrame.Plain)
-        # self.tableView.setObjectName("tableView")
         self.label_3 = QtWidgets.QLabel(self.tab_3)
         self.label_3.setGeometry(QtCore.QRect(64, 136, 59, 14))
         self.label_3.setObjectName("label_3")
@@ -233,10 +219,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "border-color:rgb(255, 153, 0 );\n"
                                    "")
         self.label_2.setObjectName("label_2")
+
         self.analysis.addTab(self.tab_3, "")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        # self.menuBar.setGeometry(QtCore.QRect(0, 0, 759, 19))
         self.menuBar.setObjectName("menuBar")
         self.menuBRO_visualizer = QtWidgets.QMenu(self.menuBar)
         self.menuBRO_visualizer.setObjectName("menuBRO_visualizer")
@@ -260,11 +246,70 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         self.currentQuery
         # self.dbu=DB
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setWindowTitle(_translate("MainWindow", "BILA"))
+        self.radioButton.setText(_translate("MainWindow", "load single file"))
+        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
+        self.pushButton.setText(_translate("MainWindow", "Load"))
+        self.label.setVisible(False)
+        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
+        self.pushButton_2.setText(_translate("MainWindow", "..."))
+        self.pushButton_3.setText(_translate("MainWindow", "..."))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "files statistics"))
+        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
+        self.menuHelp.setTitle(_translate("MainWindow", "help"))
+        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
+        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
+        self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.label_2.setStyleSheet("color : green")
+        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
+        self.label_2.setVisible(False)
+        self.label_4.setText("")
+        self.label_4.setVisible(True)
+        self.comboBox.setToolTip(
+        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
+        self.analysis.setTabEnabled(1, True)
+        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        # self.analysis.setTabEnabled(2,False)
+        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
+        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
+        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
+        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
+        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
+        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
+        self.pushButton_4.clicked.connect(self.pier)
+        # self.textEdit.textChanged.connect(self.uMan)
+        self.pushButton_5.clicked.connect(self.executeSQL)
+        self.comboBox.currentIndexChanged.connect(self.selected_query)
+        self.tab_2.setEnabled(True)
+        self.tab_3.setEnabled(False)
+        self.radioButton.click()
+        self.m = None
+
+    def pier(self):
+
+        if self.single==True:
+            self.label_4.setText('files statistics not available in single files mode')
+            self.label_4.show()
+
+            return
+        # Data to plot
+        else :
+            self.label_4.setVisible(False)
+            self.m=PlotCanvas(self, width=6, height=8)
+
+            self.m.show()
+
 
     def uMan(self):
         self.label_2.setVisible(False)
-
-
 
     def valuefilter(self, num):
         if num != -1:
@@ -274,20 +319,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def traverse(self, fname):  # this function will traverse the file that is based to it
         # if the field value is -1 , the field should be neglected )
-        print('traversing')
-        print(fname)
 
         try:
             #fname = (fname.split('.')[0])  # this statment splits the fname and neglects the .log part of it
-            print(fname)
+
             hashtemp = ""  # this variable stores the entire log file to calculate it's hash value
-            print (os.getcwd())
+
             if fname in os.listdir():
                 print('yes')
             fil = open(fname , 'r+')  # open the log file Read-Only mode
-            print ('file is now opened')
             #IF FILED IN ID AND FNAME != 'CONN' : DO NOT EXECUTE SECOND INSERT STATMENT
-            print (fil.__sizeof__())
             f1=mmap(fil.fileno(),0,flags=MAP_PRIVATE,prot=PROT_WRITE)
             readline=f1.readline
             i =codecs.decode(readline(),'ascii')
@@ -297,12 +338,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 if i[:7] == "#fields" or i[:7] == "Fields":  # field loading algorithm
                     # i = i.lower()  # ignore the case of the fields line
-                    # print(i)
                     fields = (i[7:].split())
-                    print(fields)
                     fname=(fname.split('.')[0])
-                    print(fname)
-                    print(validFields[fname])
                     for field in fields:
                         if field in validFields[fname]:
 
@@ -315,7 +352,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                     try :
                         validFields[fname] = sorted(validFields[fname].items(), key=operator.itemgetter(1)) # needs review , is this important ?
-                        print ('sorted',validFields[fname])
                     except:
                         print ('already sorted ?')
 
@@ -325,21 +361,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     # sort dictionary based on key values
                     try:
                         sql_commands=(self.SQLcreator(fname, line)) # call the SQL creator function which generates queries and return an array if queries
-                        print ("PRINTING RECEIVED LIST",sql_commands)
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
                                 DBquery.exec_ (command)
                                 DBconnection.commit()
-                                print ("executed correctly :\n",command)
 
                             except QtSql.QSqlError:
                                     print ('error executing',command)
                         # sql_command_ids=(self.SQLcreator2(line))  #this line stores command for other secondary normalized tables
                         # DBquery.exec_(sql_command,sql_command_ids)
                     except Exception as exc1:
-                        # print (str(a))
                         print('error creating SQL',str (exc1))
-                print ('end')
                 i = codecs.decode(readline(), 'ascii')
 
                 # i=fil.readline()
@@ -349,7 +381,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 self.progress += 1
                 self.progressBar.setValue((self.progress / self.linesCount) * 100)
-                print ("progress :%d overall : %d "%(self.progress,self.linesCount))
             f1.close()
 
 
@@ -368,7 +399,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         except Exception as exc3:  # this block is executed in case of failure of instering
             print(str(exc3))
-            print ('exception occurd')
             with open(historyLog, 'a') as csvfile:
                 wr1 = csv.writer(csvfile, delimiter=',')
                 wr1.writerow((fname, "FAILED"))
@@ -388,12 +418,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         while(self.model.rowCount()>0):
             self.model.removeRow(0)
 
-    def setup_combobox(self, fname):
+    def setup_combobox(self):
         try:
-            print(len(AllowedQueries))
-            for obj in AllowedQueries:
-                for query in obj:
-                    self.comboBox.addItem(query.Query)
+            print (type(AllowedQueries))
+            print (AllowedQueries)
+            try :
+                for obj in AllowedQueries:
+                    for query in obj:
+                        self.comboBox.addItem(query.Query)
+                        print (query.Query)
+                self.comboBox.setEnabled(True)
+            except Exception as s1:
+                print (s1)
+
         except Exception as A:
             print('eroro adding to combo box ', A)
 
@@ -412,7 +449,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     for count in range (len(self.currentQuery.Headers[0])):
                         self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
                         result+= str(DBquery.value(count))
-                    print (result)
                     rowcount+=1
 
             self.label_2.setStyleSheet("color: green")
@@ -420,8 +456,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label_2.show()
 
         except sqlite3.OperationalError as err:
-            print(str(err))
-
             self.message.setText("error selecting rows from data base")
             self.message.setDetailedText(str(err))
             self.label_2.setText("error executing SQL command")
@@ -450,28 +484,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.load_files()
     def load_files(self):  # this function loads the content of the log files into the DB
         # todo : progress bar check
-
+        self.tab_3.setEnabled(True)
         if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
             fName = fPath[len(fPath) - 1]            # get file name
             path = '/'.join(fPath[:len(fPath) - 1])  # -1 since the right slicing operator is excluded
-            print("123456",fName)
-            print(fPath, path)
             os.chdir(path)             # change crwdir
 
             if table_created[fName.split('.')[0]] == False:
                 if fName.split('.')[0] in ['weird','dns','conn','http','dhcp','irc','ssl'] :
                     if table_created['ids']==False:
                         ids_creation_statment = tableCreator('ids')
-                        print ("ids creation statments",ids_creation_statment)
                         try:
                             DBquery.exec_(ids_creation_statment)
                             table_created['ids'] == True
                         except:
                             table_created['ids'] == False
                     queries =tableCreator(fName)
-                    print (queries)
-                    print (queries.keys())
                     for key in list(queries.keys()):
                         DBquery.exec_(queries[key])
                         table_created[key]=True
@@ -483,25 +512,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
-            self.setup_combobox(fName)
-            print (table_created)
+            self.setup_combobox()
 
-            # print(self.linesCount)
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
-            print ('valid files',self.validFiles)
             for each in self.validFiles:
                 each = str.lower(each)
-                print(each)
+                AllowedQueries.append(initQueries(each.split('.')[0]))
                 if table_created[each.split('.')[0]] == False:
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
-
                         DBquery.exec_(ids_creation_statment)
-                        print('wtf',each.split('.')[0])
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            print (queries[query])
                             DBquery.exec_(queries[query])
                             table_created[query] = True
 
@@ -511,15 +534,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
-                # self.progressBar.setValue(self.progressBar.value() + progress)
+                print (each,"wtffffff")
+
+            self.setup_combobox()
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
-
+            self.tab_2.setEnabled(True)
             self.analysis.setTabEnabled(2, True)  #enable query tab after loading
             # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
             self.message.setText("please specifiy a file to load or a directory")
             self.message.show()
+
 
     def switch1(self):  # functions switch1 and switch 2 disables the objects of GUI accoridng to radiobuttons
                         # disables the GUI components that allow user to load DIRs
@@ -544,25 +570,21 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
     def openFile(self):  # function used to open files (single files and files inside working directory )
         self.label.setVisible(False)
-        single = True
+        self.single = True
         try:
             path = self.lineEdit.text().split('/')
             name = path[len(path) - 1]
-            print(name + "this")
             if name in self.valid:
-                print(name)
                 file = open(self.lineEdit.text())
                 self.count = 0
                 for line in file:
                     self.linesCount += 1
-
                 file.close()
 
                 self.label.setText("the selected file has " + str(self.count) + " lines")
                 self.label.setVisible(True)
 
             elif name in self.UnsupportedFiles:
-                print("here")
                 self.message.setText("BILA does not currently support the file you are trying to use")
                 self.message.show()
                 self.lineEdit.clear()
@@ -572,18 +594,17 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.lineEdit.clear()
 
         except:  # handling incorrect file directories / paths
-            print("exception raised")
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
-        single = False
+        self.single = False
         fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
         print(fname)
         self.lineEdit.setText(fname[0])
         try:
             file = open(fname[0])
             ui.linesCount = 0
-            for i in file:
+            for line in file:
                 ui.linesCount += 1
             self.label.setText("the selected file has " + str(ui.linesCount) + " lines")
             self.label.setVisible(True)
@@ -595,20 +616,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def openDirDialog(self): # the following function provides the ability to open DIRs through dialog box
         ui.linesCount=0
         self.validFiles=[]
+        self.single=False
         try:
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
-            print(dire)
             os.chdir(dire)  # change current working directory
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
                 if each in self.valid:
                     self.validFiles.append(each)  # appends BRO valid log files names to the discovered logs
-                    print(self.validFiles)
             for each in self.validFiles:
                 file = open(each, 'r')
-                for i in file:
+                linescount[each]=0
+                line_sum = 0
+                for line in file:
+                    line_sum +=1
                     ui.linesCount += 1  # stores the total lines count of the DIR
+                linescount[each]=line_sum
                 file.close()
             self.label.setText(
                 "the directory you have selected have %s valid files with %s lines" % (
@@ -628,7 +652,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.progressBar.setValue(0)
         self.progress=0
         self.analysis.setTabEnabled(1, False)
-        print(table_created)
         for key in  (table_created.keys()):
             table_created[key]=False
         DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
@@ -649,9 +672,8 @@ def droptables(table):  # a map function drops tables , return 1 on success
             return 0
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
-    # print (validQueries)
+    linescount = {}
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-    print(table_created)
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
     AllowedQueries = []
@@ -679,29 +701,20 @@ if __name__ == "__main__":  # main module
         DBconnection.open()
         DBquery=QtSql.QSqlQuery()
 
-        print("connected")
         dropped = map(droptables, tables)  # fix ? dropping tables
         drop_result=list(dropped.__iter__())   # returns the results of the map
 
         norm_drop=map(droptables, normalized_tables)
-        print ("dropped tables : ",list(norm_drop.__iter__()))
 
         dropped={}
         for i in range (len(drop_result)):
             dropped[tables[i]]=drop_result[i]
 
-        for i in dropped :
-            print (i,dropped[i])
-
         for i in tables :
             table_created[i]=False
-
-        print (table_created)
-                # print(tables - dropped + "non dropped tables ") #fix ?
         try:
             DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
             table_created['main']=True
-            print ("Success creating main table")
 
         except:
             print("error dropping main ?")
@@ -712,7 +725,6 @@ if __name__ == "__main__":  # main module
                 writer = csv.writer(csvfile)
                 writer.writerow(["new session", str(datetime.now())[:19]])
         else:
-            print(historyLog)
             f = open(historyLog, "w")
             f.close()
             with open(historyLog, 'a') as csvfile:

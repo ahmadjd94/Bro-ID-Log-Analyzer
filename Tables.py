@@ -82,4 +82,8 @@ UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_l
                     'notice.log', 'software.log', 'snmp.log', 'socks.log',
                     'syslog.log', 'traceroute.log',
                     'known_hosts.log']
+defaultColors=['#F16745','#FFC65D','#7BC8A4','#4CC3D9','#93648D','#404040'
+    ,'#FF6600','	#C0C0C0','#040F01','#83831F','#FF5EAA','#CC1559','#01B6AD','#0A4958'
+             '#FF0000','#400D12'   ]
+
 
