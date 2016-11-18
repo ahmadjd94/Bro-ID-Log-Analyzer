@@ -21,6 +21,8 @@ from random import randint
 import numpy
 import Tables
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import random
@@ -34,7 +36,7 @@ import hashlib, codecs, operator, sqlite3, os,time
 
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
-        fig = plt.figure(figsize=(height, width),facecolor='red',edgecolor='white')
+        fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='#ff9900')
 
         # ax = fig.gca()
 
@@ -81,7 +83,7 @@ class PlotCanvas(FigureCanvas):
 
 class PlotGraph(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
-        fig = plt.figure(figsize=(height, width),facecolor='red',edgecolor='white')
+        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
         query='SELECT ORIG_H,RESP_H FROM ids'
         result=DBquery.exec_(query)
         graph=nx.Graph()
@@ -92,14 +94,15 @@ class PlotGraph(FigureCanvas):
             graph.add_node(DBquery.value(1))
             graph.add_edge(DBquery.value(0),DBquery.value(1))
         nx.draw_networkx(graph)
-
-
         FigureCanvas.__init__(self, fig)
-        self.setParent(parent.tab_2)
+        self.setParent(parent.container)
+
         FigureCanvas.setSizePolicy(self,
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+
+
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -198,7 +201,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-
+        self.container =QtWidgets.QGraphicsView()
+        self.container.setParent(self.tab_2)
+        self.container.setGeometry(20,80,700,300)
+        self.container.setStyleSheet("""
+                                        border-color:rgb(255,153,0 );\n
+                                        background - color:  # 333333;""")
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -321,6 +329,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.m = None
 
     def pier(self):
+
         if self.comboBox_2.currentText()=='--select a plot type--':
             self.label_4.setText('please select a valid option')
         elif self.comboBox_2.currentText()=='files statistics':
@@ -331,11 +340,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             # Data to plot
             else :
                 self.label_4.setVisible(False)
-                self.m=PlotCanvas(self, width=5, height=4)
+                self.m=PlotCanvas(self, width=9, height=3)
 
                 self.m.show()
         elif self.comboBox_2.currentText() == 'connections graph':
-            self.m = PlotGraph(self, width=4, height=4)
+
+            self.m = PlotGraph(self,width=9, height=3)
+            toolbar=NavigationToolbar(canvas=self.m, parent=self.container)
+            self.m.toolbar.show()
+            print(self.m.get_width_height())
             self.m.show()
 
 
