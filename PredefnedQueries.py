@@ -26,7 +26,8 @@ def initQueries(Key):
           QueryStatment("SELECT uid,ts,PROTO FROM CONN",15,'conn',['uid','ts','proto']),
           QueryStatment("SELECT uid,ts,ORIG_BYTES FROM CONN",16,'conn',['uid','ts','orig_bytes']),
           QueryStatment("SELECT uid,ts,RESP_BYTES FROM CONN",17,'conn',['uid','ts','resp_bytes']),
-          QueryStatment("SELECT uid,ts,CONN_STATE FROM CONN",18,'conn',['uid','ts','conn_state'])]
+          QueryStatment("SELECT uid,ts,CONN_STATE FROM CONN",18,'conn',['uid','ts','conn_state']),
+          QueryStatment("SELECT uid,ts,ORIG_H,RESP_H FROM ids", 19, 'conn', ['uid', 'ts', 'origin host','respondent host'])]
         return conn
     elif Key == 'ssl':
         ssl=[QueryStatment("SELECT uid,ts,VERSION FROM SSL",19,'ssl',['uid','ts','version']),

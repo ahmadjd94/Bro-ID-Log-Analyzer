@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 from BilaTypes import BilaTypes
+import networkx as nx
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
@@ -32,10 +33,10 @@ import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
 
 class PlotCanvas(FigureCanvas):
-    def __init__(self, parent=None, width=6, height=8, dpi=100):
-        fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='white')
+    def __init__(self, parent=None, width=5, height=8, dpi=100):
+        fig = plt.figure(figsize=(height, width),facecolor='red',edgecolor='white')
 
-        ax = fig.gca()
+        # ax = fig.gca()
 
         labels = list(linescount.keys())
         sizes = []
@@ -78,6 +79,27 @@ class PlotCanvas(FigureCanvas):
         # ax.set_aspect('equal')
         # plt.draw()
 
+class PlotGraph(FigureCanvas):
+    def __init__(self, parent=None, width=5, height=8, dpi=100):
+        fig = plt.figure(figsize=(height, width),facecolor='red',edgecolor='white')
+        query='SELECT ORIG_H,RESP_H FROM ids'
+        result=DBquery.exec_(query)
+        graph=nx.Graph()
+
+        while DBquery.next():
+            print (DBquery.value(0))
+            graph.add_node(DBquery.value(0))
+            graph.add_node(DBquery.value(1))
+            graph.add_edge(DBquery.value(0),DBquery.value(1))
+        nx.draw_networkx(graph)
+
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.tab_2)
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -210,7 +232,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "border-color:rgb(255, 153, 0 );\n"
                                    "")
         self.label_2.setObjectName("label_2")
-        self.comboBox = QtWidgets.QComboBox(self.tab_3)
+        self.comboBox = QtWidgets.QComboBox(self.tab_2)
+        self.comboBox_2 = QtWidgets.QComboBox(self.tab_2)
+        self.comboBox_2.setGeometry(QtCore.QRect(30, 390, 161, 22))
         self.comboBox.setGeometry(QtCore.QRect(60, 50, 351, 22))
         self.comboBox.setObjectName("comboBox")
         self.label_2 = QtWidgets.QLabel(self.tab_3)
@@ -290,21 +314,28 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.tab_2.setEnabled(True)
         self.tab_3.setEnabled(False)
+        self.comboBox_2.addItem('--select a plot type--')
+        self.comboBox_2.addItem('files statistics')
+        self.comboBox_2.addItem('connections graph')
         self.radioButton.click()
         self.m = None
 
     def pier(self):
+        if self.comboBox_2.currentText()=='--select a plot type--':
+            self.label_4.setText('please select a valid option')
+        elif self.comboBox_2.currentText()=='files statistics':
+            if self.single==True:
+                self.label_4.setText('files statistics not available in single files mode')
+                self.label_4.show()
+                return
+            # Data to plot
+            else :
+                self.label_4.setVisible(False)
+                self.m=PlotCanvas(self, width=5, height=4)
 
-        if self.single==True:
-            self.label_4.setText('files statistics not available in single files mode')
-            self.label_4.show()
-
-            return
-        # Data to plot
-        else :
-            self.label_4.setVisible(False)
-            self.m=PlotCanvas(self, width=6, height=8)
-
+                self.m.show()
+        elif self.comboBox_2.currentText() == 'connections graph':
+            self.m = PlotGraph(self, width=4, height=4)
             self.m.show()
 
 
@@ -443,7 +474,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.model.setRowCount(0)
             rowcount=0
             while DBquery.next():
-
                     self.model.insertRow(rowcount)
                     result=''
                     for count in range (len(self.currentQuery.Headers[0])):
