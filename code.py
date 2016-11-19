@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from Functions import SQLcreator,tableCreator
-from Tables import table_created
+from Tables import table_created,WeirdFlags
 from Queries import QueryStatment
 from mmap import *
 from PredefnedQueries import initQueries
@@ -102,7 +102,28 @@ class PlotGraph(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
+class PlotBars(FigureCanvas):
+    def __init__(self, parent=None, width=5, height=7, dpi=100):
+        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
+        results={}
+        for i in WeirdFlags :
+            qu="select count  (name) from weird where name=\'"+i+"\'"
+            print (qu)
+            DBquery.exec_(qu)
+            while DBquery.next():
+                  print (DBquery.value(0))
+                  results[i]=DBquery.value(0)
+        self.barh = plt.bar(range(len(results)),results.values(),align='center')
 
+        plt.xticks(range(len(results)), results.keys())
+        print (results)
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.container)
+
+        FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        plt.tight_layout(1.0)
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -325,6 +346,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('--select a plot type--')
         self.comboBox_2.addItem('files statistics')
         self.comboBox_2.addItem('connections graph')
+        self.comboBox_2.addItem('weird bars')
         self.radioButton.click()
         self.m = None
 
@@ -345,10 +367,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.m.show()
         elif self.comboBox_2.currentText() == 'connections graph':
 
-            self.m = PlotGraph(self,width=9, height=3)
+            self.m = PlotGraph(self,width=9, height=4)
             toolbar=NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             print(self.m.get_width_height())
+            self.m.show()
+        elif self.comboBox_2.currentText() == 'weird bars':
+            self.m = PlotBars(self, width=9, height=4)
+            toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
+            self.m.toolbar.show()
             self.m.show()
 
 
