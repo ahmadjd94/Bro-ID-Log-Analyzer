@@ -559,10 +559,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return
         else :
             self.load_files(connection)
+
     def load_files(self,connection):  # this function loads the content of the log files into the DB
 
-
-        # todo : progress bar check
         self.tab_3.setEnabled(True)
         if self.radioButton.isChecked() and self.lineEdit.text() != "":  # user choosed to load a single file
             fPath = self.lineEdit.text().split('/')  # split the DIR path to get file name
@@ -668,7 +667,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 try:
                     dir_files = (os.listdir())
                     for file in dir_files:
-                        if re.match('BILA %s\d\d\d\d-\d\d-\d\d\ \d\d\:\d\d\:\d\d\.db'%name, file):
+                        if re.match('BILA %s[\d]{4}-\d\d-\d\d\ \d\d\:\d\d\:\d\d\.db'%name, file):
                             self.message.setWindowTitle("DB file exists ! ")
                             self.message.setText(file+
                                 " is A SQLITE database file was found.\nmake sure you rename the file or consider loading it through the files menu")
@@ -754,7 +753,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         try :
             dir_files= ( os.listdir())
             for file in dir_files:
-                if re.match('BILA 20\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.db',file):
+                if re.match('BILA [\d]{4}-\d\d-\d\d \d\d:\d\d:\d\d\.db',file):
                     self.message.setWindowTitle("DB file exists ! ")
                     self.message.setText("A SQLITE database file was found.\nmake sure you rename the file or consider loading it through the files menu ")
                     self.message.show()
