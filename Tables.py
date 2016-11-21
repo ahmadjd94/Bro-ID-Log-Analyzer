@@ -85,5 +85,9 @@ UnsupportedFiles = ['x509.log', 'packet_filter.log', 'app_stats.log', 'capture_l
 defaultColors=['#F16745','#FFC65D','#7BC8A4','#4CC3D9','#93648D','#404040'
     ,'#FF6600','	#C0C0C0','#040F01','#83831F','#FF5EAA','#CC1559','#01B6AD','#0A4958'
              '#FF0000','#400D12'   ]
+WeirdFlags=['window_recision','SYN_after_reset','dns_unmatched_msg','data_before_established',
+            'SYN_seq_jump','excessively_small_fragment','incompletely_captured_fragment','fragment_inconsistency',
+            'connection_originator_SYN_ack','TCP_ack_underflow_or_misorder','fragment_protocol_inconsistency',
+            ]
 
 
