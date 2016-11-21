@@ -1,7 +1,10 @@
 from PyQt5.QtSql import QSqlDatabase
-def setup_connection ():
-    try :
-        connection =QSqlDatabase.addDatabase('QSQLITE')
-    except:
-        return False
-    return connection
+from PyQt5.QtSql import QSqlQuery\
+
+class DbConnection:
+
+    def __init__(self,dbname):
+         self.db_connection=QSqlDatabase.addDatabase("QSQLITE")
+         self.db_connection.setDatabaseName(dbname)
+         self.db_connection.open()
+         self.DBquery = QSqlQuery()
