@@ -8,6 +8,7 @@
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 from BilaTypes import BilaTypes
 import networkx as nx
+import re
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
@@ -128,7 +129,6 @@ class PlotBars(FigureCanvas):
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
     ################################  defining global variable ###################################
-    global DBconnection
     global table_created  # connection to DB
     global AllowedQueries
 
@@ -297,6 +297,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
+        self.DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
+        self.DBquery=QtSql.QSqlQuery()
+
         self.currentQuery
         # self.dbu=DB
     def retranslateUi(self, MainWindow):
@@ -434,8 +437,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         sql_commands=(self.SQLcreator(fname, line)) # call the SQL creator function which generates queries and return an array if queries
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
-                                DBquery.exec_ (command)
-                                DBconnection.commit()
+                                self.DBquery.exec_ (command)
+                                self.DBconnection.commit()
 
                             except QtSql.QSqlError:
                                     print ('error executing',command)
@@ -510,15 +513,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.clear_table()
         command = self.comboBox.currentText()
         try:
-            DBquery.exec_(command)
+            self.DBquery.exec_(command)
             self.model.setRowCount(0)
             rowcount=0
-            while DBquery.next():
+            while self.DBquery.next():
                     self.model.insertRow(rowcount)
                     result=''
                     for count in range (len(self.currentQuery.Headers[0])):
-                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
-                        result+= str(DBquery.value(count))
+                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(self.DBquery.value(count))))
+                        result+= str(self.DBquery.value(count))
                     rowcount+=1
 
             self.label_2.setStyleSheet("color: green")
@@ -545,7 +548,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                          QMessageBox.No)  # shows a message box to user to  make sure of reloading files
             if reply == QMessageBox.Yes:
                 self.reset()            # reset the GUI , clear line edit , clear database all tables
-                map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
+                # map(droptables, tables) # dropping tables   # drop tables , function will return 0 incase of failure / exceptions were raised
                 self.load_files()
 
             else:
@@ -566,19 +569,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     if table_created['ids']==False:
                         ids_creation_statment = tableCreator('ids')
                         try:
-                            DBquery.exec_(ids_creation_statment)
+                            self.DBquery.exec_(ids_creation_statment)
                             table_created['ids'] == True
                         except:
                             table_created['ids'] == False
                     queries =tableCreator(fName)
                     for key in list(queries.keys()):
-                        DBquery.exec_(queries[key])
+                        self.DBquery.exec_(queries[key])
                         table_created[key]=True
 
                 else :
                     queries = tableCreator(fName)
                     for key in queries.keys():
-                        DBquery.exec_(queries[key])
+                        self.DBquery.exec_(queries[key])
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
@@ -592,16 +595,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
-                        DBquery.exec_(ids_creation_statment)
+                        self.DBquery.exec_(ids_creation_statment)
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            DBquery.exec_(queries[query])
+                            self.DBquery.exec_(queries[query])
                             table_created[query] = True
 
                     else:
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            DBquery.exec_(queries[query])
+                            self.DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
                 print (each,"wtffffff")
@@ -667,6 +670,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.label.show()
 
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
+
         self.single = False
         fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
         print(fname)
@@ -691,6 +695,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
             os.chdir(dire)  # change current working directory
+
+
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
                 if each in self.valid:
@@ -717,6 +723,23 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         finally:
             self.label.show()
+        try :
+            dir_files= ( os.listdir())
+            for file in dir_files:
+                if re.match('BILA 20\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.db',file):
+                    self.message.setWindowTitle("DB file exists ! ")
+                    self.message.setText("A SQLITE database file was found.\nmake sure you rename the file or consider loading it through the files menu ")
+                    self.message.show()
+            print("current files in the dir")
+
+            self.DBconnection.setDatabaseName('BILA '+datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S.db'))
+            self.DBconnection.open()
+        except PermissionError as DB1:
+            self.message1=QMessageBox('error while creating database file')
+            self.message1.show()
+            print(str(DB1) + 'database craetion error ')
+        except Exception as DB:
+            print (str (DB)+'wtf ')
 
     def reset(self):  # this function resets gui components if user tried to reload files
         self.progressBar.setValue(0)
@@ -724,29 +747,29 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setTabEnabled(1, False)
         for key in  (table_created.keys()):
             table_created[key]=False
-        DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
+        self.DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
         table_created['main'] = True
         # todo : drop tables
         # todo  reset timeline
 
 
-def droptables(table):  # a map function drops tables , return 1 on success
-    try:
-        DBquery.exec_("drop table %s" % table)
-        DBconnection.commit()
-        return 1
-    except sqlite3.OperationalError as a:
-        if "no such table" in str(a):
-            return 0
-        else:
-            return 0
+# def droptables(table):  # a map function drops tables , return 1 on success
+#     try:
+#         DBquery.exec_("drop table %s" % table)
+#         DBconnection.commit()
+#         return 1
+#     except sqlite3.OperationalError as a:
+#         if "no such table" in str(a):
+#             return 0
+#         else:
+#             return 0
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
     linescount = {}
-    DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
     AllowedQueries = []
+
 
     import sys
     import csv
@@ -762,32 +785,27 @@ if __name__ == "__main__":  # main module
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-
+    # DBconnection.open()
 
     try:
 
-        DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-        DBconnection.setDatabaseName('analyze2.db')
-        DBconnection.open()
-        DBquery=QtSql.QSqlQuery()
-
-        dropped = map(droptables, tables)  # fix ? dropping tables
-        drop_result=list(dropped.__iter__())   # returns the results of the map
-
-        norm_drop=map(droptables, normalized_tables)
-
-        dropped={}
-        for i in range (len(drop_result)):
-            dropped[tables[i]]=drop_result[i]
-
-        for i in tables :
-            table_created[i]=False
-        try:
-            DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
-            table_created['main']=True
-
-        except:
-            print("error dropping main ?")
+        # # # dropped = map(droptables, tables)  # fix ? dropping tables
+        # # # drop_result=list(dropped.__iter__())   # returns the results of the map
+        # #
+        # # # norm_drop=map(droptables, normalized_tables)
+        # #
+        # # dropped={}
+        # # for i in range (len(drop_result)):
+        # #     dropped[tables[i]]=drop_result[i]
+        # #
+        # # for i in tables :
+        # #     table_created[i]=False
+        # # try:
+        # #     DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")#PRIMARY KEY(uid,ts) )") #creating main table
+        # #     table_created['main']=True
+        #
+        # except:
+        #     print("error dropping main ?")
 
         if "history.csv" in os.listdir():  # creating a new history.csv if the program is executed for the first time
                                             # todo : logging into csv should add files paths
