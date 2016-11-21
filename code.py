@@ -297,8 +297,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.SQLcreator = SQLcreator
-        self.DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-        self.DBquery=QtSql.QSqlQuery()
+
+        DBquery=QtSql.QSqlQuery()
 
         self.currentQuery
         # self.dbu=DB
@@ -437,7 +437,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         sql_commands=(self.SQLcreator(fname, line)) # call the SQL creator function which generates queries and return an array if queries
                         for command in sql_commands:                #execute each insert statment returned by the sqlcreator func
                             try :
-                                self.DBquery.exec_ (command)
+                                DBquery.exec_ (command)
                                 self.DBconnection.commit()
 
                             except QtSql.QSqlError:
@@ -513,15 +513,15 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.clear_table()
         command = self.comboBox.currentText()
         try:
-            self.DBquery.exec_(command)
+            DBquery.exec_(command)
             self.model.setRowCount(0)
             rowcount=0
-            while self.DBquery.next():
+            while DBquery.next():
                     self.model.insertRow(rowcount)
                     result=''
                     for count in range (len(self.currentQuery.Headers[0])):
-                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(self.DBquery.value(count))))
-                        result+= str(self.DBquery.value(count))
+                        self.model.setItem(rowcount,count,QtWidgets.QTableWidgetItem(str(DBquery.value(count))))
+                        result+= str(DBquery.value(count))
                     rowcount+=1
 
             self.label_2.setStyleSheet("color: green")
@@ -569,19 +569,19 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     if table_created['ids']==False:
                         ids_creation_statment = tableCreator('ids')
                         try:
-                            self.DBquery.exec_(ids_creation_statment)
+                            DBquery.exec_(ids_creation_statment)
                             table_created['ids'] == True
                         except:
                             table_created['ids'] == False
                     queries =tableCreator(fName)
                     for key in list(queries.keys()):
-                        self.DBquery.exec_(queries[key])
+                        DBquery.exec_(queries[key])
                         table_created[key]=True
 
                 else :
                     queries = tableCreator(fName)
                     for key in queries.keys():
-                        self.DBquery.exec_(queries[key])
+                        DBquery.exec_(queries[key])
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
@@ -595,16 +595,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
                                     table_created['ids'] == False:
                         ids_creation_statment = tableCreator('ids')
-                        self.DBquery.exec_(ids_creation_statment)
+                        DBquery.exec_(ids_creation_statment)
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            self.DBquery.exec_(queries[query])
+                            DBquery.exec_(queries[query])
                             table_created[query] = True
 
                     else:
                         queries = tableCreator(each.split('.')[0])
                         for query in queries.keys():
-                            self.DBquery.exec_(queries[query])
+                            DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
                 print (each,"wtffffff")
@@ -747,7 +747,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setTabEnabled(1, False)
         for key in  (table_created.keys()):
             table_created[key]=False
-        self.DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
+        DBquery.exec_("CREATE TABLE main (uid TEXT , ts int ) ")  # PRIMARY KEY(uid,ts) )") #creating main table
         table_created['main'] = True
         # todo : drop tables
         # todo  reset timeline
