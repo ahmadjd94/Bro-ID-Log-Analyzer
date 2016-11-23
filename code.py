@@ -14,6 +14,7 @@ from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
+from networkx import draw_networkx_edge_labels as delnx
 from Functions import SQLcreator,tableCreator
 from Tables import table_created,WeirdFlags
 from Queries import QueryStatment
@@ -128,6 +129,44 @@ class PlotBars(FigureCanvas):
         FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         plt.tight_layout(1.0)
+
+class DirectedPlotGraph(FigureCanvas):
+    global connection
+    from networkx import draw_networkx_edge_labels as delnx
+    def __init__(self, parent=None, width=5, height=8, dpi=100):
+        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
+        query='SELECT ORIG_H,RESP_H FROM ids'
+
+        result=connection.DBquery.exec_(query)
+        graph=nx.DiGraph()
+        # edge_labels=[];i=0
+        # pos = nx.spring_layout(graph)
+        while connection.DBquery.next():
+            # i+=1
+            print (connection.DBquery.value(0))
+            graph.add_node(connection.DBquery.value(0))
+            graph.add_node(connection.DBquery.value(1))
+            graph.add_edge(connection.DBquery.value(0),connection.DBquery.value(1))
+            # edge_labels.append(i)
+        sever_response="select resp_h ,orig_h from ids"
+
+        result = connection.DBquery.exec_(query)
+        while connection.DBquery.next():
+            print(connection.DBquery.value(0))
+            graph.add_node(connection.DBquery.value(0))
+            graph.add_node(connection.DBquery.value(1))
+            graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
+
+        nx.draw_networkx(graph)
+
+        # delnx(graph,pos,edge_labels=edge_labels)
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.container)
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -266,7 +305,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "border-color:rgb(255, 153, 0 );\n"
                                    "")
         self.label_2.setObjectName("label_2")
-        self.comboBox = QtWidgets.QComboBox(self.tab_2)
+        self.comboBox = QtWidgets.QComboBox(self.tab_3)
         self.comboBox_2 = QtWidgets.QComboBox(self.tab_2)
         self.comboBox_2.setGeometry(QtCore.QRect(30, 390, 161, 22))
         self.comboBox.setGeometry(QtCore.QRect(60, 50, 351, 22))
@@ -352,6 +391,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('files statistics')
         self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
+        self.comboBox_2.addItem('DNS Graph')
         self.radioButton.click()
         self.m = None
 
@@ -379,6 +419,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.m.show()
         elif self.comboBox_2.currentText() == 'weird bars':
             self.m = PlotBars(self, width=9, height=4)
+            toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
+            self.m.toolbar.show()
+            self.m.show()
+        elif self.comboBox_2.currentText() == 'DNS Graph':
+            self.m = DirectedPlotGraph(self, width=9, height=4)
             toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             self.m.show()
