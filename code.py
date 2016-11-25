@@ -9,6 +9,7 @@
 from BilaTypes import BilaTypes
 import networkx as nx
 import re
+import pygraphviz as pgv
 from DBconnection import *
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
@@ -28,6 +29,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from matplotlib import patches
 import random
 from PyQt5.QtGui import QIcon
 
@@ -133,33 +135,39 @@ class PlotBars(FigureCanvas):
 class DirectedPlotGraph(FigureCanvas):
     global connection
     from networkx import draw_networkx_edge_labels as delnx
-    def __init__(self, parent=None, width=5, height=8, dpi=100):
+    def __init__(self, parent=None, width=5, height=8, dpi=100,file_output=False):
+        print (file_output)
         fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
         query='SELECT ORIG_H,RESP_H FROM ids'
 
         result=connection.DBquery.exec_(query)
         graph=nx.DiGraph()
+
         # edge_labels=[];i=0
         # pos = nx.spring_layout(graph)
-        while connection.DBquery.next():
-            # i+=1
-            print (connection.DBquery.value(0))
-            graph.add_node(connection.DBquery.value(0))
-            graph.add_node(connection.DBquery.value(1))
-            graph.add_edge(connection.DBquery.value(0),connection.DBquery.value(1))
-            # edge_labels.append(i)
+        if result :
+            while connection.DBquery.next():
+                # i+=1
+                print (connection.DBquery.value(0))
+                graph.add_node(connection.DBquery.value(0))
+                graph.add_node(connection.DBquery.value(1))
+                graph.add_edge(connection.DBquery.value(0),connection.DBquery.value(1))
+                # edge_labels.append(i)
         sever_response="select resp_h ,orig_h from ids"
 
-        result = connection.DBquery.exec_(query)
-        while connection.DBquery.next():
-            print(connection.DBquery.value(0))
-            graph.add_node(connection.DBquery.value(0))
-            graph.add_node(connection.DBquery.value(1))
-            graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
-
-        nx.draw_networkx(graph)
-
-        # delnx(graph,pos,edge_labels=edge_labels)
+        result = connection.DBquery.exec_(sever_response)
+        if result :
+            while connection.DBquery.next():
+                print(connection.DBquery.value(0))
+                # graph.add_node(connection.DBquery.value(0))
+                # graph.add_node(connection.DBquery.value(1))
+                graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1),color="r")
+        pos = nx.circular_layout(graph)
+        nx.draw_networkx(graph,pos)
+        if file_output:
+            filegraph=nx.nx_agraph.to_agraph(graph)
+            filegraph.layout(prog="circo")
+            filegraph.draw('dns.png')
         FigureCanvas.__init__(self, fig)
         self.setParent(parent.container)
         FigureCanvas.setSizePolicy(self,
@@ -423,7 +431,16 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.m.toolbar.show()
             self.m.show()
         elif self.comboBox_2.currentText() == 'DNS Graph':
-            self.m = DirectedPlotGraph(self, width=9, height=4)
+            reply = QMessageBox.question(self.message, 'Message',
+                                         "due to NetworkX module limitation BILA can render the network in a "
+                                         "clearer format as image file file\n"
+                                         "would you like to render the result in a seperate file ?",
+                                         QMessageBox.Yes,
+                                         QMessageBox.No)  # shows a message box to user to  make sure of reloading files
+            if reply == QMessageBox.Yes:
+                self.m = DirectedPlotGraph(self, width=9, height=4,file_output=True)
+            else:
+                self.m = DirectedPlotGraph(self, width=9, height=4, file_output=False)
             toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             self.m.show()
