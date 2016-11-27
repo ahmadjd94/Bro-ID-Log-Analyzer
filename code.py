@@ -135,6 +135,9 @@ class PlotBars(FigureCanvas):
 class DirectedPlotGraph(FigureCanvas):
     global connection
     from networkx import draw_networkx_edge_labels as delnx
+    def onpick (self,*args):
+        print ("hovering")
+
     def __init__(self, parent=None, width=5, height=8, dpi=100,file_output=False):
         print (file_output)
         fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
@@ -151,7 +154,10 @@ class DirectedPlotGraph(FigureCanvas):
                 print (connection.DBquery.value(0))
                 graph.add_node(connection.DBquery.value(0))
                 graph.add_node(connection.DBquery.value(1))
-                graph.add_edge(connection.DBquery.value(0),connection.DBquery.value(1))
+                if graph.has_edge(connection.DBquery.value(0),connection.DBquery.value(1)):
+                    graph[connection.DBquery.value(0)][connection.DBquery.value(1)]['weight']+=1
+                else:
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1), weight=10)
                 # edge_labels.append(i)
         sever_response="select resp_h ,orig_h from ids"
 
@@ -164,6 +170,7 @@ class DirectedPlotGraph(FigureCanvas):
                 graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1),color="r")
         pos = nx.circular_layout(graph)
         nx.draw_networkx(graph,pos)
+        print ((graph.out_degree([0,1])))
         if file_output:
             filegraph=nx.nx_agraph.to_agraph(graph)
             filegraph.layout(prog="circo")
@@ -174,6 +181,7 @@ class DirectedPlotGraph(FigureCanvas):
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+        fig.canvas.mpl_connect("button_press_event" , self.onpick)
 
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
