@@ -156,8 +156,10 @@ class DirectedPlotGraph(FigureCanvas):
                 graph.add_node(connection.DBquery.value(1))
                 if graph.has_edge(connection.DBquery.value(0),connection.DBquery.value(1)):
                     graph[connection.DBquery.value(0)][connection.DBquery.value(1)]['weight']+=1
+                    print("has edge")
                 else:
-                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1), weight=10)
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1), weight=1)
+                    print ("has no edge")
                 # edge_labels.append(i)
         sever_response="select resp_h ,orig_h from ids"
 
@@ -170,6 +172,8 @@ class DirectedPlotGraph(FigureCanvas):
                 graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1),color="r")
         pos = nx.circular_layout(graph)
         nx.draw_networkx(graph,pos)
+        labels = nx.get_edge_attributes(graph, 'weight')
+        nx.draw_networkx_edge_labels(graph,pos,labels)
         print ((graph.out_degree([0,1])))
         if file_output:
             filegraph=nx.nx_agraph.to_agraph(graph)
