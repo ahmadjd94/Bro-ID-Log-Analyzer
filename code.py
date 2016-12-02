@@ -149,27 +149,35 @@ class DirectedPlotGraph(FigureCanvas):
         # edge_labels=[];i=0
         # pos = nx.spring_layout(graph)
         if result :
+            requests_count = 0
             while connection.DBquery.next():
-                # i+=1
+
                 print (connection.DBquery.value(0))
                 graph.add_node(connection.DBquery.value(0))
                 graph.add_node(connection.DBquery.value(1))
                 if graph.has_edge(connection.DBquery.value(0),connection.DBquery.value(1)):
-                    graph[connection.DBquery.value(0)][connection.DBquery.value(1)]['weight']+=1
+                    requests_count += 1
                     print("has edge")
                 else:
-                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1), weight=1)
+                    requests_count =1
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
                     print ("has no edge")
+                graph[connection.DBquery.value(1)][connection.DBquery.value(0)]['weight'] = "requestcount:%d"%requests_count
                 # edge_labels.append(i)
         sever_response="select resp_h ,orig_h from ids"
 
         result = connection.DBquery.exec_(sever_response)
         if result :
+            response_count = 0
             while connection.DBquery.next():
-                print(connection.DBquery.value(0))
-                # graph.add_node(connection.DBquery.value(0))
-                # graph.add_node(connection.DBquery.value(1))
-                graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1),color="r")
+                if graph.has_edge(connection.DBquery.value(0), connection.DBquery.value(1)):
+                    response_count += 1
+                    print("has edge")
+                else:
+                    response_count_count = 1
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
+                    print("has no edge")
+                graph[connection.DBquery.value(0)][connection.DBquery.value(1)]['weight'] = "response count:%d" % response_count
         pos = nx.circular_layout(graph)
         nx.draw_networkx(graph,pos)
         labels = nx.get_edge_attributes(graph, 'weight')
@@ -351,8 +359,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         MainWindow.setStatusBar(self.statusBar)
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionLoadDb = QtWidgets.QAction(MainWindow)
+        self.actionLoadDb.setObjectName("actionLoadDb")
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
+        self.menuBRO_visualizer.addAction(self.actionLoadDb)
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.menuBar.setNativeMenuBar(False)
@@ -384,6 +395,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
         self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
         self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.actionLoadDb.setText(_translate("MainWindow", "load DB"))
         self.label_2.setStyleSheet("color : green")
         self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
         self.label_2.setVisible(False)
@@ -394,10 +406,12 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.setTabEnabled(1, True)
         self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
         # self.analysis.setTabEnabled(2,False)
+        self.actionAbout.setEnabled(True)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
         self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
         self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.actionLoadDb.triggered.connect(self.loadDB)  # connect event triggered to function load DB
         self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
@@ -415,6 +429,13 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.radioButton.click()
         self.m = None
 
+    def loadDB (self):
+        global connection
+        DBpath = QFileDialog.getOpenFileName(None, 'connect to a database', '/home','BILA*.db')
+        DBpath=DBpath[0]
+        connection=DbConnection(DBpath)
+        self.tab.setEnabled(False)
+        self.tab_3.setEnabled(False)
     def pier(self):
 
         if self.comboBox_2.currentText()=='--select a plot type--':
@@ -771,7 +792,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
         global connection
         self.single = False
-        fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
+        fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')
         print(fname)
         self.lineEdit.setText(fname[0])
         try:
@@ -796,7 +817,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
             os.chdir(dire)  # change current working directory
-
 
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
