@@ -18,8 +18,9 @@ from mmap import *
 from PredefnedQueries import initQueries
 import numpy
 import Tables
+import subprocess
 from PyQt5.QtGui import QIcon
-
+import multiprocessing as mp
 # module used for changing Current working directory of the program
 import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
@@ -647,9 +648,19 @@ def droptables(table):  # a map function drops tables , return 1 on success
             return 0
         else:
             return 0
+# def run_rails():
+#     os.chdir(os.getcwd()+"/front/BILA/")
+#     print (os.getcwd())
+#     subprocess.Popen(["ruby"],shell=True)
+#     subprocess.Popen(['rails',' s'],shell=True)
+
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
     # print (validQueries)
+    # run_front=mp.Process(target=run_rails)
+    # run_front.start()
+    print (os.getcwd())
+    rails=subprocess.Popen("./runRails.py")
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     print(table_created)
     tables=Tables.tables
@@ -723,7 +734,6 @@ if __name__ == "__main__":  # main module
     except sqlite3.Error as e:
         print(e)
         print("error")
-
         ui.__message2__.show()
-
+    rails.kill()
     sys.exit(app.exec_())
