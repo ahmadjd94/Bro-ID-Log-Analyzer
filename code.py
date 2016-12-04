@@ -9,6 +9,8 @@
 from BilaTypes import BilaTypes
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox)
 from Functions import SQLcreator,tableCreator
@@ -65,6 +67,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_3.setText(_translate("MainWindow", "..."))
         self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
         self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_4), _translate("MainWindow", "Plotting"))
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
@@ -179,9 +182,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-
-
-
         self.pushButton_4 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_4.setGeometry(QtCore.QRect(600, 390, 97, 27))
         self.pushButton_4.setStyleSheet("background-color: rgb(186, 186, 186);\n"
@@ -197,7 +197,25 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # self.tableView.setAutoFillBackground(False)
         # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
         #                              "")
+        ##############################################plotting tab components
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.connect=QtWidgets.QPushButton(self.tab_4)
+        self.webview=QWebEngineView(self.tab_4)
+        self.webview.setZoomFactor(.5)
+        self.webview.setHtml("""
+        <body>
+        <h1>Welcome To BILA</h1>
+        <h3>make sure to load files / directories before connecting to the plotter</h3>
+        </body>
+
+        """
+                             )
+        ######################################################################
+
+
         self.model = QtWidgets.QTableWidget(self.tab_3)
+
         # self.modelview = QtWidgets.QTableView()
         # # self.modelview.setModel(self.model)
         # self.modelview.setGeometry(QtCore.QRect(10, 10, 711, 351))
@@ -235,6 +253,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "")
         self.label_2.setObjectName("label_2")
         self.analysis.addTab(self.tab_3, "")
+        self.analysis.addTab(self.tab_4,'')
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         # self.menuBar.setGeometry(QtCore.QRect(0, 0, 759, 19))
@@ -261,7 +280,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         self.currentQuery
         # self.dbu=DB
-
+    def connect_plot(self):
+        self.webview.setUrl(QUrl("http://127.0.0.1:9497"))
+        self.webview.load()
     def uMan(self):
         self.label_2.setVisible(False)
 
