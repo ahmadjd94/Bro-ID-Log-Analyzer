@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 from BilaTypes import BilaTypes
+import signal
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtCore import QUrl
@@ -211,6 +212,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         """
                              )
+        self.webview.load(QUrl("http://127.0.0.1:9497"))
         ######################################################################
 
 
@@ -681,7 +683,7 @@ if __name__ == "__main__":  # main module
     # run_front=mp.Process(target=run_rails)
     # run_front.start()
     print (os.getcwd())
-    rails=subprocess.Popen("./runRails.py")
+    rails=subprocess.Popen("./runRails.py",shell=True)
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     print(table_created)
     tables=Tables.tables
@@ -756,5 +758,9 @@ if __name__ == "__main__":  # main module
         print(e)
         print("error")
         ui.__message2__.show()
-    rails.kill()
-    sys.exit(app.exec_())
+
+
+    app.exec_()
+    print("exiting")
+    rails.send_signal(signal.SIGINT)
+    sys.exit()
