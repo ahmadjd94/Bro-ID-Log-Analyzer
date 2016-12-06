@@ -367,6 +367,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.menuBar.setNativeMenuBar(False)
+        self.label_db = QtWidgets.QLabel(self.tab)
+        self.label_db.setGeometry(QtCore.QRect(160, 290, 351, 17))
+        self.label_db.setStyleSheet("color: rgb(255, 0, 0);")
+        self.label_db.setObjectName("label_db")
 
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
@@ -401,6 +405,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_2.setVisible(False)
         self.label_4.setText("")
         self.label_4.setVisible(True)
+        self.label_db.setText(_translate("MainWindow",
+                                        "<html><head/><body><p><span style=\" color:#07ff1b;\">file loading not available </span></p></body></html>"))
+        self.label_db.setVisible(False)
         self.comboBox.setToolTip(
         _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
         self.analysis.setTabEnabled(1, True)
@@ -435,7 +442,11 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         DBpath=DBpath[0]
         connection=DbConnection(DBpath)
         self.tab.setEnabled(False)
+        self.lineEdit.setDisabled(True)
+        self.lineEdit_2.setDisabled(True)
         self.tab_3.setEnabled(False)
+        self.label_db.setVisible(True)
+
     def pier(self):
 
         if self.comboBox_2.currentText()=='--select a plot type--':
