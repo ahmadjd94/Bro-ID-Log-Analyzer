@@ -9,11 +9,13 @@
 from BilaTypes import BilaTypes
 import networkx as nx
 import re
+import pygraphviz as pgv
 from DBconnection import *
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
+from networkx import draw_networkx_edge_labels as delnx
 from Functions import SQLcreator,tableCreator
 from Tables import table_created,WeirdFlags
 from Queries import QueryStatment
@@ -27,6 +29,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from matplotlib import patches
 import random
 from PyQt5.QtGui import QIcon
 
@@ -128,6 +131,70 @@ class PlotBars(FigureCanvas):
         FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         plt.tight_layout(1.0)
+
+class DirectedPlotGraph(FigureCanvas):
+    global connection
+    from networkx import draw_networkx_edge_labels as delnx
+    def onpick (self,*args):
+        print ("hovering")
+
+    def __init__(self, parent=None, width=5, height=8, dpi=100,file_output=False):
+        print (file_output)
+        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
+        query='SELECT ORIG_H,RESP_H FROM ids'
+
+        result=connection.DBquery.exec_(query)
+        graph=nx.DiGraph()
+
+        # edge_labels=[];i=0
+        # pos = nx.spring_layout(graph)
+        if result :
+            requests_count = 0
+            while connection.DBquery.next():
+
+                print (connection.DBquery.value(0))
+                graph.add_node(connection.DBquery.value(0))
+                graph.add_node(connection.DBquery.value(1))
+                if graph.has_edge(connection.DBquery.value(0),connection.DBquery.value(1)):
+                    requests_count += 1
+                    print("has edge")
+                else:
+                    requests_count =1
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
+                    print ("has no edge")
+                graph[connection.DBquery.value(1)][connection.DBquery.value(0)]['weight'] = "requestcount:%d"%requests_count
+                # edge_labels.append(i)
+        sever_response="select resp_h ,orig_h from ids"
+
+        result = connection.DBquery.exec_(sever_response)
+        if result :
+            response_count = 0
+            while connection.DBquery.next():
+                if graph.has_edge(connection.DBquery.value(0), connection.DBquery.value(1)):
+                    response_count += 1
+                    print("has edge")
+                else:
+                    response_count_count = 1
+                    graph.add_edge(connection.DBquery.value(0), connection.DBquery.value(1))
+                    print("has no edge")
+                graph[connection.DBquery.value(0)][connection.DBquery.value(1)]['weight'] = "response count:%d" % response_count
+        pos = nx.circular_layout(graph)
+        nx.draw_networkx(graph,pos)
+        labels = nx.get_edge_attributes(graph, 'weight')
+        nx.draw_networkx_edge_labels(graph,pos,labels)
+        print ((graph.out_degree([0,1])))
+        if file_output:
+            filegraph=nx.nx_agraph.to_agraph(graph)
+            filegraph.layout(prog="circo")
+            filegraph.draw('dns.png')
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.container)
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        fig.canvas.mpl_connect("button_press_event" , self.onpick)
+
 
 class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and classes
 
@@ -266,7 +333,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                    "border-color:rgb(255, 153, 0 );\n"
                                    "")
         self.label_2.setObjectName("label_2")
-        self.comboBox = QtWidgets.QComboBox(self.tab_2)
+        self.comboBox = QtWidgets.QComboBox(self.tab_3)
         self.comboBox_2 = QtWidgets.QComboBox(self.tab_2)
         self.comboBox_2.setGeometry(QtCore.QRect(30, 390, 161, 22))
         self.comboBox.setGeometry(QtCore.QRect(60, 50, 351, 22))
@@ -292,11 +359,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         MainWindow.setStatusBar(self.statusBar)
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionLoadDb = QtWidgets.QAction(MainWindow)
+        self.actionLoadDb.setObjectName("actionLoadDb")
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
+        self.menuBRO_visualizer.addAction(self.actionLoadDb)
         self.menuBar.addAction(self.menuBRO_visualizer.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.menuBar.setNativeMenuBar(False)
+        self.label_db = QtWidgets.QLabel(self.tab)
+        self.label_db.setGeometry(QtCore.QRect(160, 290, 351, 17))
+        self.label_db.setStyleSheet("color: rgb(255, 0, 0);")
+        self.label_db.setObjectName("label_db")
 
         self.retranslateUi(MainWindow)
         self.analysis.setCurrentIndex(0)
@@ -325,20 +399,26 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
         self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
         self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.actionLoadDb.setText(_translate("MainWindow", "load DB"))
         self.label_2.setStyleSheet("color : green")
         self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
         self.label_2.setVisible(False)
         self.label_4.setText("")
         self.label_4.setVisible(True)
+        self.label_db.setText(_translate("MainWindow",
+                                        "<html><head/><body><p><span style=\" color:#07ff1b;\">file loading not available </span></p></body></html>"))
+        self.label_db.setVisible(False)
         self.comboBox.setToolTip(
         _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
         self.analysis.setTabEnabled(1, True)
         self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
         # self.analysis.setTabEnabled(2,False)
+        self.actionAbout.setEnabled(True)
         self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
         self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
         self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
         self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.actionLoadDb.triggered.connect(self.loadDB)  # connect event triggered to function load DB
         self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
         self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
         self.pushButton.clicked.connect(self.load)  # # connect event click to function load
@@ -352,8 +432,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('files statistics')
         self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
+        self.comboBox_2.addItem('DNS Graph')
         self.radioButton.click()
         self.m = None
+
+    def loadDB (self):
+        global connection
+        DBpath = QFileDialog.getOpenFileName(None, 'connect to a database', '/home','BILA*.db')
+        DBpath=DBpath[0]
+        connection=DbConnection(DBpath)
+        self.tab.setEnabled(False)
+        self.lineEdit.setDisabled(True)
+        self.lineEdit_2.setDisabled(True)
+        self.tab_3.setEnabled(False)
+        self.label_db.setVisible(True)
 
     def pier(self):
 
@@ -379,6 +471,20 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.m.show()
         elif self.comboBox_2.currentText() == 'weird bars':
             self.m = PlotBars(self, width=9, height=4)
+            toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
+            self.m.toolbar.show()
+            self.m.show()
+        elif self.comboBox_2.currentText() == 'DNS Graph':
+            reply = QMessageBox.question(self.message, 'Message',
+                                         "due to NetworkX module limitation BILA can render the network in a "
+                                         "clearer format as image file file\n"
+                                         "would you like to render the result in a seperate file ?",
+                                         QMessageBox.Yes,
+                                         QMessageBox.No)  # shows a message box to user to  make sure of reloading files
+            if reply == QMessageBox.Yes:
+                self.m = DirectedPlotGraph(self, width=9, height=4,file_output=True)
+            else:
+                self.m = DirectedPlotGraph(self, width=9, height=4, file_output=False)
             toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             self.m.show()
@@ -697,7 +803,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def openFileDialog(self):  # displays open file dialog for user to select the required log file
         global connection
         self.single = False
-        fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')  # error in params
+        fname = QFileDialog.getOpenFileName(None, 'Open file', '/home', '*.log')
         print(fname)
         self.lineEdit.setText(fname[0])
         try:
@@ -722,7 +828,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             dire = QFileDialog.getExistingDirectory(None, 'open dir of log files', '/home',
                                                     QFileDialog.ShowDirsOnly)  # error in params
             os.chdir(dire)  # change current working directory
-
 
             files = (os.listdir())  # make a list of files inside current working dir
             for each in files:
