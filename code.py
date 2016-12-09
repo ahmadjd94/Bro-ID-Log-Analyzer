@@ -21,7 +21,6 @@ from mmap import *
 from PredefnedQueries import initQueries
 import numpy
 import Tables
-import subprocess
 from PyQt5.QtGui import QIcon
 import multiprocessing as mp
 # module used for changing Current working directory of the program
