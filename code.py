@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 from BilaTypes import BilaTypes
-import signal
+import signal,gzip
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtCore import QUrl
@@ -758,6 +758,19 @@ if __name__ == "__main__":  # main module
         print(e)
         print("error")
         ui.__message2__.show()
+    if 'GeoLite2-City.mmdb' not in os.listdir():
+        try:
+            print ("decompressing important files")
+            compresed=open('GeoLite2-City.mmdb.gz','rb')
+            decompressed=gzip.decompress(compresed.read())
+            decompress=open('GeoLite2-City.mmdb','wb')
+            decompress.write(decompressed)
+            decompress.close()
+        except:
+            print('failed to decompressed the geolocation DB')
+    else :
+        print ('geolocations DB exists')
+
 
 
     app.exec_()
