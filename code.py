@@ -769,10 +769,5 @@ if __name__ == "__main__":  # main module
             print('failed to decompressed the geolocation DB')
     else :
         print ('geolocations DB exists')
-
-
-
     app.exec_()
-    print("exiting")
-    rails.send_signal(signal.SIGINT)
     sys.exit()
