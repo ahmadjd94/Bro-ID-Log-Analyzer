@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-#fewfew
 # Form implementation generated from reading ui file 'mainwindow.ui'
-#
 # Created by: PyQt5 UI code generator 5.2.1
-#
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
+
 from BilaTypes import BilaTypes
-import signal,gzip
+import gzip
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtCore import QUrl
