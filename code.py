@@ -11,6 +11,7 @@ import networkx as nx
 import re
 import pygraphviz as pgv
 from DBconnection import *
+import gzip
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
@@ -929,5 +930,17 @@ if __name__ == "__main__":  # main module
         print("error")
 
         ui.__message2__.show()
-
-    sys.exit(app.exec_())
+    if 'GeoLite2-City.mmdb' not in os.listdir():
+        try:
+            print ("decompressing important files")
+            compresed=open('GeoLite2-City.mmdb.gz','rb')
+            decompressed=gzip.decompress(compresed.read())
+            decompress=open('GeoLite2-City.mmdb','wb')
+            decompress.write(decompressed)
+            decompress.close()
+        except:
+            print('failed to decompressed the geolocation DB')
+    else :
+        print ('geolocations DB exists')
+    app.exec_()
+    sys.exit()
