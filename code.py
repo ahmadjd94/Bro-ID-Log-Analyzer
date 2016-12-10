@@ -42,59 +42,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     valid=Tables.valid
     currentQuery=None
 
-
-
-      # SHOW MESSAGE WHEN AN UNSUPPORTED FILE IS LOADED
-
-    # END OF GLOVAL VARIABLES DEFENITION
-
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-
-        #self.__message2__.setText("error connecting to database")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.radioButton.setText(_translate("MainWindow", "load single file"))
-        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
-        self.pushButton.setText(_translate("MainWindow", "Load"))
-        self.label.setVisible(False)
-        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
-        self.pushButton_2.setText(_translate("MainWindow", "..."))
-        self.pushButton_3.setText(_translate("MainWindow", "..."))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_4), _translate("MainWindow", "Plotting"))
-        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
-        self.menuHelp.setTitle(_translate("MainWindow", "help"))
-        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
-        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
-        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
-        self.actionAbout.setText(_translate("MainWindow", "about"))
-        self.label_2.setStyleSheet("color : green")
-        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
-        self.label_2.setVisible(False)
-        self.comboBox.setToolTip(
-        _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
-
-        self.analysis.setTabEnabled(1, False)
-        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
-        # self.analysis.setTabEnabled(2,False)
-        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
-        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
-        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
-        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
-        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
-        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
-        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
-        # self.textEdit.textChanged.connect(self.uMan)
-        self.pushButton_5.clicked.connect(self.executeSQL)
-        self.comboBox.currentIndexChanged.connect(self.selected_query)
-        self.radioButton.click()
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
@@ -281,13 +228,57 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.SQLcreator = SQLcreator
         self.currentQuery
         # self.dbu=DB
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+
+        # self.__message2__.setText("error connecting to database")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("small logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.radioButton.setText(_translate("MainWindow", "load single file"))
+        self.radioButton_2.setText(_translate("MainWindow", "load directory of log files"))
+        self.pushButton.setText(_translate("MainWindow", "Load"))
+        self.label.setVisible(False)
+        self.label.setText(_translate("MainWindow", "unable to load file , please check your file directory"))
+        self.pushButton_2.setText(_translate("MainWindow", "..."))
+        self.pushButton_3.setText(_translate("MainWindow", "..."))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "analyses"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_4), _translate("MainWindow", "Plotting"))
+        self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
+        self.menuHelp.setTitle(_translate("MainWindow", "help"))
+        #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
+        self.pushButton_5.setText(_translate("MainWindow", "Execute Command"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_3), _translate("MainWindow", "SQL commands "))
+        self.actionAbout.setText(_translate("MainWindow", "about"))
+        self.label_2.setStyleSheet("color : green")
+        self.pushButton_4.setText(_translate("MainWindow", "draw timeline"))
+        self.label_2.setVisible(False)
+        self.comboBox.setToolTip(
+            _translate("MainWindow", "<html><head/><body><p>select a predefined query to execute</p></body></html>"))
+
+        self.analysis.setTabEnabled(1, False)
+        self.comboBox.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        # self.analysis.setTabEnabled(2,False)
+        self.radioButton.clicked.connect(self.switch1)  # connect event click to function switch1
+        self.radioButton_2.clicked.connect(self.switch2)  # connect event click to function switch2)
+        self.pushButton_2.clicked.connect(self.openFileDialog)  # connect event click to function openfile dialog
+        self.actionAbout.triggered.connect(self.about)  # connect event triggered to function about
+        self.lineEdit.textChanged.connect(self.openFile)  # connect event text-changed to function openFile
+        self.pushButton_3.clicked.connect(self.openDirDialog)  # connect event click to function openDirDialog
+        self.pushButton.clicked.connect(self.load)  # # connect event click to function load
+        # self.textEdit.textChanged.connect(self.uMan)
+        self.pushButton_5.clicked.connect(self.executeSQL)
+        self.comboBox.currentIndexChanged.connect(self.selected_query)
+        self.radioButton.click()
     def connect_plot(self):
         self.webview.setUrl(QUrl("http://127.0.0.1:9497"))
         self.webview.load()
     def uMan(self):
         self.label_2.setVisible(False)
-
-
 
     def valuefilter(self, num):
         if num != -1:
@@ -420,7 +411,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         except Exception as A:
             print('eroro adding to combo box ', A)
 
-
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
         self.clear_table()
         command = self.comboBox.currentText()
@@ -471,6 +461,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 return
         else :
             self.load_files()
+
     def load_files(self):  # this function loads the content of the log files into the DB
         # todo : progress bar check
 
@@ -670,11 +661,7 @@ def droptables(table):  # a map function drops tables , return 1 on success
             return 0
         else:
             return 0
-# def run_rails():
-#     os.chdir(os.getcwd()+"/front/BILA/")
-#     print (os.getcwd())
-#     subprocess.Popen(["ruby"],shell=True)
-#     subprocess.Popen(['rails',' s'],shell=True)
+
 
 if __name__ == "__main__":  # main module
     # validQueries = Tables.validQueries
@@ -682,7 +669,6 @@ if __name__ == "__main__":  # main module
     # run_front=mp.Process(target=run_rails)
     # run_front.start()
     print (os.getcwd())
-    rails=subprocess.Popen("./runRails.py",shell=True)
     DBconnection = QtSql.QSqlDatabase.addDatabase('QSQLITE')
     print(table_created)
     tables=Tables.tables
