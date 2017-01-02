@@ -436,16 +436,22 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.radioButton.click()
         self.m = None
 
-    def loadDB (self):
-        global connection
-        DBpath = QFileDialog.getOpenFileName(None, 'connect to a database', '/home','BILA*.db')
-        DBpath=DBpath[0]
-        connection=DbConnection(DBpath)
-        self.tab.setEnabled(False)
-        self.lineEdit.setDisabled(True)
-        self.lineEdit_2.setDisabled(True)
-        self.tab_3.setEnabled(False)
-        self.label_db.setVisible(True)
+    def loadDB(self):
+        global connection  # defines the global connection
+        DBpath = QFileDialog.getOpenFileName(None, 'connect to a database', '/home',
+                                             'BILA*.db')  # open files that follow a certain regex
+        print(DBpath)
+        DBpath = DBpath[0]
+        # get the DIR of the database .. second index stores the m regex that the file name must follow
+        if DBpath != '':
+            connection = DbConnection(DBpath)
+            self.tab.setEnabled(False)
+            self.lineEdit.setDisabled(True)
+            self.lineEdit_2.setDisabled(True)
+            self.tab_3.setEnabled(False)
+            self.label_db.setVisible(True)
+        else:
+            pass
 
     def pier(self):
 
