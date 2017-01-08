@@ -11,19 +11,21 @@ def plotbars(connection):
     test=[]
     flags_query="select distinct (name) from weird"
     connection.DBquery.exec_(flags_query)
+
     while connection.DBquery.next():
         flags.append(connection.DBquery.value(0))
         test.append(connection.DBquery.value(1))
+
     overall_count_query = "select count  (*) from weird "
     connection.DBquery.exec_(overall_count_query)
     while connection.DBquery.next():
         overall_count=(connection.DBquery.value(0))
-    print (flags)
-    print(type(flags))
+
     for i in flags:
         qu = "select count  (*) from weird where name='%s'"%str(i)
         print(qu)
         connection.DBquery.exec_(qu)
+
         while connection.DBquery.next():
             count=(connection.DBquery.value(0))
             ls.append(count)
