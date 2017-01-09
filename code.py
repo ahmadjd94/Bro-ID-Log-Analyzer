@@ -38,7 +38,7 @@ import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
-
+from SMTPfiles import smtp_files
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
         fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='#ff9900')
@@ -433,6 +433,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
+        self.comboBox_2.addItem('smtp and files relation')
+
         self.radioButton.click()
         self.m = None
 
@@ -494,6 +496,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             self.m.show()
+        elif self.comboBox_2.currentText() == 'smtp and files relation':
+            smtp_files(connection)
 
 
     def uMan(self):
