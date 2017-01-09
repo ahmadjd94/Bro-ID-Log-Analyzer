@@ -37,7 +37,7 @@ validFields = {
                 "cipher": -1,
                 "server_name": -1, "session_id": -1, "subject": -1,
                 "issuer_subject": -1, "not_valid_before": -1,
-                "last_alert": -1, "client_subject": -1, "clnt_issuer_subject": -1, "cert_hash": -1,
+                "last_alert": -1, "client_subject": -1, "client_issuer_subject": -1, "cert_hash": -1,
                 "validation_status": -1},
 
         'weird': {"uid": -1,'ts':-1 ,"id.orig_h": -1, "id.orig_p": -1, "id.resp_h": -1, "id.resp_p": -1 , "name": -1, "addi": -1, "notice": -1, "peer": -1},
