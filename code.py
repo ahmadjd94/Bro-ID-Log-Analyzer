@@ -17,12 +17,13 @@ from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from networkx import draw_networkx_edge_labels as delnx
 from Functions import SQLcreator,tableCreator
-from Tables import table_created,WeirdFlags
+from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
 from PredefnedQueries import initQueries
 from random import randint
 import numpy
+from plotBars import plotbars
 import Tables
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -108,29 +109,7 @@ class PlotGraph(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-class PlotBars(FigureCanvas):
-    global connection
-    def __init__(self, parent=None, width=5, height=7, dpi=100):
-        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
-        results={}
-        for i in WeirdFlags :
-            qu="select count  (name) from weird where name=\'"+i+"\'"
-            print (qu)
-            connection.DBquery.exec_(qu)
-            while connection.DBquery.next():
-                  print (connection.DBquery.value(0))
-                  results[i]=connection.DBquery.value(0)
-        self.barh = plt.bar(range(len(results)),results.values(),align='center')
 
-        plt.xticks(range(len(results)), results.keys())
-        print (results)
-
-        FigureCanvas.__init__(self, fig)
-        self.setParent(parent.container)
-
-        FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
-        FigureCanvas.updateGeometry(self)
-        plt.tight_layout(1.0)
 
 class DirectedPlotGraph(FigureCanvas):
     global connection
@@ -476,10 +455,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             print(self.m.get_width_height())
             self.m.show()
         elif self.comboBox_2.currentText() == 'weird bars':
-            self.m = PlotBars(self, width=9, height=4)
-            toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
-            self.m.toolbar.show()
-            self.m.show()
+            plotbars(connection)
         elif self.comboBox_2.currentText() == 'DNS Graph':
             reply = QMessageBox.question(self.message, 'Message',
                                          "due to NetworkX module limitation BILA can render the network in a "
