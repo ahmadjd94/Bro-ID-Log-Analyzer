@@ -3,13 +3,13 @@ import geoip2.database as reader
 def map (connection,finder):
     # finder=reader.Reader('GeoLite2-City.mmdb')
     destinations=[]
-    query = 'SELECT distinct ORIG_H,RESP_H FROM ids '
+    query = 'SELECT distinct ORIG_H,RESP_H FROM ids'
     edges=[]
     orphaned_locs=[]
     results = connection.DBquery.exec_(query)
+    print (results)
     while connection.DBquery.next():
         loc1_found=False
-        loc1_found
         try:
             ip1=str(connection.DBquery.value(0))
             l1=finder.city(ip1)
@@ -25,12 +25,12 @@ def map (connection,finder):
         except:
             loc2_found = False
 
-            if loc1_found and loc2_found:
-                edges.append((location1,location2))
-            elif loc1_found:
-                orphaned_locs.append(location1)
-            elif loc2_found:
-                orphaned_locs.append(location2)
+        if loc1_found and loc2_found:
+            edges.append((location1 , location2))
+        elif loc1_found:
+            orphaned_locs.append(location1)
+        elif loc2_found:
+            orphaned_locs.append(location2)
     print (edges,orphaned_locs)
 
     orphaned_longintudes=[]
