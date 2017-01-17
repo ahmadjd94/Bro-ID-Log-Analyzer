@@ -7,10 +7,12 @@
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
 from BilaTypes import BilaTypes
+import plotlyMap
 import networkx as nx
 import re
 import pygraphviz as pgv
 from DBconnection import *
+import gzip,geoip2.database
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
@@ -181,6 +183,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     global table_created  # connection to DB
     global AllowedQueries
     global connection
+    global OriDir
+    global finder
 
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -412,6 +416,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
+        self.comboBox_2.addItem('connections map')
         self.radioButton.click()
         self.m = None
 
@@ -470,6 +475,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
             self.m.toolbar.show()
             self.m.show()
+        elif self.comboBox_2.currentText() == 'connections map':
+            os.chdir(OriDir)
+            plotlyMap.map(connection,finder)
+
 
 
     def uMan(self):
@@ -881,6 +890,7 @@ if __name__ == "__main__":  # main module
     import csv
     from datetime import datetime
     global connection
+
     linescount = {}
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
@@ -911,5 +921,19 @@ if __name__ == "__main__":  # main module
         print("error")
 
         ui.__message2__.show()
-
-    sys.exit(app.exec_())
+    if 'GeoLite2-City.mmdb' not in os.listdir():
+        try:
+            print ("decompressing important files")
+            compresed=open('GeoLite2-City.mmdb.gz','rb')
+            decompressed=gzip.decompress(compresed.read())
+            decompress=open('GeoLite2-City.mmdb','wb')
+            decompress.write(decompressed)
+            decompress.close()
+            finder=geoip2.database.Reader('GeoLite2-City.mmdb')
+        except:
+            print('failed to decompressed the geolocation DB')
+    else :
+        print ('geolocations DB exists')
+        finder = geoip2.database.Reader('GeoLite2-City.mmdb')
+    app.exec_()
+    sys.exit()
