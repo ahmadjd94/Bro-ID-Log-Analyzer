@@ -41,7 +41,6 @@ import fnmatch  # module used for matching files names
 # import pyqtgraph as pg
 import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
-
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
         fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='#ff9900')
