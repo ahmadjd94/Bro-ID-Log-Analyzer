@@ -111,7 +111,29 @@ class PlotGraph(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
+class PlotBars(FigureCanvas):
+    global connection
+    def __init__(self, parent=None, width=5, height=7, dpi=100):
+        fig = plt.figure(figsize=(width,height),facecolor='#333333',edgecolor='#ff9900')
+        results={}
+        for i in WeirdFlags :
+            qu="select count  (name) from weird where name=\'"+i+"\'"
+            print (qu)
+            connection.DBquery.exec_(qu)
+            while connection.DBquery.next():
+                  print (connection.DBquery.value(0))
+                  results[i]=connection.DBquery.value(0)
+        self.barh = plt.bar(range(len(results)),results.values(),align='center')
 
+        plt.xticks(range(len(results)), results.keys())
+        print (results)
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent.container)
+
+        FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        plt.tight_layout(1.0)
 
 class DirectedPlotGraph(FigureCanvas):
     global connection
@@ -183,8 +205,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     global table_created  # connection to DB
     global AllowedQueries
     global connection
-    global OriDir
-    global finder
 
     linesCount = 0  # count of lines
     loaded = False  # this variable stores if there is a file loaded into program or not
@@ -417,6 +437,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
         self.comboBox_2.addItem('connections map')
+        self.comboBox_2.addItem('HTTP status code piechart')
         self.radioButton.click()
         self.m = None
 
@@ -479,6 +500,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             os.chdir(OriDir)
             plotlyMap.map(connection,finder)
 
+        elif self.comboBox_2.currentText() == 'HTTP status code piechart':
+                plot_http_status_pir(connection)
 
 
     def uMan(self):
@@ -890,7 +913,6 @@ if __name__ == "__main__":  # main module
     import csv
     from datetime import datetime
     global connection
-
     linescount = {}
     tables=Tables.tables
     normalized_tables=Tables.normalized_tables
@@ -921,19 +943,5 @@ if __name__ == "__main__":  # main module
         print("error")
 
         ui.__message2__.show()
-    if 'GeoLite2-City.mmdb' not in os.listdir():
-        try:
-            print ("decompressing important files")
-            compresed=open('GeoLite2-City.mmdb.gz','rb')
-            decompressed=gzip.decompress(compresed.read())
-            decompress=open('GeoLite2-City.mmdb','wb')
-            decompress.write(decompressed)
-            decompress.close()
-            finder=geoip2.database.Reader('GeoLite2-City.mmdb')
-        except:
-            print('failed to decompressed the geolocation DB')
-    else :
-        print ('geolocations DB exists')
-        finder = geoip2.database.Reader('GeoLite2-City.mmdb')
-    app.exec_()
-    sys.exit()
+
+    sys.exit(app.exec_())
