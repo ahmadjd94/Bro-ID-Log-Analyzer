@@ -430,7 +430,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_3.setEnabled(False)
         self.comboBox_2.addItem('--select a plot type--')
         self.comboBox_2.addItem('files statistics')
-        self.comboBox_2.addItem('connections graph')
+
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
         self.comboBox_2.addItem('HTTP status code piechart')
