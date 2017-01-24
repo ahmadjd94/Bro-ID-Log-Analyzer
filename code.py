@@ -43,6 +43,7 @@ import hashlib, codecs, operator, sqlite3, os,time
 #hashlib used to use MD5 , codecs , converting strings to bytes , sqlite3 to use db , os to use DIRs ,
 from REGEX import REGEXP
 from ssl_subject import ssl_subjects_pie
+from httpStatusPie import plot_http_status_pir
 
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
