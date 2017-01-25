@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-#fewfew
 # Form implementation generated from reading ui file 'mainwindow.ui'
-#
 # Created by: PyQt5 UI code generator 5.2.1
-#
 # WARNING! All changes made in this file will be lost!
 """project's backlog : https://tree.taiga.io/project/ahmadjd94-bila """
+
 from BilaTypes import BilaTypes
 import plotlyMap
 import networkx as nx
@@ -321,6 +319,30 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.analysis.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
+        # self.tableView = QtWidgets.QTableView(self.tab_3)
+        # self.tableView.setGeometry(QtCore.QRect(60, 150, 641, 291))
+        # self.tableView.setFocusPolicy(QtCore.Qt.NoFocus)
+        # self.tableView.setAutoFillBackground(False)
+        # self.tableView.setStyleSheet("border-color:rgb(255, 153, 0 );\n"
+        #                              "")
+        ##############################################plotting tab components
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.connect=QtWidgets.QPushButton(self.tab_4)
+        self.webview=QWebEngineView(self.tab_4)
+        self.webview.setZoomFactor(.5)
+        self.webview.setHtml("""
+        <body>
+        <h1>Welcome To BILA</h1>
+        <h3>make sure to load files / directories before connecting to the plotter</h3>
+        </body>
+
+        """
+                             )
+
+        ######################################################################
+
+
         self.model = QtWidgets.QTableWidget(self.tab_3)
         self.model.setGeometry(QtCore.QRect(60, 150, 641, 291))
         self.model.setStyleSheet("background-color: grey;\n"
@@ -446,6 +468,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('connections map')
         self.comboBox_2.addItem('HTTP status code piechart')
         self.radioButton.click()
+    def connect_plot(self):
+        self.webview.setUrl(QUrl("BILA.html"))
+        self.webview.load()
         self.m = None
 
     def loadDB(self):
