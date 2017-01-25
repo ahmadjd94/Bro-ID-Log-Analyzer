@@ -45,6 +45,7 @@ from REGEX import REGEXP
 from ssl_subject import ssl_subjects_pie
 from httpStatusPie import plot_http_status_pir
 
+from SMTPfiles import smtp_files
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=8, dpi=100):
         fig = plt.figure(figsize=(height, width),facecolor='#333333',edgecolor='#ff9900')
@@ -439,6 +440,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
+        self.comboBox_2.addItem('smtp and files relation')
+
         self.comboBox_2.addItem('ssl subjects')
         self.comboBox_2.addItem('connections map')
         self.comboBox_2.addItem('HTTP status code piechart')
@@ -512,6 +515,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 plot_http_status_pir(connection)
         elif self.comboBox_2.currentText() == 'ssl subjects':
             ssl_subjects_pie(connection)
+        elif self.comboBox_2.currentText() == 'smtp and files relation':
+            smtp_files(connection)
 
 
     def uMan(self):
@@ -803,12 +808,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                                 " is A SQLITE database file was found.\nmake sure you rename the file or consider loading it through the files menu")
                             self.message.show()
                     print("current files in the dir")
-                    DBpath='BILA '+name + datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.db')
-                    connection = DbConnection(DBpath)
-                    temp_connection = sqlite3.connect(DBpath)
-                    temp_connection.create_function("REGEXP", 2, REGEXP)
-                    temp_connection.commit()
-                    temp_connection.close()
+                    connection = DbConnection('BILA '+name + datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.db'))
 
                 except PermissionError as DB1:
                     self.message = QMessageBox('error while creating database file')
