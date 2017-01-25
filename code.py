@@ -426,6 +426,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.pushButton_3.setText(_translate("MainWindow", "..."))
         self.analysis.setTabText(self.analysis.indexOf(self.tab), _translate("MainWindow", "Load Files"))
         self.analysis.setTabText(self.analysis.indexOf(self.tab_2), _translate("MainWindow", "files statistics"))
+        self.analysis.setTabText(self.analysis.indexOf(self.tab_4), _translate("MainWindow", "Plotting"))
+
         self.menuBRO_visualizer.setTitle(_translate("MainWindow", "BRO visualizer"))
         self.menuHelp.setTitle(_translate("MainWindow", "help"))
         #        self.mainToolBar.setWindowTitle(_translate("MainWindow", "BRO Log file analyzer and visualizer"))
