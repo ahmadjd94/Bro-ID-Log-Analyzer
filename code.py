@@ -377,6 +377,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.label_2.setObjectName("label_2")
 
         self.analysis.addTab(self.tab_3, "")
+        self.analysis.addTab(self.tab_4,'')
+
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         self.menuBar.setObjectName("menuBar")
