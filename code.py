@@ -997,10 +997,12 @@ if __name__ == "__main__":  # main module
             decompress = open('GeoLite2-City.mmdb', 'wb')
             decompress.write(decompressed)
             decompress.close()
+            finder = geoip2.database.Reader('GeoLite2-City.mmdb')
         except:
             print('failed to decompressed the geolocation DB')
     else:
         print('geolocations DB exists')
+        finder = geoip2.database.Reader('GeoLite2-City.mmdb')
     app.exec_()
     sys.exit()
 
