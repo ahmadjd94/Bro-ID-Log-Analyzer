@@ -156,7 +156,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
         """
                              )
-        self.webview.load(QUrl("http://127.0.0.1:9497"))
+
         ######################################################################
 
 
@@ -273,7 +273,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.comboBox.currentIndexChanged.connect(self.selected_query)
         self.radioButton.click()
     def connect_plot(self):
-        self.webview.setUrl(QUrl("http://127.0.0.1:9497"))
+        self.webview.setUrl(QUrl("BILA.html"))
         self.webview.load()
     def uMan(self):
         self.label_2.setVisible(False)
