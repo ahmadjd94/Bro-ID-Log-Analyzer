@@ -649,15 +649,5 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # todo  reset timeline
 
 
-def droptables(table):  # a map function drops tables , return 1 on success
-    try:
-        DBquery.exec_("drop table %s" % table)
-        DBconnection.commit()
-        return 1
-    except sqlite3.OperationalError as a:
-        if "no such table" in str(a):
-            return 0
-        else:
-            return 0
 
 
