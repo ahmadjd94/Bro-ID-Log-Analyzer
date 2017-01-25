@@ -17,6 +17,8 @@ from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from networkx import draw_networkx_edge_labels as delnx
 from Functions import SQLcreator,tableCreator
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+
 from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
