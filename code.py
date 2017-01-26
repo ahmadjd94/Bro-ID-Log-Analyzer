@@ -13,12 +13,13 @@ from DBconnection import *
 import gzip,geoip2.database
 from BilaFieldIndecies import validFields
 from PyQt5 import QtCore, QtGui, QtWidgets,QtSql
+
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
                              QAction, QFileDialog, QApplication, QMessageBox,QSizePolicy)
 from networkx import draw_networkx_edge_labels as delnx
 from Functions import SQLcreator,tableCreator
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-
+from PyQt5.QtCore import QUrl
 from Tables import table_created
 from Queries import QueryStatment
 from mmap import *
@@ -26,6 +27,7 @@ from PredefnedQueries import initQueries
 from random import randint
 import numpy
 from plotBars import plotbars
+from plotGraph import graph_plot
 import Tables
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -332,6 +334,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_4.setObjectName("tab_4")
         self.connect=QtWidgets.QPushButton(self.tab_4)
         self.webview=QWebEngineView(self.tab_4)
+
         self.webview.setZoomFactor(.5)
         self.webview.setHtml("""
         <body>
@@ -465,7 +468,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_3.setEnabled(False)
         self.comboBox_2.addItem('--select a plot type--')
         self.comboBox_2.addItem('files statistics')
-        self.comboBox_2.addItem('connections graph')
         self.comboBox_2.addItem('weird bars')
         self.comboBox_2.addItem('DNS Graph')
         self.comboBox_2.addItem('smtp and files relation')
@@ -515,39 +517,28 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.m=PlotCanvas(self, width=9, height=3)
 
                 self.m.show()
-        elif self.comboBox_2.currentText() == 'connections graph':
 
-            self.m = PlotGraph(self,width=9, height=4)
-            toolbar=NavigationToolbar(canvas=self.m, parent=self.container)
-            self.m.toolbar.show()
-            print(self.m.get_width_height())
-            self.m.show()
-        elif self.comboBox_2.currentText() == 'weird bars':
-            plotbars(connection)
-        elif self.comboBox_2.currentText() == 'DNS Graph':
-            reply = QMessageBox.question(self.message, 'Message',
-                                         "due to NetworkX module limitation BILA can render the network in a "
-                                         "clearer format as image file file\n"
-                                         "would you like to render the result in a seperate file ?",
-                                         QMessageBox.Yes,
-                                         QMessageBox.No)  # shows a message box to user to  make sure of reloading files
-            if reply == QMessageBox.Yes:
-                self.m = DirectedPlotGraph(self, width=9, height=4,file_output=True)
-            else:
-                self.m = DirectedPlotGraph(self, width=9, height=4, file_output=False)
-            toolbar = NavigationToolbar(canvas=self.m, parent=self.container)
-            self.m.toolbar.show()
-            self.m.show()
-        elif self.comboBox_2.currentText() == 'connections map':
+        elif self.comboBox_2.currentText() == 'weird bars':     #completed
+            page = plotbars(connection)
+
+
+        elif self.comboBox_2.currentText() == 'DNS Graph':      #completed
+            page=graph_plot(connection)
+
+        elif self.comboBox_2.currentText() == 'connections map':  #completed
             os.chdir(OriDir)
-            plotlyMap.map(connection,finder)
+            page = plotlyMap.map(connection,finder)
 
-        elif self.comboBox_2.currentText() == 'HTTP status code piechart':
-                plot_http_status_pir(connection)
-        elif self.comboBox_2.currentText() == 'ssl subjects':
-            ssl_subjects_pie(connection)
-        elif self.comboBox_2.currentText() == 'smtp and files relation':
-            smtp_files(connection)
+        elif self.comboBox_2.currentText() == 'HTTP status code piechart': #completed
+            page = plot_http_status_pir(connection)
+
+        elif self.comboBox_2.currentText() == 'ssl subjects':   #completed
+            page = ssl_subjects_pie(connection)
+        elif self.comboBox_2.currentText() == 'smtp and files relation':  #completed
+            page = smtp_files(connection)
+        self.webview.setZoomFactor(.5)
+
+        self.webview.load(QUrl('file://' + os.getcwd() + '/%s' % page))
 
 
     def uMan(self):

@@ -1,5 +1,6 @@
 import plotly.graph_objs as go
 import plotly.offline as py
+from datetime import datetime as time
 global connection
 def smtp_files(connection):
     smtp_files_query='select count(smtp.fuid) from smtp_fuids as smtp inner join files on smtp.fuid=files.fuid'
@@ -16,10 +17,12 @@ def smtp_files(connection):
 
     labels = ['smtp', 'other']
     values = [mailed_files, all_files]
-
+    now = time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file = 'BILA-smtp-pie-%s.html' % now
     trace = go.Pie(labels=labels, values=values)
 
-    py.plot([trace])
+    py.plot([trace],filename=file,auto_open=False)
+    return file
 
 
 

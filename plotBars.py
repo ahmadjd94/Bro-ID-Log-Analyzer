@@ -1,4 +1,4 @@
-
+from datetime import datetime as time
 import plotly.graph_objs as go
 import plotly.offline as py
 global connection
@@ -48,7 +48,11 @@ def plotbars(connection):
     data = [trace0]
     layout = go.Layout(
         title='weird flags',
+        width=600,
+        height=400
     )
-
+    now = time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file = 'BILA-weird-bars-%s.html' % now
     fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename='text-hover-bar')
+    py.plot(fig, filename=file)
+    return file

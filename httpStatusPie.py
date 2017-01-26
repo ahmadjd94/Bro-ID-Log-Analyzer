@@ -1,5 +1,6 @@
 import plotly.offline as py
 global connection
+from datetime import datetime as time
 import plotly.graph_objs as go
 def plot_http_status_pir(connection):
     count_http_requests_count="select count (*) from http"
@@ -43,4 +44,9 @@ def plot_http_status_pir(connection):
             ]
         }
     }
-    py.plot(fig)
+
+    now = time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file = 'BILA-HTTP-statuscodes-%s.html' % now
+
+    py.plot(fig, filename=file, auto_open=False)
+    return file

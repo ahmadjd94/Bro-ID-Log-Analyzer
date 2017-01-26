@@ -1,8 +1,9 @@
 global connection
 from plotly.graph_objs import *
 import plotly.offline  as py
+import os
 import networkx as nx
-
+from datetime import datetime as time
 def graph_plot(connection):
     nodes=[]
     edges=[]
@@ -151,7 +152,11 @@ def graph_plot(connection):
 
     fig['layout'].update(annotations=make_annotations(pos, [str(k) for k in range(len(pos))]))
     # py.sign_in('', '')
-    py.plot(fig, filename='12312',auto_open=True)
+    now=time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file='BILA-DNS-graph-%s.html'%now
+
+    py.plot(fig, filename=file,auto_open=False)
+    return file
 
 
 

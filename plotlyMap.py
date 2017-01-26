@@ -1,5 +1,6 @@
 import plotly.offline as py
 import geoip2.database as reader
+from datetime import datetime as time
 def map (connection,finder):
     # finder=reader.Reader('GeoLite2-City.mmdb')
     destinations=[]
@@ -78,7 +79,8 @@ def map (connection,finder):
     layout = dict(
         title='CONNECTIONS APPROXIMATE LOCATIONS',
         showlegend=False,
-
+        width=600,
+        height=400,
         geo=dict(
             showocean=True,
             showland=True,
@@ -97,8 +99,11 @@ def map (connection,finder):
         )
     )
 
+    now = time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file = 'BILA-conn-map-%s.html' % now
     fig = dict(data=flight_paths + orphaned_nodes, layout=layout)
-    py.plot(fig, filename='d3-flight-paths')
+    py.plot(fig, filename=file,auto_open=False)
+    return file
 
 
 

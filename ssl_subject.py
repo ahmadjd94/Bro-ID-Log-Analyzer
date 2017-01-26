@@ -1,6 +1,7 @@
 global connection
 import plotly.offline as py
 import plotly.graph_objs as go
+from datetime import datetime as time
 def ssl_subjects_pie(connection):
     certified_conns = []
     labels=[]
@@ -22,7 +23,11 @@ def ssl_subjects_pie(connection):
             if i[:2]=='CN':
                 print (i)
                 labels.append(i)
-
+    now = time.now().strftime('%Y-%m-%d %H:%m:%S')
+    file = 'BILA-SSL-pie-%s.html' % now
+    layout=dict(width=600,
+        height=400)
     trace = go.Pie(labels=labels, values=values)
 
-    py.plot([trace])
+    py.plot([trace],filename=file,auto_open=False)
+    return file
