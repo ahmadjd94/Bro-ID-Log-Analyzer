@@ -467,14 +467,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.tab_2.setEnabled(True)
         self.tab_3.setEnabled(False)
         self.comboBox_2.addItem('--select a plot type--')
-        self.comboBox_2.addItem('files statistics')
-        self.comboBox_2.addItem('weird bars')
-        self.comboBox_2.addItem('DNS Graph')
-        self.comboBox_2.addItem('smtp and files relation')
 
-        self.comboBox_2.addItem('ssl subjects')
-        self.comboBox_2.addItem('connections map')
-        self.comboBox_2.addItem('HTTP status code piechart')
         self.radioButton.click()
     def connect_plot(self):
         self.webview.setUrl(QUrl("BILA.html"))
@@ -497,8 +490,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.tab.setEnabled(False)
             self.lineEdit.setDisabled(True)
             self.lineEdit_2.setDisabled(True)
-            self.tab_3.setEnabled(False)
+            self.tab_3.setEnabled(True)
+
             self.label_db.setVisible(True)
+            self.setup_combobox('DB')
         else:
             pass
 
@@ -641,33 +636,100 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def selected_query(self):
         self.clear_table()
         for i in AllowedQueries:
-            for query in i:
-                if query.Query == self.comboBox.currentText():
-                    self.currentQuery = query
-                    print(query.Headers[0])
-                    self.model.setColumnCount(len(query.Headers[0]))
-                    self.model.setHorizontalHeaderLabels(query.Headers[0])
-                    self.model.show()
+            if i != None:
+                for query in i:
+                    if query.Query == self.comboBox.currentText():
+                        self.currentQuery = query
+                        print(query.Headers[0])
+                        self.model.setColumnCount(len(query.Headers[0]))
+                        self.model.setHorizontalHeaderLabels(query.Headers[0])
+                        self.model.show()
 
     def clear_table(self):
         while(self.model.rowCount()>0):
             self.model.removeRow(0)
+    def add_queries(self,who):
+        pass
 
-    def setup_combobox(self):
+    def setup_combobox(self,who):
+        self.comboBox_2.addItem('--select a plot type--')
+        self.comboBox_2.clear()
+        self.comboBox.clear()
+        IDSmap = False  # this variable indicates oid the IDS connection map has been inserted into combobox
+        table=[]
+
         try:
-            print (type(AllowedQueries))
-            print (AllowedQueries)
-            try :
-                for obj in AllowedQueries:
-                    for query in obj:
-                        self.comboBox.addItem(query.Query)
-                        print (query.Query)
-                self.comboBox.setEnabled(True)
-            except Exception as s1:
-                print (s1)
+            if who =='loader':
 
+                try :
+                    for obj in AllowedQueries:
+                        for query in obj:
+                            self.comboBox.addItem(query.Query)
+                            if query.Table not in table:
+                                table.append(query.Table)
+
+                            print (query.Query)
+
+                    if table_created['smtp'] and table_created['files']:
+                        table.append('smtp')
+                        table.append('files')
+
+                except Exception as s1:
+                    print (s1)
+
+            elif who =='DB':
+
+
+                if table_created['smtp'] and table_created['files']:
+                    table.append('smtp')
+                    table.append('files')
+                query='Select distinct name from sqlite_master'
+                connection.DBquery.exec_(query)
+                while (connection.DBquery.next()):
+                    table.append(connection.DBquery.value(0).lower())
+                print (table)
+                for i in table:
+                    try:
+                        AllowedQueries.append(initQueries(i))
+                        print (AllowedQueries)
+                        for obj in AllowedQueries:
+                            if obj !=None:
+                                for query in obj:
+                                    self.comboBox.addItem(query.Query)
+                                    if query.Table not in table:
+                                        table.append(query.Table)
+
+                                    print(query.Query)
+                    except Exception as queries_error:
+                        print (queries_error)
+
+
+            for each in table:
+
+                if IDSmap == False and (each in ['weird', 'http', 'ssl', 'conn','dns']):
+                    self.comboBox_2.addItem('connections map')
+                    IDSmap = True
+                if each == 'http':
+                    self.comboBox_2.addItem('HTTP status code piechart')
+
+                elif each == 'dns':
+                    self.comboBox_2.addItem('DNS Graph')
+
+                elif each == 'ssl':
+                    self.comboBox_2.addItem('ssl subjects')
+
+                elif each == 'weird':
+                    self.comboBox_2.addItem('weird bars')
+            if 'smtp' and 'files' in table:
+                self.comboBox_2.addItem('smtp and files relation')
+
+            self.comboBox.setEnabled(True)
+            self.comboBox_2.setEnabled(True)
+            print ("DONE here")
         except Exception as A:
-            print('eroro adding to combo box ', A)
+            print('error adding to combo box ', A)
+
+
 
 
     def executeSQL(self):  # this function performs the SQL queries in the SQL panel
@@ -747,7 +809,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
-            self.setup_combobox()
+            self.setup_combobox('loader')
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
             for each in self.validFiles:
@@ -771,7 +833,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                 self.traverse(each)   # load every file in the dir
                 print (each,"wtffffff")
 
-            self.setup_combobox()
+            self.setup_combobox('loader')
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
             self.tab_2.setEnabled(True)
