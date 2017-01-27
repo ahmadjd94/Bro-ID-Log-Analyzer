@@ -464,7 +464,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         # self.textEdit.textChanged.connect(self.uMan)
         self.pushButton_5.clicked.connect(self.executeSQL)
         self.comboBox.currentIndexChanged.connect(self.selected_query)
-        self.tab_2.setEnabled(True)
+        self.tab_2.setEnabled(False)
+        self.tab_4.setEnabled(False)
         self.tab_3.setEnabled(False)
         self.comboBox_2.addItem('--select a plot type--')
 
@@ -490,8 +491,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.tab.setEnabled(False)
             self.lineEdit.setDisabled(True)
             self.lineEdit_2.setDisabled(True)
+            self.tab_2.setEnabled(True)
+            self.tab_4.setEnabled(True)
             self.tab_3.setEnabled(True)
-
             self.label_db.setVisible(True)
             self.setup_combobox('DB')
         else:
@@ -689,19 +691,18 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                     table.append(connection.DBquery.value(0).lower())
                 print (table)
                 for i in table:
-                    try:
+
                         AllowedQueries.append(initQueries(i))
                         print (AllowedQueries)
-                        for obj in AllowedQueries:
-                            if obj !=None:
-                                for query in obj:
-                                    self.comboBox.addItem(query.Query)
-                                    if query.Table not in table:
-                                        table.append(query.Table)
+                for obj in AllowedQueries:
+                    if obj != None:
+                        for query in obj:
+                            self.comboBox.addItem(query.Query)
+                            print ("Query Table:",query.Table)
 
-                                    print(query.Query)
-                    except Exception as queries_error:
-                        print (queries_error)
+
+                            print(query.Query)
+
 
 
             for each in table:
@@ -810,6 +811,10 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
             self.setup_combobox('loader')
+            self.tab_2.setEnabled(True)
+            self.tab_3.setEnabled(True)
+            self.tab_4.setEnabled(True)
+
 
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
             for each in self.validFiles:
@@ -831,13 +836,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             connection.DBquery.exec_(queries[query])
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
-                print (each,"wtffffff")
+
 
             self.setup_combobox('loader')
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
             self.tab_2.setEnabled(True)
-            self.analysis.setTabEnabled(2, True)  #enable query tab after loading
+            self.tab_3.setEnabled(True)
+            self.tab_4.setEnabled(True)  #enable query tab after loading
             # self.loaded = True                      # this flag indicates the program and database are loaded with data
         else:
             self.message.setText("please specifiy a file to load or a directory")
