@@ -26,10 +26,11 @@ def plot_http_status_pir(connection):
           "domain": {"x": [0, .48]},
           "name": "status codes of HTTP log",
           "hoverinfo":"label+percent+name",
-          "hole": .4,
+          "hole": .3,
           "type": "pie"
         }],
       "layout": {
+             "autosize" : True,
             "title":"status codes of HTTP log",
             "annotations": [
                 {

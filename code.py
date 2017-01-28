@@ -224,6 +224,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(759, 518)
         self.single = False  # indicates if user is dealing with a signle file / DIR
+        self.DBmode=False
         MainWindow.setStyleSheet("background-color: rgb(51, 51, 51);")
         self.progress = 0  # indicate the level of progress bar
         self.centralWidget = QtWidgets.QWidget(MainWindow)
@@ -476,6 +477,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         self.m = None
 
     def loadDB(self):
+
         global connection  # defines the global connection
         DBpath = QFileDialog.getOpenFileName(None, 'connect to a database', '/home',
                                              'BILA*.db')  # open files that follow a certain regex
@@ -496,6 +498,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.tab_3.setEnabled(True)
             self.label_db.setVisible(True)
             self.setup_combobox('DB')
+            self.DBmode = True
         else:
             pass
 
@@ -504,7 +507,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         if self.comboBox_2.currentText()=='--select a plot type--':
             self.label_4.setText('please select a valid option')
         elif self.comboBox_2.currentText()=='files statistics':
-            if self.single==True:
+            if self.single==True or self.DBmode==True:
                 self.label_4.setText('files statistics not available in single files mode')
                 self.label_4.show()
                 return
@@ -515,27 +518,28 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 self.m.show()
 
-        elif self.comboBox_2.currentText() == 'weird bars':     #completed
+        elif self.comboBox_2.currentText() == 'weird bars':     #completed and tested
             page = plotbars(connection)
 
 
-        elif self.comboBox_2.currentText() == 'DNS Graph':      #completed
+        elif self.comboBox_2.currentText() == 'DNS Graph':      #completed and tested
             page=graph_plot(connection)
 
-        elif self.comboBox_2.currentText() == 'connections map':  #completed
+        elif self.comboBox_2.currentText() == 'connections map':  #completed and tested
             os.chdir(OriDir)
             page = plotlyMap.map(connection,finder)
 
-        elif self.comboBox_2.currentText() == 'HTTP status code piechart': #completed
+        elif self.comboBox_2.currentText() == 'HTTP status code piechart': #completed and tested
             page = plot_http_status_pir(connection)
 
         elif self.comboBox_2.currentText() == 'ssl subjects':   #completed
             page = ssl_subjects_pie(connection)
-        elif self.comboBox_2.currentText() == 'smtp and files relation':  #completed
+        elif self.comboBox_2.currentText() == 'smtp and files relation':  #completed and tested
             page = smtp_files(connection)
-        self.webview.setZoomFactor(.5)
+
 
         self.webview.load(QUrl('file://' + os.getcwd() + '/%s' % page))
+
 
 
     def uMan(self):
@@ -653,10 +657,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
     def add_queries(self,who):
         pass
 
-    def setup_combobox(self,who):
-        self.comboBox_2.addItem('--select a plot type--')
+    def setup_combobox(self,who,Dbmode,single):
         self.comboBox_2.clear()
         self.comboBox.clear()
+        self.comboBox_2.addItem('--select a plot type--')
+        if Dbmode==False and single==False:
+            self.comboBox_2.addItem('files statistics')
+
+
         IDSmap = False  # this variable indicates oid the IDS connection map has been inserted into combobox
         table=[]
 
@@ -837,8 +845,8 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
 
+            self.setup_combobox('loader',self.DBmode,self.single)
 
-            self.setup_combobox('loader')
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
             self.tab_2.setEnabled(True)

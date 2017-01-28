@@ -48,11 +48,10 @@ def plotbars(connection):
     data = [trace0]
     layout = go.Layout(
         title='weird flags',
-        width=600,
-        height=400
+        autosize=True
     )
     now = time.now().strftime('%Y-%m-%d %H:%m:%S')
     file = 'BILA-weird-bars-%s.html' % now
     fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename=file)
+    py.plot(fig, filename=file,auto_open=False)
     return file
