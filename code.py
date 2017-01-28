@@ -497,7 +497,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.tab_4.setEnabled(True)
             self.tab_3.setEnabled(True)
             self.label_db.setVisible(True)
-            self.setup_combobox('DB')
+            self.setup_combobox('DB',True,False)
             self.DBmode = True
         else:
             pass
@@ -514,8 +514,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             # Data to plot
             else :
                 self.label_4.setVisible(False)
-                self.m=PlotCanvas(self, width=9, height=3)
-
+                self.m=PlotCanvas(self)
                 self.m.show()
 
         elif self.comboBox_2.currentText() == 'weird bars':     #completed and tested
@@ -537,8 +536,9 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif self.comboBox_2.currentText() == 'smtp and files relation':  #completed and tested
             page = smtp_files(connection)
 
-
-        self.webview.load(QUrl('file://' + os.getcwd() + '/%s' % page))
+        if self.comboBox_2.currentText() !=('files statistics'):
+            self.webview.load(QUrl('file://' + os.getcwd() + '/%s' % page))
+            self.analysis.setCurrentIndex(3)
 
 
 
@@ -665,7 +665,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.comboBox_2.addItem('files statistics')
 
 
-        IDSmap = False  # this variable indicates oid the IDS connection map has been inserted into combobox
+        IDSmap = False  # this variable indicates if the IDS connection map option has been inserted into combobox
         table=[]
 
         try:
@@ -673,12 +673,14 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
                 try :
                     for obj in AllowedQueries:
-                        for query in obj:
-                            self.comboBox.addItem(query.Query)
-                            if query.Table not in table:
-                                table.append(query.Table)
+                        if obj !=None:
+                            for query in obj:
+                                self.comboBox.addItem(query.Query)
 
-                            print (query.Query)
+                                if query.Table not in table:
+                                    table.append(query.Table)
+
+                                print (query.Query)
 
                     if table_created['smtp'] and table_created['files']:
                         table.append('smtp')
@@ -710,8 +712,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
 
 
                             print(query.Query)
-
-
 
             for each in table:
 
@@ -818,7 +818,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                         table_created[key] = True
             AllowedQueries.append(initQueries(fName.split('.')[0]))
             self.traverse(fName)
-            self.setup_combobox('loader')
+            self.setup_combobox('loader',False,True)
             self.tab_2.setEnabled(True)
             self.tab_3.setEnabled(True)
             self.tab_4.setEnabled(True)
@@ -827,6 +827,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
         elif self.radioButton_2.isChecked() and self.lineEdit_2.text() != "":   # user choosed to load multiple files
             for each in self.validFiles:
                 each = str.lower(each)
+                print (each.split('.'))
                 AllowedQueries.append(initQueries(each.split('.')[0]))
                 if table_created[each.split('.')[0]] == False:
                     if each.split('.')[0] in ['weird', 'dns', 'conn', 'http', 'dhcp', 'irc', 'ssl'] and \
@@ -845,7 +846,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             table_created[query] = True
                 self.traverse(each)   # load every file in the dir
 
-            self.setup_combobox('loader',self.DBmode,self.single)
+            self.setup_combobox('loader',False,False)
 
             self.analysis.setTabEnabled(1, True)   #enable plotting tab after loading
             self.loaded=True
