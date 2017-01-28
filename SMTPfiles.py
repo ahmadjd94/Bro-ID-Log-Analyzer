@@ -17,11 +17,46 @@ def smtp_files(connection):
 
     labels = ['smtp', 'other']
     values = [mailed_files, all_files]
+
+    fig = {
+        "data": [
+            {
+                "values": values,
+                "labels": labels,
+                "domain": {"x": [0, .48]},
+                "name": "status codes of HTTP log",
+                "hoverinfo": "label+percent+name",
+                "hole": .1,
+                "type": "pie"
+            }],
+        "layout": {
+            "autosize": True,
+            "title": "ratio of files origin according to smtp",
+            "annotations": [
+                {
+                    "font": {
+                        "size": 14
+                    },
+                    "showarrow": False,
+                    "text": "ratio",
+                    "x": 0.20,
+                    "y": 0.5
+                }
+            ]
+        }
+    }
+
+
+
     now = time.now().strftime('%Y-%m-%d %H:%m:%S')
     file = 'BILA-smtp-pie-%s.html' % now
-    trace = go.Pie(labels=labels, values=values)
 
-    py.plot([trace],filename=file,auto_open=False)
+
+
+
+
+
+    py.plot(fig,filename=file,auto_open=False)
     return file
 
 

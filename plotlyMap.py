@@ -59,9 +59,9 @@ def map (connection,finder):
     for j in edges :
         edges_longitudes.append((j[0][0],j[1][0]))
         edges_latitudes.append((j[0][1], j[1][1]))
-    flight_paths = []
+    connection_paths = []
 
-    flight_paths.append(
+    connection_paths.append(
             dict(
                 type='scattergeo',
                 locationmode='global',
@@ -79,8 +79,7 @@ def map (connection,finder):
     layout = dict(
         title='CONNECTIONS APPROXIMATE LOCATIONS',
         showlegend=False,
-        width=600,
-        height=400,
+        autosize=True,
         geo=dict(
             showocean=True,
             showland=True,
@@ -90,7 +89,7 @@ def map (connection,finder):
                 rotation=dict(
                     lon=-100,
                     lat=40,
-                    roll=0
+                    roll=1
                 )
             ),
             oceancolor='rgb(179, 240, 255)',
@@ -101,7 +100,7 @@ def map (connection,finder):
 
     now = time.now().strftime('%Y-%m-%d %H:%m:%S')
     file = 'BILA-conn-map-%s.html' % now
-    fig = dict(data=flight_paths + orphaned_nodes, layout=layout)
+    fig = dict(data=connection_paths + orphaned_nodes, layout=layout)
     py.plot(fig, filename=file,auto_open=False)
     return file
 
