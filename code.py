@@ -711,7 +711,6 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
                             print ("Query Table:",query.Table)
 
 
-                            print(query.Query)
 
             for each in table:
 
@@ -735,6 +734,7 @@ class Ui_MainWindow(object):  # Qt and PYUIC creator generated functions and cla
             self.comboBox.setEnabled(True)
             self.comboBox_2.setEnabled(True)
             print ("DONE here")
+            AllowedQueries.clear()
         except Exception as A:
             print('error adding to combo box ', A)
 
